@@ -25,6 +25,99 @@
     #app{max-width:430px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--bg);}
     .screen{display:none;flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:80px;animation:fadeIn .2s ease;}
     .screen.active{display:block;}
+
+    /* ====== DESKTOP SIDEBAR ====== */
+    .desktop-sidebar{display:none;}
+
+    @media(min-width:768px){
+      #app{max-width:100%;flex-direction:row;}
+
+      /* Sidebar */
+      .desktop-sidebar{
+        display:flex;flex-direction:column;
+        width:240px;flex-shrink:0;
+        background:var(--bg2);border-right:1px solid var(--border);
+        padding:24px 16px;gap:4px;
+        height:100dvh;overflow-y:auto;
+      }
+      .sidebar-logo{
+        display:flex;align-items:center;gap:10px;
+        font-size:18px;font-weight:700;letter-spacing:-.3px;
+        padding:0 8px 24px;border-bottom:1px solid var(--border);margin-bottom:8px;
+      }
+      .sidebar-logo iconify-icon{color:var(--accent);font-size:24px;}
+      .sidebar-nav-item{
+        display:flex;align-items:center;gap:12px;
+        padding:11px 12px;border-radius:10px;
+        border:none;background:transparent;
+        color:var(--text2);font-family:inherit;font-size:14px;font-weight:500;
+        cursor:pointer;transition:all .15s;width:100%;text-align:left;
+      }
+      .sidebar-nav-item iconify-icon{font-size:20px;flex-shrink:0;}
+      .sidebar-nav-item:hover{background:var(--bg3);color:var(--text);}
+      .sidebar-nav-item.active{background:var(--accent-bg);color:var(--accent2);}
+      .sidebar-nav-item.active iconify-icon{filter:drop-shadow(0 0 6px rgba(129,140,248,.5));}
+      .sidebar-nav-item.add-item{
+        background:var(--accent);color:#fff;margin-top:4px;
+      }
+      .sidebar-nav-item.add-item:hover{background:var(--accent2);}
+      .sidebar-spacer{flex:1;}
+      .sidebar-user{
+        display:flex;align-items:center;gap:10px;
+        padding:12px 8px;border-top:1px solid var(--border);margin-top:8px;
+        font-size:13px;
+      }
+      .sidebar-user-avatar{
+        width:32px;height:32px;border-radius:10px;
+        background:var(--accent-bg);border:1px solid var(--accent);
+        display:flex;align-items:center;justify-content:center;
+        font-size:12px;font-weight:700;color:var(--accent2);flex-shrink:0;
+      }
+      .sidebar-user-info{flex:1;min-width:0;}
+      .sidebar-user-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .sidebar-user-sub{font-size:11px;color:var(--text3);}
+
+      /* Main area */
+      #main-app{flex-direction:row!important;flex:1;overflow:hidden;}
+      .main-content{flex:1;overflow-y:auto;overflow-x:hidden;}
+      .screen{padding-bottom:24px;}
+      .bottom-nav{display:none!important;}
+
+      /* Wider cards on desktop */
+      .card,.balance-card,.budget-overview,.budget-card,.settings-section{
+        max-width:700px;
+      }
+      .stat-row{max-width:700px;}
+      #screen-home .card,
+      #screen-home .balance-card,
+      #screen-home .stat-row{margin-left:auto;margin-right:auto;}
+
+      /* Dashboard 2-col grid */
+      .desktop-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:0 16px;
+        padding:0 16px;
+        margin-bottom:16px;
+        max-width:700px;margin-left:auto;margin-right:auto;
+      }
+      .desktop-grid .stat-card{margin:0;}
+      .stat-row{display:none;}
+
+      /* Wider screens: even more space */
+      .screen{padding-left:max(0px, calc((100% - 760px)/2));}
+    }
+
+    @media(min-width:1200px){
+      .desktop-sidebar{width:260px;}
+    }
+
+    /* Desktop login: toon naast elkaar */
+    @media(min-width:768px){
+      #screen-login{ padding-bottom:0; }
+      .login-content{ max-width:440px; }
+      .login-card input{ font-size:16px; }
+    }
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     .screen::-webkit-scrollbar{width:4px}
     .screen::-webkit-scrollbar-track{background:transparent}
@@ -289,11 +382,42 @@
     </div>
   </div>
 
+  <!-- DESKTOP SIDEBAR -->
+  <aside class="desktop-sidebar" id="desktop-sidebar" style="display:none;">
+    <div class="sidebar-logo">
+      <iconify-icon icon="ph:currency-eur-bold"></iconify-icon>
+      Family-App
+    </div>
+    <button class="sidebar-nav-item active" data-tab="home" onclick="switchTab('home')">
+      <iconify-icon icon="ph:house-bold"></iconify-icon> Overzicht
+    </button>
+    <button class="sidebar-nav-item" data-tab="transactions" onclick="switchTab('transactions')">
+      <iconify-icon icon="ph:arrow-left-right-bold"></iconify-icon> Transacties
+    </button>
+    <button class="sidebar-nav-item add-item" data-tab="add" onclick="switchTab('add')">
+      <iconify-icon icon="ph:plus-bold"></iconify-icon> Toevoegen
+    </button>
+    <button class="sidebar-nav-item" data-tab="budget" onclick="switchTab('budget')">
+      <iconify-icon icon="ph:chart-pie-bold"></iconify-icon> Budgetten
+    </button>
+    <button class="sidebar-nav-item" data-tab="settings" onclick="switchTab('settings')">
+      <iconify-icon icon="ph:gear-bold"></iconify-icon> Instellingen
+    </button>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar" id="sidebar-avatar">AA</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebar-name">Abdul</div>
+        <div class="sidebar-user-sub" id="sidebar-sync">☁️ Gesynchroniseerd</div>
+      </div>
+    </div>
+  </aside>
+
   <!-- MAIN APP -->
-  <div id="main-app" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+  <div id="main-app" style="display:none;flex-direction:column;flex:1;overflow:hidden;min-width:0;">
 
     <!-- OVERZICHT -->
-    <div id="screen-home" class="screen">
+    <div id="screen-home" class="screen" style="overflow-y:auto;">
       <div class="app-header">
         <div class="header-logo"><iconify-icon icon="ph:currency-eur-bold"></iconify-icon>Family-App</div>
         <div class="header-actions">
@@ -634,9 +758,17 @@ function enterApp(){
   document.getElementById('screen-login').style.display='none';
   const m = document.getElementById('main-app');
   m.style.display='flex'; m.style.flexDirection='column'; m.style.flex='1'; m.style.overflow='hidden';
+  const initials = currentUser.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
   document.getElementById('profile-name').textContent=currentUser.name;
   document.getElementById('profile-email').textContent=currentUser.email||'Lokale modus';
-  document.getElementById('profile-avatar').textContent=currentUser.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('profile-avatar').textContent=initials;
+  // Desktop sidebar tonen
+  if(window.innerWidth >= 768){
+    const sb = document.getElementById('desktop-sidebar');
+    if(sb) sb.style.display='flex';
+    const sn=document.getElementById('sidebar-name'); if(sn) sn.textContent=currentUser.name;
+    const sa=document.getElementById('sidebar-avatar'); if(sa) sa.textContent=initials;
+  }
   loadData();
 }
 async function doLogout(){
@@ -681,9 +813,11 @@ function defaultBudgets(){
 function setSyncIcon(s){
   const el=document.getElementById('sync-icon'); if(!el)return;
   el.classList.remove('syncing');
-  if(s==='ok'){el.textContent='☁️';el.title='Gesynchroniseerd';}
-  else if(s==='sync'){el.textContent='⏳';el.title='Bezig...';el.classList.add('syncing');}
-  else{el.textContent='📵';el.title='Offline';}
+  const icon = s==='ok'?'☁️':s==='sync'?'⏳':'📵';
+  const title = s==='ok'?'Gesynchroniseerd':s==='sync'?'Bezig...':'Offline';
+  el.textContent=icon; el.title=title;
+  // Also update sidebar sync indicator
+  const ss=document.getElementById('sidebar-sync'); if(ss) ss.textContent=icon+' '+title;
 }
 
 // ============================================================
@@ -693,7 +827,10 @@ function switchTab(tab){
   activeTab=tab;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const s=document.getElementById('screen-'+tab); if(s)s.classList.add('active');
+  // Bottom nav
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.tab===tab));
+  // Sidebar nav
+  document.querySelectorAll('.sidebar-nav-item').forEach(n=>n.classList.toggle('active',n.dataset.tab===tab));
   if(tab==='home')renderHome();
   if(tab==='transactions')renderTransactions();
   if(tab==='budget')renderBudget();
