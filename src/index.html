@@ -6,703 +6,799 @@
 <title>Family-App</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 <style>
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0B0F1A;--bg2:#111827;--bg3:#1a2235;--bg4:#1f2d45;
-  --border:#1e2d45;--text:#f1f5ff;--text2:#8fa4c8;--text3:#4d6480;
-  --accent:#0179FE;--accent2:#4893FF;--accent-bg:rgba(1,121,254,.12);
-  --indigo:#6366f1;--indigo2:#818cf8;
-  --green:#22c55e;--green-bg:rgba(34,197,94,.12);
-  --red:#ef4444;--red-bg:rgba(239,68,68,.12);
-  --amber:#f59e0b;--amber-bg:rgba(245,158,11,.12);
+  --bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;
+  --sidebar:#111827;--sidebar2:#1F2937;--sidebar-text:#9CA3AF;--sidebar-active:#0179FE;
+  --border:#E5E7EB;--border2:#D1D5DB;
+  --text:#1A1F36;--text2:#6B7280;--text3:#9CA3AF;
+  --accent:#0179FE;--accent2:#4893FF;--accent-bg:#EFF6FF;
   --grad-blue:linear-gradient(135deg,#0179FE,#4893FF);
   --grad-teal:linear-gradient(135deg,#01797A,#489399);
-  --grad-indigo:linear-gradient(135deg,#6366f1,#818cf8);
-  --r:16px;--r-sm:10px;--r-btn:12px;
-  --shadow:0 4px 24px rgba(0,0,0,.3);
-  --shadow-card:0 2px 12px rgba(0,0,0,.2);
+  --grad-purple:linear-gradient(135deg,#6172F3,#A855F7);
+  --grad-green:linear-gradient(135deg,#059669,#34D399);
+  --green:#22C55E;--green-bg:#F0FDF4;--green-text:#166534;
+  --red:#EF4444;--red-bg:#FEF2F2;--red-text:#991B1B;
+  --amber:#F59E0B;--amber-bg:#FFFBEB;--amber-text:#92400E;
+  --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
 }
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden;}
-body{overscroll-behavior:none;}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;}
+body{overflow:hidden;}
 
-/* LAYOUT */
+/* ===================== LAYOUT ===================== */
 #app{display:flex;height:100dvh;overflow:hidden;}
-.sidebar{width:260px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 16px;gap:4px;overflow-y:auto;transition:transform .3s;}
-.sidebar-logo{font-family:'IBM Plex Serif',serif;font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px;padding:0 8px 24px;border-bottom:1px solid var(--border);margin-bottom:8px;letter-spacing:-.3px;}
-.sidebar-logo iconify-icon{color:var(--accent);font-size:26px;}
-.nav-btn{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:var(--r-sm);border:none;background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;width:100%;text-align:left;}
-.nav-btn:hover{background:var(--bg3);color:var(--text);}
-.nav-btn.active{background:var(--accent-bg);color:var(--accent);}
-.nav-btn.active iconify-icon{filter:drop-shadow(0 0 6px rgba(1,121,254,.5));}
-.nav-btn iconify-icon{font-size:20px;flex-shrink:0;}
-.sidebar-spacer{flex:1;}
-.sidebar-user{display:flex;align-items:center;gap:10px;padding:12px 8px;border-top:1px solid var(--border);margin-top:8px;}
-.sidebar-avatar{width:36px;height:36px;border-radius:10px;background:var(--grad-blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.sidebar{width:250px;flex-shrink:0;background:var(--sidebar);display:flex;flex-direction:column;overflow-y:auto;transition:transform .3s;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-logo-icon{width:32px;height:32px;background:var(--grad-blue);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.sidebar-logo-icon iconify-icon{color:#fff;font-size:18px;}
+.sidebar-logo-text{font-family:'IBM Plex Serif',serif;font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+.sidebar-nav{flex:1;padding:16px 12px;}
+.sidebar-section{margin-bottom:24px;}
+.sidebar-section-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;padding:0 8px;margin-bottom:6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:var(--sidebar-text);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none;background:transparent;width:100%;text-align:left;}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.nav-item.active{background:rgba(1,121,254,.2);color:#fff;}
+.nav-item.active iconify-icon{color:var(--accent2);}
+.nav-item iconify-icon{font-size:18px;flex-shrink:0;}
+.sidebar-footer{padding:16px 12px;border-top:1px solid rgba(255,255,255,.08);}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:4px;}
+.sidebar-user:hover{background:rgba(255,255,255,.06);}
+.sidebar-avatar{width:36px;height:36px;border-radius:50%;background:var(--grad-blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
 .sidebar-user-info{flex:1;min-width:0;}
-.sidebar-user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sidebar-user-sub{font-size:11px;color:var(--text3);}
+.sidebar-user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-user-email{font-size:11px;color:var(--sidebar-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.btn-logout{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;color:var(--sidebar-text);font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;width:100%;transition:all .15s;}
+.btn-logout:hover{background:rgba(239,68,68,.15);color:#FCA5A5;}
 
 /* MAIN */
-.main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;}
-.screen{display:none;flex:1;overflow-y:auto;overflow-x:hidden;animation:fadeIn .2s ease;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--bg);}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
+.topbar-left{}
+.topbar-greeting{font-family:'IBM Plex Serif',serif;font-size:22px;font-weight:600;color:var(--text);letter-spacing:-.3px;}
+.topbar-date{font-size:13px;color:var(--text2);margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:var(--grad-blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;}
+.icon-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:18px;transition:all .15s;}
+.icon-btn:hover{background:var(--bg3);color:var(--text);}
+
+/* CONTENT AREA */
+.content-area{flex:1;display:flex;overflow:hidden;}
+.main-scroll{flex:1;overflow-y:auto;padding:24px 28px;}
+.main-scroll::-webkit-scrollbar{width:6px;}
+.main-scroll::-webkit-scrollbar-track{background:transparent;}
+.main-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* RIGHT PANEL */
+.right-panel{width:355px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;padding:24px 20px;}
+.right-panel::-webkit-scrollbar{width:4px;}
+.right-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.panel-section{margin-bottom:28px;}
+.panel-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.panel-section-title{font-size:15px;font-weight:600;color:var(--text);}
+.panel-section-link{font-size:12px;color:var(--accent);text-decoration:none;cursor:pointer;font-weight:500;}
+.panel-section-link:hover{text-decoration:underline;}
+
+/* SCREENS */
+.screen{display:none;}
 .screen.active{display:block;}
-.screen-inner{max-width:1100px;margin:0 auto;padding:24px 28px;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.screen::-webkit-scrollbar{width:4px}
-.screen::-webkit-scrollbar-track{background:transparent}
-.screen::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.screen-with-panel.active{display:flex;height:100%;overflow:hidden;}
 
-/* BOTTOM NAV (mobile) */
-.bottom-nav{display:none;background:var(--bg2);border-top:1px solid var(--border);padding:6px 0 max(6px,env(safe-area-inset-bottom));position:sticky;bottom:0;z-index:20;}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;cursor:pointer;border:none;background:transparent;color:var(--text3);font-family:inherit;font-size:10px;font-weight:500;transition:color .15s;}
-.bnav-item iconify-icon{font-size:22px;}
-.bnav-item.active{color:var(--accent);}
-.bnav-item.active iconify-icon{filter:drop-shadow(0 0 5px rgba(1,121,254,.5));}
-
-/* PAGE HEADERS */
-.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
-.page-title{font-family:'IBM Plex Serif',serif;font-size:24px;font-weight:700;letter-spacing:-.3px;}
+/* PAGE HEADER */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;}
+.page-title{font-family:'IBM Plex Serif',serif;font-size:22px;font-weight:600;letter-spacing:-.2px;}
 .page-sub{font-size:13px;color:var(--text2);margin-top:2px;}
 
-/* APP HEADER (mobile) */
-.app-header{display:none;align-items:center;justify-content:space-between;padding:14px 20px 8px;position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);}
-.app-header-logo{font-family:'IBM Plex Serif',serif;font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;}
-.app-header-logo iconify-icon{color:var(--accent);font-size:22px;}
-.app-header-actions{display:flex;align-items:center;gap:8px;}
-
-/* CARDS */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-card);}
-.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--shadow-card);}
-.card-title{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
-.card-title a{font-size:12px;color:var(--accent);text-decoration:none;font-weight:500;text-transform:none;letter-spacing:0;}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
-
-/* BALANCE CARD */
-.balance-card{background:var(--grad-blue);border-radius:var(--r);padding:28px 24px 20px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(1,121,254,.3);}
-.balance-card::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.07);}
-.balance-card::after{content:'';position:absolute;bottom:-60px;left:-20px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.05);}
-.balance-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}
-.balance-amount{font-family:'JetBrains Mono',monospace;font-size:42px;font-weight:700;color:#fff;letter-spacing:-1.5px;margin-bottom:20px;position:relative;z-index:1;animation:glowPulse 3s ease-in-out infinite;}
-.balance-amount.hidden{filter:blur(10px);user-select:none;}
-@keyframes glowPulse{0%,100%{text-shadow:0 0 20px rgba(255,255,255,.2)}50%{text-shadow:0 0 40px rgba(255,255,255,.4)}}
-.balance-badges{display:flex;gap:10px;position:relative;z-index:1;}
-.balance-badge{flex:1;background:rgba(255,255,255,.12);backdrop-filter:blur(10px);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;}
-.balance-badge iconify-icon{font-size:18px;color:rgba(255,255,255,.8);}
-.balance-badge-lbl{font-size:10px;color:rgba(255,255,255,.6);margin-bottom:2px;}
-.balance-badge-amt{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:#fff;}
-
-/* KPI CARDS */
-.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px;}
-.kpi-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;}
-.kpi-label{font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:500;}
-.kpi-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;}
-.kpi-value.pos{color:var(--green);}
+/* ===================== CARDS ===================== */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--shadow);}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow);}
+.kpi-label{font-size:12px;color:var(--text2);font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.kpi-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--text);}
+.kpi-value.pos{color:#059669;}
 .kpi-value.neg{color:var(--red);}
+.kpi-trend{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500;margin-top:6px;}
+.kpi-trend.up{color:#059669;}
+.kpi-trend.down{color:var(--red);}
 
-/* CHARTS */
-.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
-.donut{width:120px;height:120px;border-radius:50%;flex-shrink:0;position:relative;}
-.donut-center{position:absolute;inset:18px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-direction:column;}
-.donut-center-lbl{font-size:10px;color:var(--text2);}
-.donut-center-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;}
-.donut-wrap{display:flex;align-items:center;gap:20px;}
-.legend{flex:1;display:flex;flex-direction:column;gap:7px;}
-.legend-item{display:flex;align-items:center;gap:8px;}
-.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.legend-name{flex:1;font-size:12px;color:var(--text2);}
-.legend-amt{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;}
-.legend-pct{font-size:11px;color:var(--text3);min-width:30px;text-align:right;}
-/* Bar chart */
-.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px;}
-.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
-.bar-pair{display:flex;gap:3px;align-items:flex-end;height:100px;}
-.bar{width:14px;border-radius:4px 4px 0 0;transition:height 1s ease-out;min-height:4px;}
-.bar.inc{background:var(--green);}
-.bar.exp{background:var(--red-bg);border:1px solid var(--red);}
-.bar-label{font-size:10px;color:var(--text3);}
+/* ===================== BANK CARDS ===================== */
+.bank-card{border-radius:16px;padding:22px;position:relative;overflow:hidden;height:190px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:transform .2s,box-shadow .2s;}
+.bank-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+.bank-card::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.1);}
+.bank-card::after{content:'';position:absolute;bottom:-60px;left:-20px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06);}
+.bc-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}
+.bc-bank{font-size:13px;font-weight:600;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:6px;}
+.bc-chip{width:32px;height:24px;border-radius:4px;background:linear-gradient(135deg,#f0c040,#d4a010);position:relative;}
+.bc-number{font-family:'JetBrains Mono',monospace;font-size:15px;color:rgba(255,255,255,.9);letter-spacing:2px;position:relative;z-index:1;}
+.bc-bottom{display:flex;align-items:flex-end;justify-content:space-between;position:relative;z-index:1;}
+.bc-holder{font-size:12px;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.5px;}
+.bc-balance{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:#fff;}
 
-/* TRANSACTIONS */
-.tx-group-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:12px 0 6px;}
-.tx-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;border-radius:var(--r-sm);margin:0 -8px;padding-left:8px;padding-right:8px;}
-.tx-item:hover{background:var(--bg3);}
-.tx-item:last-child{border-bottom:none;}
-.tx-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.tx-info{flex:1;min-width:0;}
-.tx-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cat-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;margin-top:2px;}
-.tx-right{text-align:right;flex-shrink:0;}
-.tx-amount{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;}
-.tx-amount.income{color:var(--green);}
+/* COMPACT BANK CARD (right panel) */
+.bank-mini{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:background .15s;}
+.bank-mini:hover{background:var(--bg3);}
+.bank-mini-bar{width:4px;height:36px;border-radius:2px;flex-shrink:0;}
+.bank-mini-info{flex:1;min-width:0;}
+.bank-mini-name{font-size:13px;font-weight:600;color:var(--text);}
+.bank-mini-num{font-size:11px;color:var(--text3);}
+.bank-mini-bal{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--text);}
+
+/* ===================== TRANSACTIONS ===================== */
+.tx-table{width:100%;}
+.tx-table-head{display:grid;grid-template-columns:2fr 1fr 100px 100px 110px 100px;gap:8px;padding:10px 16px;background:var(--bg3);border-radius:8px;margin-bottom:4px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+.tx-row{display:grid;grid-template-columns:2fr 1fr 100px 100px 110px 100px;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer;transition:background .15s;border-radius:8px;}
+.tx-row:hover{background:var(--bg3);}
+.tx-merchant{display:flex;align-items:center;gap:10px;}
+.tx-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.tx-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tx-cat-small{font-size:11px;color:var(--text3);}
+.tx-amount{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;}
+.tx-amount.income{color:#059669;}
 .tx-amount.expense{color:var(--red);}
-.tx-date{font-size:11px;color:var(--text3);}
+.tx-date-col{font-size:12px;color:var(--text2);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;}
+.badge-success{background:var(--green-bg);color:var(--green-text);}
+.badge-pending{background:var(--amber-bg);color:var(--amber-text);}
+.badge-cat{background:var(--accent-bg);color:var(--accent);}
 
-/* BANK CARDS */
-.bank-card{border-radius:var(--r);padding:22px;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s;height:180px;}
-.bank-card:hover{transform:translateY(-2px);}
-.bank-card::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08);}
-.bank-card::after{content:'';position:absolute;bottom:-50px;left:-10px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.05);}
-.bank-card-type{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px;position:relative;z-index:1;}
-.bank-card-number{font-family:'JetBrains Mono',monospace;font-size:16px;color:rgba(255,255,255,.9);margin:12px 0;position:relative;z-index:1;}
-.bank-card-name{font-size:13px;font-weight:600;color:#fff;position:relative;z-index:1;}
-.bank-card-balance{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:#fff;position:absolute;bottom:22px;right:22px;z-index:1;}
+/* FILTERS */
+.filter-bar{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;box-shadow:var(--shadow);}
+.filter-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;}
+.filter-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+.filter-input{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text);background:var(--bg2);transition:border .2s;}
+.filter-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(1,121,254,.1);}
+.filter-input::placeholder{color:var(--text3);}
+select.filter-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
 
-/* PROGRESS BARS */
-.progress-bg{height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
-.progress-fill{height:100%;border-radius:4px;transition:width 1s ease-out;}
-.progress-fill.green{background:var(--green);}
+/* STATS BANNER */
+.stats-banner{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow);}
+.stats-banner-item{background:var(--bg2);padding:16px 20px;}
+.stats-banner-label{font-size:12px;color:var(--text2);margin-bottom:4px;}
+.stats-banner-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;}
+
+/* ===================== BUDGET ===================== */
+.budget-overview-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;box-shadow:var(--shadow);}
+.budget-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.budget-cat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow);}
+.budget-cat-card:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(1,121,254,.07);}
+.budget-cat-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.budget-cat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.budget-cat-name{font-size:13px;font-weight:600;color:var(--text);}
+.budget-cat-amounts{font-size:12px;color:var(--text2);margin-bottom:8px;}
+.progress-bg{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;transition:width 1s ease-out;}
+.progress-fill.green{background:#22C55E;}
 .progress-fill.amber{background:var(--amber);}
 .progress-fill.red{background:var(--red);}
 
+/* MINI BUDGET (right panel) */
+.budget-mini{margin-bottom:10px;}
+.budget-mini-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.budget-mini-name{font-size:12px;font-weight:500;color:var(--text);}
+.budget-mini-amounts{font-size:11px;color:var(--text3);}
+
 /* GOALS */
-.goal-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;}
-.goal-circle{width:80px;height:80px;border-radius:50%;margin:0 auto 12px;position:relative;display:flex;align-items:center;justify-content:center;}
-.goal-circle-bg{position:absolute;inset:0;border-radius:50%;}
-.goal-emoji{font-size:28px;position:relative;z-index:1;}
-.goal-name{font-size:14px;font-weight:700;margin-bottom:4px;}
+.goals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.goal-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;box-shadow:var(--shadow);transition:all .15s;}
+.goal-card:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(1,121,254,.07);}
+.goal-circle-wrap{position:relative;width:80px;height:80px;margin:0 auto 12px;}
+.goal-circle-svg{transform:rotate(-90deg);}
+.goal-emoji{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.goal-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
 .goal-amounts{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:8px;}
-.goals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+.goal-deadline{font-size:11px;color:var(--text3);margin-bottom:12px;}
 
-/* AI CHAT */
-.chat-container{display:flex;flex-direction:column;height:100%;}
-.chat-messages{flex:1;overflow-y:auto;padding:0 0 16px;display:flex;flex-direction:column;gap:12px;}
-.chat-messages::-webkit-scrollbar{width:4px}
-.chat-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.msg{display:flex;gap:10px;align-items:flex-start;animation:fadeIn .2s ease;}
-.msg.user{flex-direction:row-reverse;}
-.msg-avatar{width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;}
-.msg-avatar.ai{background:var(--grad-blue);}
-.msg-avatar.user-av{background:var(--grad-indigo);}
-.msg-bubble{max-width:75%;padding:12px 16px;border-radius:var(--r);font-size:14px;line-height:1.6;}
-.msg.user .msg-bubble{background:var(--accent);color:#fff;border-radius:var(--r) var(--r) 4px var(--r);}
-.msg.ai .msg-bubble{background:var(--bg2);border:1px solid var(--border);border-radius:4px var(--r) var(--r) var(--r);}
-.msg-time{font-size:10px;color:var(--text3);margin-top:4px;}
-.chat-suggestions{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0 8px;}
-.chip-suggestion{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.chip-suggestion:hover{border-color:var(--accent);color:var(--accent);}
-.chat-input-row{display:flex;gap:10px;padding-top:8px;border-top:1px solid var(--border);}
-.chat-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;color:var(--text);font-family:inherit;font-size:14px;resize:none;max-height:100px;}
-.chat-input:focus{outline:none;border-color:var(--accent);}
-.chat-input::placeholder{color:var(--text3);}
-.typing-indicator{display:flex;gap:4px;align-items:center;padding:12px 16px;}
-.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:typingBounce 1.2s infinite;}
-.typing-dot:nth-child(2){animation-delay:.2s;}
-.typing-dot:nth-child(3){animation-delay:.4s;}
-@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+/* GOAL MINI (right panel) */
+.goal-mini{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;border:1px solid var(--border);margin-bottom:8px;}
+.goal-mini-circle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--bg3);}
+.goal-mini-info{flex:1;}
+.goal-mini-name{font-size:12px;font-weight:600;color:var(--text);}
+.goal-mini-pct{font-size:11px;color:var(--text3);}
 
-/* AI WIDGET on dashboard */
-.ai-widget{background:linear-gradient(135deg,var(--bg3),var(--bg2));border:1px solid var(--border);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;}
-.ai-widget::before{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(1,121,254,.08);}
-.ai-widget-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.ai-widget-icon{width:36px;height:36px;border-radius:10px;background:var(--grad-blue);display:flex;align-items:center;justify-content:center;}
-.ai-widget-title{font-size:14px;font-weight:700;}
-.ai-widget-sub{font-size:11px;color:var(--text2);}
-.ai-tip{font-size:14px;color:var(--text2);line-height:1.6;position:relative;z-index:1;}
-
-/* FORMS */
+/* ===================== FORMS ===================== */
 .form-group{margin-bottom:16px;}
-.form-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:block;}
-.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;color:var(--text);font-family:inherit;font-size:14px;transition:border-color .2s;}
-.form-input:focus{outline:none;border-color:var(--accent);}
+.form-label{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px;}
+.form-input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;color:var(--text);background:var(--bg2);transition:all .2s;}
+.form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(1,121,254,.1);}
 .form-input::placeholder{color:var(--text3);}
-select.form-input{appearance:none;}
-.form-input[type="password"]{letter-spacing:2px;}
+.form-input-icon{position:relative;}
+.form-input-icon iconify-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:18px;pointer-events:none;}
+.form-input-icon input{padding-left:40px;}
+.input-pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3);cursor:pointer;font-size:18px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:var(--r-btn);border:none;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;}
-.btn:active{transform:scale(.97);}
-.btn-primary{background:var(--accent);color:#fff;}
-.btn-primary:hover{background:var(--accent2);}
-.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
-.btn-secondary:hover{background:var(--bg4);}
+/* ===================== BUTTONS ===================== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .15s;}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--grad-blue);color:#fff;box-shadow:0 2px 8px rgba(1,121,254,.3);}
+.btn-primary:hover{box-shadow:0 4px 12px rgba(1,121,254,.4);}
+.btn-secondary{background:var(--bg2);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--bg3);}
 .btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.2);}
-.btn-danger:hover{background:rgba(239,68,68,.2);}
+.btn-danger:hover{background:rgba(239,68,68,.1);}
+.btn-sm{padding:7px 14px;font-size:13px;}
 .btn-full{width:100%;}
-.btn-icon{width:36px;height:36px;padding:0;border-radius:var(--r-sm);background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
-.btn-icon:hover{background:var(--bg4);color:var(--text);}
-.fab{position:fixed;bottom:80px;right:20px;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:24px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(1,121,254,.4);z-index:30;transition:all .2s;}
-.fab:hover{transform:scale(1.05);}
+.btn-icon{width:36px;height:36px;padding:0;border-radius:8px;}
 
-/* MODALS */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:flex-end;justify-content:center;}
+/* ===================== LOGIN ===================== */
+#login-screen{position:fixed;inset:0;z-index:500;display:flex;}
+.login-left{width:40%;min-height:100%;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:48px 56px;overflow-y:auto;}
+.login-right{flex:1;background:#111827;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;position:relative;overflow:hidden;}
+.login-right::before{content:'';position:absolute;top:-80px;right:-80px;width:360px;height:360px;border-radius:50%;background:rgba(1,121,254,.15);}
+.login-right::after{content:'';position:absolute;bottom:-100px;left:-60px;width:400px;height:400px;border-radius:50%;background:rgba(1,121,254,.08);}
+.login-logo{display:flex;align-items:center;gap:8px;margin-bottom:40px;}
+.login-logo-icon{width:36px;height:36px;background:var(--grad-blue);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.login-logo-icon iconify-icon{color:#fff;font-size:20px;}
+.login-logo-text{font-family:'IBM Plex Serif',serif;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+.login-heading{font-family:'IBM Plex Serif',serif;font-size:30px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:-.5px;}
+.login-sub{font-size:14px;color:var(--text2);margin-bottom:28px;}
+.login-error{display:none;background:var(--red-bg);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:16px;}
+.login-success{display:none;background:var(--green-bg);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:10px 14px;font-size:13px;color:#166534;margin-bottom:16px;}
+.login-switch{text-align:center;margin-top:20px;font-size:13px;color:var(--text2);}
+.login-switch a{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:none;}
+.login-feature{display:flex;align-items:center;gap:12px;margin-bottom:16px;position:relative;z-index:1;}
+.login-feature-icon{width:36px;height:36px;background:rgba(1,121,254,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.login-feature-icon iconify-icon{color:#60A5FA;font-size:18px;}
+.login-feature-text{color:rgba(255,255,255,.8);font-size:14px;}
+.login-right-heading{font-family:'IBM Plex Serif',serif;font-size:26px;font-weight:700;color:#fff;margin-bottom:8px;text-align:center;position:relative;z-index:1;}
+.login-right-sub{font-size:14px;color:rgba(255,255,255,.6);text-align:center;margin-bottom:40px;position:relative;z-index:1;}
+
+/* ===================== MODALS ===================== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
 .modal-overlay.open{display:flex;}
-.modal{width:100%;max-width:560px;background:var(--bg2);border-radius:24px 24px 0 0;padding:12px 0 0;animation:slideUp .3s cubic-bezier(.16,1,.3,1);max-height:90dvh;overflow-y:auto;}
-.modal-desktop{border-radius:var(--r)!important;max-width:500px;margin:auto;}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
-.modal-header{display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px;}
-.modal-title{font-size:18px;font-weight:700;}
-.modal-close{width:32px;height:32px;background:var(--bg3);border:none;border-radius:50%;color:var(--text2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.modal-body{padding:0 20px 24px;}
+.modal{background:var(--bg2);border-radius:16px;padding:0;width:100%;max-width:480px;box-shadow:var(--shadow-lg);animation:modalIn .2s ease;}
+@keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);}
+.modal-title{font-size:16px;font-weight:700;color:var(--text);}
+.modal-close{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+.modal-close:hover{background:var(--bg3);}
+.modal-body{padding:24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
 
-/* CATEGORY CHIPS */
-.cat-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:4px;}
-.cat-scroll::-webkit-scrollbar{display:none;}
-.cat-chip{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px;min-width:68px;background:var(--bg3);border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s;flex-shrink:0;}
-.cat-chip:hover{border-color:var(--accent);}
-.cat-chip.sel{border-color:var(--accent);background:var(--accent-bg);}
-.cat-chip iconify-icon{font-size:22px;}
-.cat-chip span{font-size:10px;color:var(--text2);white-space:nowrap;}
-.cat-chip.sel span{color:var(--accent);}
-
-/* TYPE TOGGLE */
-.type-toggle{display:flex;background:var(--bg3);border-radius:10px;padding:3px;margin-bottom:12px;}
-.type-btn{flex:1;padding:8px;border-radius:8px;border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text2);}
-.type-btn.exp{background:var(--red-bg);color:var(--red);}
-.type-btn.inc{background:var(--green-bg);color:var(--green);}
-
-/* AMOUNT INPUT */
-.amount-wrap{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;}
-.euro{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--text3);}
-.amount-input{flex:1;background:transparent;border:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:40px;font-weight:700;min-width:0;}
-.amount-input:focus{outline:none;}
-.amount-input::placeholder{color:var(--text3);}
-
-/* SEARCH */
-.search-wrap{position:relative;margin-bottom:12px;}
-.search-wrap iconify-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:18px;pointer-events:none;}
-.search-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:11px 16px 11px 44px;color:var(--text);font-family:inherit;font-size:14px;}
-.search-input:focus{outline:none;border-color:var(--accent);}
-.search-input::placeholder{color:var(--text3);}
-
-/* FILTER CHIPS */
-.filter-row{display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;}
-.filter-row::-webkit-scrollbar{display:none;}
-.fchip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:500;white-space:nowrap;cursor:pointer;transition:all .15s;}
-.fchip:hover{border-color:var(--accent);color:var(--text);}
-.fchip.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
-
-/* SKELETON */
-.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:space-between;margin-top:20px;}
+.pagination-info{font-size:13px;color:var(--text2);}
+.pagination-btns{display:flex;gap:6px;}
+.page-btn{padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);font-size:13px;color:var(--text);cursor:pointer;transition:all .15s;}
+.page-btn:hover{background:var(--bg3);}
+.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 
 /* TOAST */
-.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:var(--r-btn);font-size:14px;font-weight:500;z-index:600;opacity:0;transform:translateX(20px);transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:8px;max-width:320px;box-shadow:var(--shadow);}
+.toast{position:fixed;top:20px;right:20px;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:600;opacity:0;transform:translateX(20px);transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:8px;max-width:320px;box-shadow:var(--shadow-lg);}
 .toast.show{opacity:1;transform:translateX(0);}
-.toast.success{background:#14532d;color:#86efac;border:1px solid #166534;}
-.toast.error{background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b;}
-.toast.info{background:#1e3a5f;color:#93c5fd;border:1px solid #1d4ed8;}
+.toast.success{background:#fff;border:1px solid #BBF7D0;color:#166534;box-shadow:0 4px 12px rgba(34,197,94,.15);}
+.toast.error{background:#fff;border:1px solid #FECACA;color:#991B1B;box-shadow:0 4px 12px rgba(239,68,68,.15);}
+.toast.info{background:#fff;border:1px solid #BFDBFE;color:#1E40AF;box-shadow:0 4px 12px rgba(59,130,246,.15);}
 
 /* EMPTY STATE */
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;gap:12px;}
-.empty iconify-icon{font-size:48px;color:var(--text3);}
-.empty h3{font-size:16px;font-weight:700;color:var(--text2);}
-.empty p{font-size:13px;color:var(--text3);}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;gap:10px;}
+.empty iconify-icon{font-size:40px;color:var(--text3);}
+.empty-title{font-size:15px;font-weight:600;color:var(--text2);}
+.empty-sub{font-size:13px;color:var(--text3);}
 
-/* MONTH NAV */
-.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
-.month-label{font-size:17px;font-weight:700;}
-.month-btn{width:36px;height:36px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
-.month-btn:hover{background:var(--bg3);color:var(--text);}
+/* SKELETON */
+.sk{background:linear-gradient(90deg,var(--bg3) 25%,#e2e8f0 50%,var(--bg3) 75%);background-size:200% 100%;animation:sk 1.5s infinite;border-radius:6px;}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-/* PHOTO UPLOAD */
-.photo-upload{border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);}
-.photo-upload:hover{border-color:var(--accent);background:var(--accent-bg);}
-.photo-upload iconify-icon{font-size:28px;color:var(--text3);display:block;margin-bottom:6px;}
-.photo-upload p{font-size:12px;color:var(--text2);}
-.photo-preview{position:relative;border-radius:10px;overflow:hidden;}
-.photo-preview img{width:100%;height:140px;object-fit:cover;display:block;}
-.photo-remove{position:absolute;top:6px;right:6px;width:28px;height:28px;background:rgba(0,0,0,.7);border:none;border-radius:50%;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+/* TYPE TOGGLE */
+.type-toggle{display:flex;background:var(--bg3);border-radius:8px;padding:3px;margin-bottom:14px;}
+.type-btn{flex:1;padding:8px;border-radius:6px;border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text2);}
+.type-btn.active-exp{background:#fff;color:var(--red);box-shadow:var(--shadow);}
+.type-btn.active-inc{background:#fff;color:#059669;box-shadow:var(--shadow);}
 
-/* SYNC */
-.sync-dot{font-size:16px;display:inline-block;}
-.sync-dot.spin{animation:spin 1s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* CAT CHIPS */
+.cat-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;}
+.cat-scroll::-webkit-scrollbar{display:none;}
+.cat-chip{display:flex;align-items:center;gap:6px;padding:7px 12px;border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);background:var(--bg2);transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.cat-chip:hover{border-color:var(--accent);}
+.cat-chip.sel{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);}
+.cat-chip iconify-icon{font-size:14px;}
 
-/* API KEY BANNER */
-.api-banner{background:var(--amber-bg);border:1px solid rgba(245,158,11,.3);border-radius:var(--r-sm);padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:13px;color:var(--amber);}
-.api-banner iconify-icon{font-size:18px;flex-shrink:0;}
-.api-banner a{color:var(--amber);font-weight:600;cursor:pointer;text-decoration:underline;}
+/* AI CHAT BUBBLE */
+.ai-fab{position:fixed;bottom:28px;right:28px;width:56px;height:56px;border-radius:50%;background:var(--grad-blue);border:none;color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(1,121,254,.4);z-index:300;transition:all .2s;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px rgba(1,121,254,.4)}50%{box-shadow:0 4px 28px rgba(1,121,254,.6)}}
+.ai-fab:hover{transform:scale(1.08);}
+.ai-chat-window{position:fixed;bottom:96px;right:28px;width:380px;height:500px;background:var(--bg2);border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow-lg);z-index:300;display:none;flex-direction:column;animation:chatIn .2s ease;}
+.ai-chat-window.open{display:flex;}
+@keyframes chatIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.ai-chat-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);}
+.ai-chat-avatar{width:32px;height:32px;border-radius:50%;background:var(--grad-blue);display:flex;align-items:center;justify-content:center;}
+.ai-chat-avatar iconify-icon{color:#fff;font-size:16px;}
+.ai-chat-name{font-size:14px;font-weight:700;color:var(--text);}
+.ai-chat-status{font-size:11px;color:#22C55E;}
+.ai-chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.ai-chat-messages::-webkit-scrollbar{width:3px;}
+.ai-chat-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.chat-msg{display:flex;gap:8px;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.chat-msg.user{flex-direction:row-reverse;}
+.chat-bubble{max-width:78%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;}
+.chat-msg.ai .chat-bubble{background:var(--bg3);color:var(--text);border-radius:4px 12px 12px 12px;}
+.chat-msg.user .chat-bubble{background:var(--grad-blue);color:#fff;border-radius:12px 4px 12px 12px;}
+.chat-time{font-size:10px;color:var(--text3);margin-top:3px;}
+.chat-typing{display:flex;gap:4px;align-items:center;padding:10px 14px;background:var(--bg3);border-radius:4px 12px 12px 12px;width:fit-content;}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:bounce 1.2s infinite;}
+.typing-dot:nth-child(2){animation-delay:.2s;}
+.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.chat-suggestions{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-top:1px solid var(--border);}
+.chat-chip{padding:5px 12px;border-radius:14px;border:1px solid var(--border);font-size:11px;color:var(--text2);cursor:pointer;transition:all .15s;background:var(--bg2);white-space:nowrap;}
+.chat-chip:hover{border-color:var(--accent);color:var(--accent);}
+.ai-chat-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border);}
+.ai-chat-input{flex:1;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:inherit;font-size:13px;color:var(--text);background:var(--bg2);resize:none;}
+.ai-chat-input:focus{outline:none;border-color:var(--accent);}
+
+/* MOBILE BOTTOM NAV */
+.mobile-header{display:none;}
+.bottom-nav{display:none;}
+
+/* SETTINGS */
+.settings-sidebar{width:200px;flex-shrink:0;border-right:1px solid var(--border);padding:20px 12px;}
+.settings-nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;}
+.settings-nav-item:hover{background:var(--bg3);color:var(--text);}
+.settings-nav-item.active{background:var(--accent-bg);color:var(--accent);}
+.settings-content{flex:1;padding:28px;overflow-y:auto;}
+.settings-section{display:none;}
+.settings-section.active{display:block;}
+.settings-section-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.settings-section-sub{font-size:13px;color:var(--text2);margin-bottom:24px;}
+
+/* ACCOUNTS GRID */
+.accounts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;}
 
 /* RESPONSIVE */
-@media(max-width:767px){
+@media(max-width:1100px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .right-panel{width:300px;}
+}
+@media(max-width:900px){
+  .right-panel{display:none;}
+  .tx-table-head,.tx-row{grid-template-columns:2fr 1fr 100px 80px;}
+  .tx-row .tx-col-hide,.tx-table-head .tx-col-hide{display:none;}
+}
+@media(max-width:768px){
   .sidebar{display:none;}
-  .bottom-nav{display:flex;}
-  .fab{display:flex;}
-  .app-header{display:flex;}
-  .screen-inner{padding:16px 16px;}
-  .grid-4{grid-template-columns:1fr 1fr;}
-  .grid-2{grid-template-columns:1fr;}
-  .charts-row{grid-template-columns:1fr;}
+  .bottom-nav{display:flex;background:var(--bg2);border-top:1px solid var(--border);padding:6px 0 max(8px,env(safe-area-inset-bottom));position:sticky;bottom:0;z-index:20;}
+  .mobile-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
+  .mobile-header-logo{font-family:'IBM Plex Serif',serif;font-size:17px;font-weight:700;color:var(--text);}
+  .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;cursor:pointer;border:none;background:transparent;color:var(--text3);font-family:inherit;font-size:10px;font-weight:500;transition:color .15s;}
+  .bnav-item iconify-icon{font-size:22px;}
+  .bnav-item.active{color:var(--accent);}
+  .topbar{display:none;}
+  .main-scroll{padding:16px;}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
   .goals-grid{grid-template-columns:1fr 1fr;}
-  .balance-amount{font-size:32px;}
-  .modal-desktop{border-radius:24px 24px 0 0!important;}
-  .fab{bottom:72px;}
+  .budget-grid{grid-template-columns:1fr;}
+  .accounts-grid{grid-template-columns:1fr;}
+  .login-right{display:none;}
+  .login-left{width:100%;padding:32px 24px;}
+  .settings-sidebar{display:none;}
+  .form-row{grid-template-columns:1fr;}
+  .ai-chat-window{width:calc(100vw - 40px);right:20px;}
+  .ai-fab{bottom:80px;}
+  .tx-table-head,.tx-row{grid-template-columns:2fr 1fr 80px;}
 }
-@media(min-width:768px){
-  .modal-overlay{align-items:center;}
-  .modal{border-radius:var(--r);}
-}
-input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.4);}
+input[type="date"]::-webkit-calendar-picker-indicator{opacity:.4;}
 input[type="number"]{-moz-appearance:textfield;}
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;}
+input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;}
 
 </style>
 </head>
 <body>
 
-<div id="app">
-
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo"><iconify-icon icon="ph:currency-eur-bold"></iconify-icon>Family-App</div>
-  <button class="nav-btn active" data-tab="home" onclick="nav('home')"><iconify-icon icon="ph:house-bold"></iconify-icon>Overzicht</button>
-  <button class="nav-btn" data-tab="transactions" onclick="nav('transactions')"><iconify-icon icon="ph:arrow-left-right-bold"></iconify-icon>Transacties</button>
-  <button class="nav-btn" data-tab="accounts" onclick="nav('accounts')"><iconify-icon icon="ph:bank-bold"></iconify-icon>Rekeningen</button>
-  <button class="nav-btn" data-tab="budgets" onclick="nav('budgets')"><iconify-icon icon="ph:chart-pie-bold"></iconify-icon>Budgetten</button>
-  <button class="nav-btn" data-tab="goals" onclick="nav('goals')"><iconify-icon icon="ph:target-bold"></iconify-icon>Doelen</button>
-  <button class="nav-btn" data-tab="ai" onclick="nav('ai')"><iconify-icon icon="ph:robot-bold"></iconify-icon>AI Assistent</button>
-  <button class="nav-btn" data-tab="settings" onclick="nav('settings')"><iconify-icon icon="ph:gear-bold"></iconify-icon>Instellingen</button>
-  <div class="sidebar-spacer"></div>
-  <div class="sidebar-user">
-    <div class="sidebar-avatar" id="sb-avatar">AA</div>
-    <div class="sidebar-user-info">
-      <div class="sidebar-user-name" id="sb-name">Abdul Aziz</div>
-      <div class="sidebar-user-sub"><span class="sync-dot" id="sync-icon">☁️</span> <span id="sync-text">Gesynchroniseerd</span></div>
-    </div>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<div class="main" id="main-area">
-
-  <!-- Mobile header -->
-  <div class="app-header" id="app-header">
-    <div class="app-header-logo"><iconify-icon icon="ph:currency-eur-bold"></iconify-icon>Family-App</div>
-    <div class="app-header-actions">
-      <span class="sync-dot" id="sync-icon-m">☁️</span>
-      <button class="btn btn-icon" onclick="nav('settings')"><iconify-icon icon="ph:gear-bold"></iconify-icon></button>
-    </div>
-  </div>
-
-  <!-- ===== OVERZICHT ===== -->
-  <div id="screen-home" class="screen active">
-    <div class="screen-inner">
-      <div id="api-banner-home" class="api-banner" style="display:none;">
-        <iconify-icon icon="ph:robot-bold"></iconify-icon>
-        Stel je Claude API key in om AI te gebruiken. <a onclick="nav('settings')">Instellingen →</a>
-      </div>
-      <div class="balance-card" id="balance-card">
-        <div class="balance-label">
-          <span>TOTAAL SALDO</span>
-          <button class="btn-icon" onclick="toggleBalance()" style="background:rgba(255,255,255,.15);border-color:transparent;color:#fff;width:32px;height:32px;">
-            <iconify-icon icon="ph:eye-bold" id="eye-icon"></iconify-icon>
-          </button>
-        </div>
-        <div class="balance-amount" id="bal-amount">€0,00</div>
-        <div class="balance-badges">
-          <div class="balance-badge">
-            <iconify-icon icon="ph:trend-up-bold"></iconify-icon>
-            <div><div class="balance-badge-lbl">Inkomsten</div><div class="balance-badge-amt" id="bal-inc">€0,00</div></div>
-          </div>
-          <div class="balance-badge">
-            <iconify-icon icon="ph:trend-down-bold"></iconify-icon>
-            <div><div class="balance-badge-lbl">Uitgaven</div><div class="balance-badge-amt" id="bal-exp">€0,00</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid-4" id="kpi-row">
-        <div class="kpi-card"><div class="kpi-icon" style="background:var(--green-bg);color:var(--green)"><iconify-icon icon="ph:calculator-bold"></iconify-icon></div><div class="kpi-label">Netto deze maand</div><div class="kpi-value" id="kpi-netto">€0,00</div></div>
-        <div class="kpi-card"><div class="kpi-icon" style="background:var(--accent-bg);color:var(--accent)"><iconify-icon icon="ph:list-numbers-bold"></iconify-icon></div><div class="kpi-label">Transacties</div><div class="kpi-value" id="kpi-count">0</div></div>
-        <div class="kpi-card"><div class="kpi-icon" style="background:var(--red-bg);color:var(--red)"><iconify-icon icon="ph:shopping-bag-bold"></iconify-icon></div><div class="kpi-label">Grootste categorie</div><div class="kpi-value" id="kpi-top" style="font-size:16px;">—</div></div>
-        <div class="kpi-card"><div class="kpi-icon" style="background:var(--amber-bg);color:var(--amber)"><iconify-icon icon="ph:chart-bar-bold"></iconify-icon></div><div class="kpi-label">Budget gebruik</div><div class="kpi-value" id="kpi-budget">—</div></div>
-      </div>
-
-      <div class="charts-row">
-        <div class="card">
-          <div class="card-title">Saldoverdeling</div>
-          <div class="donut-wrap">
-            <div class="donut" id="donut"><div class="donut-center"><div class="donut-center-lbl">Totaal</div><div class="donut-center-val" id="donut-val">€0</div></div></div>
-            <div class="legend" id="donut-legend"><div class="legend-item"><div class="legend-dot" style="background:var(--border)"></div><div class="legend-name" style="color:var(--text3)">Geen data</div></div></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">6 Maanden overzicht</div>
-          <div class="bar-chart" id="bar-chart"></div>
-          <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--text2);">
-            <span><span style="display:inline-block;width:10px;height:10px;background:var(--green);border-radius:2px;margin-right:4px;"></span>Inkomsten</span>
-            <span><span style="display:inline-block;width:10px;height:10px;background:var(--red);border-radius:2px;margin-right:4px;"></span>Uitgaven</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-bottom:20px;">
-        <div class="card-title"><span>Recente transacties</span><a onclick="nav('transactions')">Alle →</a></div>
-        <div id="recent-list"><div class="empty" style="padding:20px 0;"><iconify-icon icon="ph:receipt-bold"></iconify-icon><p>Nog geen transacties</p></div></div>
-      </div>
-
-      <div class="ai-widget" id="ai-widget">
-        <div class="ai-widget-header">
-          <div class="ai-widget-icon"><iconify-icon icon="ph:robot-bold" style="font-size:18px;color:#fff;"></iconify-icon></div>
-          <div><div class="ai-widget-title">Family AI Tip</div><div class="ai-widget-sub">Gegenereerd door Claude</div></div>
-          <button class="btn btn-icon" onclick="loadAiTip()" style="margin-left:auto;" title="Vernieuwen"><iconify-icon icon="ph:arrow-clockwise-bold"></iconify-icon></button>
-        </div>
-        <div class="ai-tip" id="ai-tip">Laad je transacties en stel een Claude API key in voor gepersonaliseerde tips.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== TRANSACTIES ===== -->
-  <div id="screen-transactions" class="screen">
-    <div class="screen-inner">
-      <div class="page-header"><div><div class="page-title">Transacties</div><div class="page-sub" id="tx-count-label">0 transacties</div></div></div>
-      <div class="search-wrap"><iconify-icon icon="ph:magnifying-glass-bold"></iconify-icon><input class="search-input" id="tx-search" placeholder="Zoeken..." oninput="renderTx()"></div>
-      <div class="filter-row">
-        <div class="fchip active" onclick="setTxFilter(this,'all')">Alles</div>
-        <div class="fchip" onclick="setTxFilter(this,'income')">Inkomsten</div>
-        <div class="fchip" onclick="setTxFilter(this,'expense')">Uitgaven</div>
-        <div class="fchip" onclick="setTxFilter(this,'Boodschappen')">🛒 Boodschappen</div>
-        <div class="fchip" onclick="setTxFilter(this,'Eten')">🍔 Eten</div>
-        <div class="fchip" onclick="setTxFilter(this,'Transport')">🚗 Transport</div>
-        <div class="fchip" onclick="setTxFilter(this,'Wonen')">🏠 Wonen</div>
-        <div class="fchip" onclick="setTxFilter(this,'Salaris')">💼 Salaris</div>
-      </div>
-      <div id="tx-list"></div>
-    </div>
-  </div>
-
-  <!-- ===== REKENINGEN ===== -->
-  <div id="screen-accounts" class="screen">
-    <div class="screen-inner">
-      <div class="page-header"><div><div class="page-title">Rekeningen</div></div><button class="btn btn-primary" onclick="openAddAccount()"><iconify-icon icon="ph:plus-bold"></iconify-icon>Toevoegen</button></div>
-      <div id="accounts-grid" class="grid-2" style="margin-bottom:20px;"></div>
-      <div class="card">
-        <div class="card-title">Transacties — <span id="selected-account-name">Alle rekeningen</span></div>
-        <div id="account-tx-list"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== BUDGETTEN ===== -->
-  <div id="screen-budgets" class="screen">
-    <div class="screen-inner">
-      <div class="month-nav">
-        <button class="month-btn" onclick="changeBudgetMonth(-1)"><iconify-icon icon="ph:caret-left-bold"></iconify-icon></button>
-        <span class="month-label" id="budget-month-lbl"></span>
-        <button class="month-btn" onclick="changeBudgetMonth(1)"><iconify-icon icon="ph:caret-right-bold"></iconify-icon></button>
-      </div>
-      <div class="card" style="margin-bottom:20px;" id="budget-overview"></div>
-      <div id="budget-list"></div>
-      <button class="btn btn-primary" onclick="openAddBudget()" style="margin-top:8px;"><iconify-icon icon="ph:plus-bold"></iconify-icon>Budget instellen</button>
-    </div>
-  </div>
-
-  <!-- ===== DOELEN ===== -->
-  <div id="screen-goals" class="screen">
-    <div class="screen-inner">
-      <div class="page-header"><div class="page-title">Doelen</div><button class="btn btn-primary" onclick="openAddGoal()"><iconify-icon icon="ph:plus-bold"></iconify-icon>Nieuw doel</button></div>
-      <div id="goals-grid" class="goals-grid"></div>
-    </div>
-  </div>
-
-  <!-- ===== AI ASSISTENT ===== -->
-  <div id="screen-ai" class="screen" style="display:flex;flex-direction:column;">
-    <div class="screen-inner" style="flex:1;display:flex;flex-direction:column;padding-bottom:8px;">
-      <div class="page-header" style="margin-bottom:12px;"><div class="page-title">AI Assistent</div><span style="font-size:12px;color:var(--text2);">Claude claude-sonnet-4-5</span></div>
-      <div id="ai-api-banner" class="api-banner" style="display:none;"><iconify-icon icon="ph:warning-bold"></iconify-icon>Geen Claude API key. <a onclick="nav('settings')">Instellen →</a></div>
-      <div class="chat-container">
-        <div class="chat-messages" id="chat-messages">
-          <div class="msg ai">
-            <div class="msg-avatar ai"><iconify-icon icon="ph:robot-bold" style="color:#fff;font-size:16px;"></iconify-icon></div>
-            <div><div class="msg-bubble">Hoi! Ik ben Family AI, je persoonlijke financiële assistent. Ik kan je helpen met je uitgaven analyseren, transacties toevoegen, en je budget bewaken. Wat kan ik voor je doen?</div><div class="msg-time">nu</div></div>
-          </div>
-        </div>
-        <div class="chat-suggestions">
-          <div class="chip-suggestion" onclick="sendSuggestion('Hoeveel gaf ik uit deze maand?')">Hoeveel gaf ik uit deze maand?</div>
-          <div class="chip-suggestion" onclick="sendSuggestion('Voeg €50 boodschappen toe')">Voeg €50 boodschappen toe</div>
-          <div class="chip-suggestion" onclick="sendSuggestion('Hoe staat mijn budget?')">Hoe staat mijn budget?</div>
-          <div class="chip-suggestion" onclick="sendSuggestion('Geef me een financieel overzicht')">Financieel overzicht</div>
-        </div>
-        <div class="chat-input-row">
-          <textarea class="chat-input" id="chat-input" placeholder="Stel een vraag of geef een opdracht..." rows="1" onkeydown="chatKeydown(event)"></textarea>
-          <button class="btn btn-primary" onclick="sendChat()" style="flex-shrink:0;height:48px;padding:0 16px;"><iconify-icon icon="ph:paper-plane-tilt-bold"></iconify-icon></button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== INSTELLINGEN ===== -->
-  <div id="screen-settings" class="screen">
-    <div class="screen-inner">
-      <div class="page-title" style="margin-bottom:24px;">Instellingen</div>
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Profiel</div>
-      <div class="card" style="margin-bottom:20px;display:flex;align-items:center;gap:16px;">
-        <div style="width:64px;height:64px;border-radius:20px;background:var(--grad-blue);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0;" id="profile-avatar">AA</div>
-        <div style="flex:1;"><div style="font-size:16px;font-weight:700;" id="profile-name">Abdul Aziz</div><div style="font-size:13px;color:var(--text2);" id="profile-email">—</div></div>
-        <button class="btn btn-danger" onclick="doLogout()"><iconify-icon icon="ph:sign-out-bold"></iconify-icon>Uitloggen</button>
-      </div>
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Claude AI</div>
-      <div class="card" style="margin-bottom:20px;">
-        <div class="form-group" style="margin-bottom:12px;">
-          <label class="form-label">Claude API Key</label>
-          <input type="password" class="form-input" id="claude-key-input" placeholder="sk-ant-...">
-        </div>
-        <button class="btn btn-primary" onclick="saveClaudeKey()"><iconify-icon icon="ph:floppy-disk-bold"></iconify-icon>Opslaan</button>
-      </div>
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Supabase</div>
-      <div class="card" style="margin-bottom:20px;">
-        <div class="form-group" style="margin-bottom:12px;">
-          <label class="form-label">Project URL</label>
-          <input type="text" class="form-input" id="supa-url-input" value="https://lttxjfrtfrjnlazmbcyq.supabase.co">
-        </div>
-        <div class="form-group" style="margin-bottom:12px;">
-          <label class="form-label">Anon Key</label>
-          <input type="text" class="form-input" id="supa-key-input" value="sb_publishable_SLofdkgzrdibQzeP5v_bew_bIBDTFAD">
-        </div>
-        <button class="btn btn-secondary" onclick="testSupabase()"><iconify-icon icon="ph:plug-bold"></iconify-icon>Verbinding testen</button>
-        <div id="supa-status" style="margin-top:8px;font-size:12px;display:none;"></div>
-      </div>
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">App</div>
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;">
-          <iconify-icon icon="ph:translate-bold" style="font-size:20px;color:var(--text2);"></iconify-icon>
-          <div style="flex:1;font-size:14px;font-weight:500;">Taal</div>
-          <span style="color:var(--text2);font-size:13px;">Nederlands</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border);">
-          <iconify-icon icon="ph:info-bold" style="font-size:20px;color:var(--text2);"></iconify-icon>
-          <div style="flex:1;font-size:14px;font-weight:500;">Versie</div>
-          <span style="color:var(--text2);font-size:13px;">v2.0</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom Nav -->
-  <nav class="bottom-nav">
-    <button class="bnav-item active" data-tab="home" onclick="nav('home')"><iconify-icon icon="ph:house-bold"></iconify-icon>Overzicht</button>
-    <button class="bnav-item" data-tab="transactions" onclick="nav('transactions')"><iconify-icon icon="ph:arrow-left-right-bold"></iconify-icon>Transacties</button>
-    <button class="bnav-item" data-tab="ai" onclick="nav('ai')"><iconify-icon icon="ph:robot-bold"></iconify-icon>AI</button>
-    <button class="bnav-item" data-tab="budgets" onclick="nav('budgets')"><iconify-icon icon="ph:chart-pie-bold"></iconify-icon>Budgetten</button>
-    <button class="bnav-item" data-tab="settings" onclick="nav('settings')"><iconify-icon icon="ph:gear-bold"></iconify-icon>Instellingen</button>
-  </nav>
-</div>
-
-<!-- FAB -->
-<button class="fab" onclick="openAddTx()" title="Transactie toevoegen"><iconify-icon icon="ph:plus-bold"></iconify-icon></button>
-
-<!-- MODAL: ADD TRANSACTION -->
-<div class="modal-overlay" id="modal-add-tx" onclick="closeModal('modal-add-tx')">
-  <div class="modal modal-desktop" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <span class="modal-title">Transactie toevoegen</span>
-      <button class="modal-close" onclick="closeModal('modal-add-tx')"><iconify-icon icon="ph:x-bold"></iconify-icon></button>
-    </div>
-    <div class="modal-body">
-      <div class="type-toggle">
-        <button class="type-btn exp" id="type-exp" onclick="setTxType('expense')">↓ Uitgave</button>
-        <button class="type-btn" id="type-inc" onclick="setTxType('income')">↑ Inkomst</button>
-      </div>
-      <div class="amount-wrap"><span class="euro">€</span><input type="number" class="amount-input" id="add-amount" placeholder="0,00" min="0" step="0.01"></div>
-      <div class="form-group"><label class="form-label">Omschrijving</label><input type="text" class="form-input" id="add-desc" placeholder="Bijv. Albert Heijn, Salaris..."></div>
-      <div class="form-group"><label class="form-label">Categorie</label><div class="cat-scroll" id="cat-chips-add"></div></div>
-      <div class="form-group"><label class="form-label">Rekening</label><select class="form-input" id="add-account-sel"></select></div>
-      <div class="form-group"><label class="form-label">Datum</label><input type="date" class="form-input" id="add-date"></div>
-      <div class="form-group"><label class="form-label">Foto (optioneel)</label><div id="photo-area"><div class="photo-upload" onclick="document.getElementById('photo-input').click()"><iconify-icon icon="ph:camera-bold"></iconify-icon><p>Tik om foto toe te voegen</p></div></div><input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)"></div>
-      <button class="btn btn-primary btn-full" onclick="saveTx()"><iconify-icon icon="ph:floppy-disk-bold"></iconify-icon>Opslaan</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: TX DETAIL -->
-<div class="modal-overlay" id="modal-tx-detail" onclick="closeModal('modal-tx-detail')">
-  <div class="modal modal-desktop" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-header"><span class="modal-title">Detail</span><button class="modal-close" onclick="closeModal('modal-tx-detail')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
-    <div class="modal-body" id="tx-detail-body"></div>
-  </div>
-</div>
-
-<!-- MODAL: ADD ACCOUNT -->
-<div class="modal-overlay" id="modal-add-account" onclick="closeModal('modal-add-account')">
-  <div class="modal modal-desktop" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-header"><span class="modal-title">Rekening toevoegen</span><button class="modal-close" onclick="closeModal('modal-add-account')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">Naam</label><input type="text" class="form-input" id="acc-name" placeholder="Bijv. ING Betaalrekening"></div>
-      <div class="form-group"><label class="form-label">Bank</label><input type="text" class="form-input" id="acc-bank" placeholder="Bijv. ING, ABN AMRO, Rabobank"></div>
-      <div class="form-group"><label class="form-label">Rekeningnummer (gemaskeerd)</label><input type="text" class="form-input" id="acc-number" placeholder="**** **** **** 1234"></div>
-      <div class="form-group"><label class="form-label">Beginsaldo (€)</label><input type="number" class="form-input" id="acc-balance" placeholder="0.00" step="0.01"></div>
-      <div class="form-group"><label class="form-label">Kleur</label><div style="display:flex;gap:8px;">
-        <button class="btn" style="flex:1;background:var(--grad-blue);color:#fff;" onclick="setAccGrad('blue')">Blauw</button>
-        <button class="btn" style="flex:1;background:var(--grad-teal);color:#fff;" onclick="setAccGrad('teal')">Teal</button>
-        <button class="btn" style="flex:1;background:var(--grad-indigo);color:#fff;" onclick="setAccGrad('indigo')">Indigo</button>
-      </div></div>
-      <button class="btn btn-primary btn-full" onclick="saveAccount()"><iconify-icon icon="ph:floppy-disk-bold"></iconify-icon>Opslaan</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: ADD BUDGET -->
-<div class="modal-overlay" id="modal-add-budget" onclick="closeModal('modal-add-budget')">
-  <div class="modal modal-desktop" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-header"><span class="modal-title">Budget instellen</span><button class="modal-close" onclick="closeModal('modal-add-budget')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">Categorie</label><select class="form-input" id="budget-cat-sel"></select></div>
-      <div class="form-group"><label class="form-label">Maandlimiet (€)</label><input type="number" class="form-input" id="budget-limit" placeholder="250" min="0"></div>
-      <button class="btn btn-primary btn-full" onclick="saveBudget()"><iconify-icon icon="ph:floppy-disk-bold"></iconify-icon>Opslaan</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: ADD GOAL -->
-<div class="modal-overlay" id="modal-add-goal" onclick="closeModal('modal-add-goal')">
-  <div class="modal modal-desktop" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-header"><span class="modal-title">Nieuw doel</span><button class="modal-close" onclick="closeModal('modal-add-goal')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">Naam</label><input type="text" class="form-input" id="goal-name" placeholder="Bijv. Vakantie, Auto, Huis..."></div>
-      <div class="form-group"><label class="form-label">Emoji</label><input type="text" class="form-input" id="goal-emoji" placeholder="🏖️" maxlength="2"></div>
-      <div class="form-group"><label class="form-label">Doelbedrag (€)</label><input type="number" class="form-input" id="goal-target" placeholder="5000" min="0"></div>
-      <div class="form-group"><label class="form-label">Huidig bedrag (€)</label><input type="number" class="form-input" id="goal-current" placeholder="0" min="0"></div>
-      <div class="form-group"><label class="form-label">Deadline</label><input type="date" class="form-input" id="goal-deadline"></div>
-      <button class="btn btn-primary btn-full" onclick="saveGoal()"><iconify-icon icon="ph:floppy-disk-bold"></iconify-icon>Opslaan</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: CONFIRM DELETE -->
-<div class="modal-overlay" id="modal-confirm" onclick="closeModal('modal-confirm')">
-  <div class="modal modal-desktop" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <div class="modal-body" style="padding:24px 20px;">
-      <h3 style="margin-bottom:10px;font-size:18px;" id="confirm-title">Verwijderen?</h3>
-      <p style="color:var(--text2);margin-bottom:20px;font-size:14px;" id="confirm-msg">Weet je het zeker?</p>
-      <div style="display:flex;gap:10px;"><button class="btn btn-secondary" style="flex:1;" onclick="closeModal('modal-confirm')">Annuleren</button><button class="btn btn-danger" style="flex:1;" id="confirm-btn">Verwijderen</button></div>
-    </div>
-  </div>
-</div>
-
 <!-- LOGIN SCREEN -->
-<div id="login-screen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:500;padding:24px;">
-  <div style="width:100%;max-width:400px;">
-    <div style="text-align:center;margin-bottom:40px;">
-      <div style="width:72px;height:72px;background:var(--grad-blue);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 8px 32px rgba(1,121,254,.4);">
-        <iconify-icon icon="ph:currency-eur-bold" style="font-size:36px;color:#fff;"></iconify-icon>
+<div id="login-screen">
+  <!-- LEFT FORM -->
+  <div class="login-left" id="login-left">
+    <div class="login-logo">
+      <div class="login-logo-icon"><iconify-icon icon="ph:currency-eur-bold"></iconify-icon></div>
+      <span class="login-logo-text">Family-App</span>
+    </div>
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <h1 class="login-heading">Welkom terug</h1>
+      <p class="login-sub">Voer je gegevens in om door te gaan</p>
+      <div class="login-error" id="login-err"></div>
+      <div class="login-success" id="login-suc"></div>
+      <div class="form-group">
+        <label class="form-label">E-mailadres</label>
+        <div class="form-input-icon"><iconify-icon icon="ph:envelope-bold"></iconify-icon><input type="email" class="form-input" id="l-email" placeholder="jouw@email.com"></div>
       </div>
-      <div style="font-family:'IBM Plex Serif',serif;font-size:28px;font-weight:700;margin-bottom:6px;">Family-App</div>
-      <div style="color:var(--text2);font-size:14px;">Persoonlijke finance manager</div>
+      <div class="form-group">
+        <label class="form-label">Wachtwoord</label>
+        <div class="form-input-icon" style="position:relative;">
+          <iconify-icon icon="ph:lock-bold"></iconify-icon>
+          <input type="password" class="form-input" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+          <iconify-icon icon="ph:eye-bold" class="input-pw-toggle" onclick="togglePw('l-pass',this)"></iconify-icon>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-bottom:16px;" onclick="doLogin()" id="btn-login"><iconify-icon icon="ph:sign-in-bold"></iconify-icon>Inloggen</button>
+      <p class="login-switch">Nog geen account? <a onclick="showForm('register')">Registreer hier</a></p>
+      <p class="login-switch" style="margin-top:8px;"><a onclick="doGuestLogin()" style="color:var(--text2);">Doorgaan als gast (lokaal)</a></p>
     </div>
-    <div id="login-error" style="display:none;background:var(--red-bg);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:12px;"></div>
-    <div id="login-success" style="display:none;background:var(--green-bg);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:12px;"></div>
-    <div class="card" style="margin-bottom:16px;">
-      <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="form-input" id="login-email" placeholder="jouw@email.com"></div>
-      <div class="form-group" style="margin-bottom:0;"><label class="form-label">Wachtwoord</label><input type="password" class="form-input" id="login-pass" placeholder="Min. 6 tekens" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <!-- REGISTER FORM -->
+    <div id="form-register" style="display:none;">
+      <h1 class="login-heading">Account aanmaken</h1>
+      <p class="login-sub">Maak je persoonlijke finance account aan</p>
+      <div class="login-error" id="reg-err"></div>
+      <div class="login-success" id="reg-suc"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Voornaam</label><input type="text" class="form-input" id="r-first" placeholder="Abdul"></div>
+        <div class="form-group"><label class="form-label">Achternaam</label><input type="text" class="form-input" id="r-last" placeholder="Aziz"></div>
+      </div>
+      <div class="form-group"><label class="form-label">E-mailadres</label><input type="email" class="form-input" id="r-email" placeholder="jouw@email.com"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Wachtwoord</label><input type="password" class="form-input" id="r-pass" placeholder="Min. 6 tekens"></div>
+        <div class="form-group"><label class="form-label">Bevestig wachtwoord</label><input type="password" class="form-input" id="r-pass2" placeholder="••••••••"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Geboortedatum</label><input type="date" class="form-input" id="r-dob"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Straat</label><input type="text" class="form-input" id="r-street" placeholder="Kerkstraat"></div>
+        <div class="form-group"><label class="form-label">Huisnummer</label><input type="text" class="form-input" id="r-num" placeholder="1A"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Postcode</label><input type="text" class="form-input" id="r-zip" placeholder="1234 AB"></div>
+        <div class="form-group"><label class="form-label">Stad</label><input type="text" class="form-input" id="r-city" placeholder="Amsterdam"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Land</label>
+        <select class="form-input" id="r-country">
+          <option value="NL">Nederland</option><option value="BE">België</option><option value="DE">Duitsland</option>
+          <option value="FR">Frankrijk</option><option value="AM">Armenië</option><option value="GE">Georgië</option>
+          <option value="AT">Oostenrijk</option><option value="CH">Zwitserland</option><option value="GB">Verenigd Koninkrijk</option>
+          <option value="OTHER">Overig</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-bottom:16px;" onclick="doRegister()" id="btn-register"><iconify-icon icon="ph:user-plus-bold"></iconify-icon>Account aanmaken</button>
+      <p class="login-switch">Al een account? <a onclick="showForm('login')">Terug naar inloggen</a></p>
     </div>
-    <button class="btn btn-primary btn-full" style="margin-bottom:10px;" onclick="doLogin()" id="btn-login"><iconify-icon icon="ph:sign-in-bold"></iconify-icon>Inloggen</button>
-    <button class="btn btn-secondary btn-full" style="margin-bottom:10px;" onclick="doRegister()" id="btn-register"><iconify-icon icon="ph:user-plus-bold"></iconify-icon>Registreren</button>
-    <div style="text-align:center;color:var(--text3);font-size:12px;margin-bottom:10px;">of</div>
-    <button class="btn btn-secondary btn-full" onclick="doGuestLogin()"><iconify-icon icon="ph:user-bold"></iconify-icon>Doorgaan als gast (lokaal)</button>
-    <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:12px;">Gast modus slaat data lokaal op, geen sync tussen apparaten.</p>
+  </div>
+  <!-- RIGHT VISUAL -->
+  <div class="login-right">
+    <div class="login-right-heading">Jouw financiën,<br>altijd inzichtelijk</div>
+    <div class="login-right-sub">Alles op één plek, veilig en persoonlijk</div>
+    <div style="position:relative;z-index:1;width:100%;max-width:360px;">
+      <div class="login-feature"><div class="login-feature-icon"><iconify-icon icon="ph:chart-line-up-bold"></iconify-icon></div><div class="login-feature-text">Financieel overzicht altijd bij de hand</div></div>
+      <div class="login-feature"><div class="login-feature-icon"><iconify-icon icon="ph:robot-bold"></iconify-icon></div><div class="login-feature-text">AI-gedreven inzichten en suggesties</div></div>
+      <div class="login-feature"><div class="login-feature-icon"><iconify-icon icon="ph:shield-check-bold"></iconify-icon></div><div class="login-feature-text">Veilig en privé — alleen voor jou</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none;">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><iconify-icon icon="ph:currency-eur-bold"></iconify-icon></div>
+      <span class="sidebar-logo-text">Family-App</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Menu</div>
+        <button class="nav-item active" data-tab="home" onclick="nav('home')"><iconify-icon icon="ph:house-bold"></iconify-icon>Overzicht</button>
+        <button class="nav-item" data-tab="transactions" onclick="nav('transactions')"><iconify-icon icon="ph:arrows-left-right-bold"></iconify-icon>Transacties</button>
+        <button class="nav-item" data-tab="accounts" onclick="nav('accounts')"><iconify-icon icon="ph:bank-bold"></iconify-icon>Rekeningen</button>
+        <button class="nav-item" data-tab="budgets" onclick="nav('budgets')"><iconify-icon icon="ph:chart-pie-bold"></iconify-icon>Budgetten</button>
+        <button class="nav-item" data-tab="goals" onclick="nav('goals')"><iconify-icon icon="ph:target-bold"></iconify-icon>Doelen</button>
+        <button class="nav-item" data-tab="settings" onclick="nav('settings')"><iconify-icon icon="ph:gear-bold"></iconify-icon>Instellingen</button>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sb-avatar">AA</div>
+        <div class="sidebar-user-info"><div class="sidebar-user-name" id="sb-name">Abdul Aziz</div><div class="sidebar-user-email" id="sb-email">—</div></div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()"><iconify-icon icon="ph:sign-out-bold"></iconify-icon>Uitloggen</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- Mobile header -->
+    <div class="mobile-header">
+      <div class="mobile-header-logo">Family-App</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span id="sync-badge" style="font-size:16px;">☁️</span>
+        <button class="icon-btn" onclick="nav('settings')"><iconify-icon icon="ph:gear-bold"></iconify-icon></button>
+      </div>
+    </div>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-greeting" id="topbar-greeting">Goedemorgen</div>
+        <div class="topbar-date" id="topbar-date"></div>
+      </div>
+      <div class="topbar-right">
+        <span id="sync-icon" style="font-size:16px;">☁️</span>
+        <button class="icon-btn"><iconify-icon icon="ph:bell-bold"></iconify-icon></button>
+        <div class="topbar-avatar" id="topbar-avatar" onclick="nav('settings')">AA</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-area">
+
+      <!-- ===== HOME ===== -->
+      <div id="screen-home" class="screen screen-with-panel active">
+        <div class="main-scroll" id="home-scroll">
+          <div class="kpi-grid" id="kpi-row">
+            <div class="kpi-card"><div class="kpi-label"><iconify-icon icon="ph:wallet-bold" style="color:var(--accent)"></iconify-icon>Totaal saldo</div><div class="kpi-value" id="kpi-bal">€0,00</div><div class="kpi-trend" id="kpi-bal-trend"></div></div>
+            <div class="kpi-card"><div class="kpi-label"><iconify-icon icon="ph:trend-up-bold" style="color:#059669"></iconify-icon>Inkomsten (maand)</div><div class="kpi-value pos" id="kpi-inc">€0,00</div></div>
+            <div class="kpi-card"><div class="kpi-label"><iconify-icon icon="ph:trend-down-bold" style="color:var(--red)"></iconify-icon>Uitgaven (maand)</div><div class="kpi-value neg" id="kpi-exp">€0,00</div></div>
+            <div class="kpi-card"><div class="kpi-label"><iconify-icon icon="ph:calculator-bold" style="color:var(--amber)"></iconify-icon>Netto (maand)</div><div class="kpi-value" id="kpi-net">€0,00</div></div>
+          </div>
+          <div class="card" style="margin-bottom:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div style="font-size:15px;font-weight:700;color:var(--text);">Recente transacties</div>
+              <a onclick="nav('transactions')" style="font-size:13px;color:var(--accent);cursor:pointer;font-weight:500;">Alles bekijken →</a>
+            </div>
+            <div id="home-tx-list"></div>
+          </div>
+        </div>
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+          <div class="panel-section">
+            <div class="panel-section-header"><span class="panel-section-title">Mijn rekeningen</span><a class="panel-section-link" onclick="openAddAccount()">+ Toevoegen</a></div>
+            <div id="panel-accounts"></div>
+            <a onclick="nav('accounts')" class="panel-section-link" style="display:block;margin-top:8px;">Alle rekeningen →</a>
+          </div>
+          <div class="panel-section">
+            <div class="panel-section-header"><span class="panel-section-title">Budgetten</span><a class="panel-section-link" onclick="nav('budgets')">Beheren →</a></div>
+            <div id="panel-budgets"></div>
+          </div>
+          <div class="panel-section">
+            <div class="panel-section-header"><span class="panel-section-title">Doelen</span><a class="panel-section-link" onclick="nav('goals')">Alle doelen →</a></div>
+            <div id="panel-goals"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TRANSACTIONS ===== -->
+      <div id="screen-transactions" class="screen">
+        <div class="main-scroll">
+          <div class="page-header"><div><div class="page-title">Transacties</div><div class="page-sub" id="tx-count-label">0 transacties</div></div><button class="btn btn-primary btn-sm" onclick="openAddTx()"><iconify-icon icon="ph:plus-bold"></iconify-icon>Toevoegen</button></div>
+          <div class="filter-bar">
+            <div class="filter-group" style="flex:2;min-width:200px;"><label class="filter-label">Zoeken</label><div class="form-input-icon"><iconify-icon icon="ph:magnifying-glass-bold"></iconify-icon><input type="text" class="filter-input" id="tx-search" placeholder="Naam of categorie..." oninput="renderTx()"></div></div>
+            <div class="filter-group"><label class="filter-label">Type</label><select class="filter-input" id="tx-type-filter" onchange="renderTx()"><option value="all">Alles</option><option value="income">Inkomsten</option><option value="expense">Uitgaven</option></select></div>
+            <div class="filter-group"><label class="filter-label">Categorie</label><select class="filter-input" id="tx-cat-filter" onchange="renderTx()"><option value="all">Alle categorieën</option></select></div>
+            <div class="filter-group"><label class="filter-label">Maand</label><select class="filter-input" id="tx-month-filter" onchange="renderTx()"></select></div>
+          </div>
+          <div class="stats-banner" id="tx-stats"></div>
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div class="tx-table-head"><span>Naam</span><span>Bedrag</span><span class="tx-col-hide">Datum</span><span class="tx-col-hide">Categorie</span><span class="tx-col-hide">Status</span><span class="tx-col-hide">Kanaal</span></div>
+            <div id="tx-list"></div>
+          </div>
+          <div class="pagination" id="tx-pagination"></div>
+        </div>
+      </div>
+
+      <!-- ===== ACCOUNTS ===== -->
+      <div id="screen-accounts" class="screen">
+        <div class="main-scroll">
+          <div class="page-header"><div><div class="page-title">Rekeningen</div><div class="page-sub">Beheer je bankrekeningen</div></div><button class="btn btn-primary btn-sm" onclick="openAddAccount()"><iconify-icon icon="ph:plus-bold"></iconify-icon>Toevoegen</button></div>
+          <div class="accounts-grid" id="accounts-grid"></div>
+          <div class="card"><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;" id="acc-tx-title">Transacties</div><div id="acc-tx-list"></div></div>
+        </div>
+      </div>
+
+      <!-- ===== BUDGETS ===== -->
+      <div id="screen-budgets" class="screen">
+        <div class="main-scroll">
+          <div class="page-header"><div class="page-title">Budgetten</div><button class="btn btn-primary btn-sm" onclick="openAddBudget()"><iconify-icon icon="ph:plus-bold"></iconify-icon>Toevoegen</button></div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <button class="icon-btn" onclick="changeBudgetMonth(-1)"><iconify-icon icon="ph:caret-left-bold"></iconify-icon></button>
+            <span style="font-size:16px;font-weight:700;" id="budget-month-lbl"></span>
+            <button class="icon-btn" onclick="changeBudgetMonth(1)"><iconify-icon icon="ph:caret-right-bold"></iconify-icon></button>
+          </div>
+          <div class="budget-overview-card" id="budget-overview-card"></div>
+          <div class="budget-grid" id="budget-list"></div>
+        </div>
+      </div>
+
+      <!-- ===== GOALS ===== -->
+      <div id="screen-goals" class="screen">
+        <div class="main-scroll">
+          <div class="page-header"><div class="page-title">Doelen</div><button class="btn btn-primary btn-sm" onclick="openAddGoal()"><iconify-icon icon="ph:plus-bold"></iconify-icon>Nieuw doel</button></div>
+          <div class="goals-grid" id="goals-grid"></div>
+        </div>
+      </div>
+
+      <!-- ===== SETTINGS ===== -->
+      <div id="screen-settings" class="screen">
+        <div style="display:flex;height:100%;overflow:hidden;">
+          <div class="settings-sidebar">
+            <div class="settings-nav-item active" data-stab="profile" onclick="setSettingsTab('profile')"><iconify-icon icon="ph:user-bold"></iconify-icon>Profiel</div>
+            <div class="settings-nav-item" data-stab="claude" onclick="setSettingsTab('claude')"><iconify-icon icon="ph:robot-bold"></iconify-icon>Claude AI</div>
+            <div class="settings-nav-item" data-stab="supabase" onclick="setSettingsTab('supabase')"><iconify-icon icon="ph:database-bold"></iconify-icon>Supabase</div>
+          </div>
+          <div class="settings-content">
+            <!-- PROFILE -->
+            <div class="settings-section active" id="stab-profile">
+              <div class="settings-section-title">Profiel</div>
+              <div class="settings-section-sub">Beheer je persoonlijke gegevens</div>
+              <div style="display:flex;align-items:center;gap:20px;margin-bottom:28px;">
+                <div style="width:72px;height:72px;border-radius:50%;background:var(--grad-blue);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;" id="profile-avatar-big">AA</div>
+                <div><div style="font-size:18px;font-weight:700;" id="profile-name-big">Abdul Aziz</div><div style="font-size:13px;color:var(--text2);" id="profile-email-big">—</div></div>
+              </div>
+              <button class="btn btn-danger" onclick="doLogout()"><iconify-icon icon="ph:sign-out-bold"></iconify-icon>Uitloggen</button>
+            </div>
+            <!-- CLAUDE -->
+            <div class="settings-section" id="stab-claude">
+              <div class="settings-section-title">Claude AI</div>
+              <div class="settings-section-sub">Configureer de AI-assistent</div>
+              <div class="form-group"><label class="form-label">Claude API Key</label>
+                <div style="position:relative;"><input type="password" class="form-input" id="claude-key-inp" placeholder="sk-ant-..."><iconify-icon icon="ph:eye-bold" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3);cursor:pointer;font-size:18px;" onclick="togglePw('claude-key-inp',this)"></iconify-icon></div>
+              </div>
+              <div class="form-group"><label class="form-label">Model</label><input type="text" class="form-input" value="claude-sonnet-4-5" readonly style="color:var(--text2);cursor:default;"></div>
+              <div style="display:flex;gap:10px;">
+                <button class="btn btn-primary" onclick="saveClaudeKey()"><iconify-icon icon="ph:floppy-disk-bold"></iconify-icon>Opslaan</button>
+                <button class="btn btn-secondary" onclick="testClaude()"><iconify-icon icon="ph:plug-bold"></iconify-icon>Verbinding testen</button>
+              </div>
+              <div id="claude-status" style="margin-top:10px;font-size:12px;display:none;"></div>
+            </div>
+            <!-- SUPABASE -->
+            <div class="settings-section" id="stab-supabase">
+              <div class="settings-section-title">Supabase</div>
+              <div class="settings-section-sub">Database en authenticatie</div>
+              <div class="form-group"><label class="form-label">Project URL</label><input type="text" class="form-input" id="supa-url-s" value="https://lttxjfrtfrjnlazmbcyq.supabase.co" readonly style="color:var(--text2);cursor:default;"></div>
+              <div class="form-group"><label class="form-label">Anon Key</label><input type="text" class="form-input" id="supa-key-s" value="sb_publishable_SLofdkgzrdibQzeP5v_bew_bIBDTFAD" readonly style="color:var(--text2);cursor:default;font-size:11px;"></div>
+              <button class="btn btn-secondary" onclick="testSupabase()"><iconify-icon icon="ph:plug-bold"></iconify-icon>Verbinding testen</button>
+              <div id="supa-status" style="margin-top:10px;font-size:12px;display:none;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content-area -->
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <button class="bnav-item active" data-tab="home" onclick="nav('home')"><iconify-icon icon="ph:house-bold"></iconify-icon>Overzicht</button>
+      <button class="bnav-item" data-tab="transactions" onclick="nav('transactions')"><iconify-icon icon="ph:arrows-left-right-bold"></iconify-icon>Transacties</button>
+      <button class="bnav-item" data-tab="accounts" onclick="nav('accounts')"><iconify-icon icon="ph:bank-bold"></iconify-icon>Rekeningen</button>
+      <button class="bnav-item" data-tab="budgets" onclick="nav('budgets')"><iconify-icon icon="ph:chart-pie-bold"></iconify-icon>Budgetten</button>
+      <button class="bnav-item" data-tab="settings" onclick="nav('settings')"><iconify-icon icon="ph:gear-bold"></iconify-icon>Instellingen</button>
+    </nav>
+  </div>
+</div>
+
+<!-- AI CHAT BUTTON + WINDOW -->
+<button class="ai-fab" id="ai-fab" onclick="toggleChat()" title="Family AI">
+  <iconify-icon icon="ph:robot-bold"></iconify-icon>
+</button>
+<div class="ai-chat-window" id="ai-chat-window">
+  <div class="ai-chat-header">
+    <div class="ai-chat-avatar"><iconify-icon icon="ph:robot-bold"></iconify-icon></div>
+    <div><div class="ai-chat-name">Family AI</div><div class="ai-chat-status">● Online</div></div>
+    <button class="modal-close" style="margin-left:auto;" onclick="toggleChat()"><iconify-icon icon="ph:x-bold"></iconify-icon></button>
+  </div>
+  <div class="ai-chat-messages" id="chat-messages">
+    <div class="chat-msg ai">
+      <div class="ai-chat-avatar" style="width:28px;height:28px;flex-shrink:0;"><iconify-icon icon="ph:robot-bold" style="font-size:14px;color:#fff;"></iconify-icon></div>
+      <div><div class="chat-bubble">Hoi! Ik ben Family AI. Ik kan je helpen je uitgaven te analyseren, transacties toevoegen en je budget bewaken. Wat kan ik voor je doen?</div><div class="chat-time">nu</div></div>
+    </div>
+  </div>
+  <div class="chat-suggestions">
+    <div class="chat-chip" onclick="sendSuggestion('Hoeveel gaf ik uit deze maand?')">Uitgaven maand?</div>
+    <div class="chat-chip" onclick="sendSuggestion('Voeg €50 boodschappen toe')">€50 boodschappen</div>
+    <div class="chat-chip" onclick="sendSuggestion('Hoe staat mijn budget?')">Budget status?</div>
+    <div class="chat-chip" onclick="sendSuggestion('Geef me een financieel overzicht')">Overzicht</div>
+  </div>
+  <div class="ai-chat-input-row">
+    <textarea class="ai-chat-input" id="chat-input" placeholder="Stel een vraag..." rows="1" onkeydown="chatKeydown(event)"></textarea>
+    <button class="btn btn-primary btn-sm" onclick="sendChat()" style="height:38px;padding:0 14px;"><iconify-icon icon="ph:paper-plane-tilt-bold"></iconify-icon></button>
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- Add Transaction -->
+<div class="modal-overlay" id="modal-add-tx" onclick="closeMod('modal-add-tx')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:520px;">
+    <div class="modal-header"><span class="modal-title">Transactie toevoegen</span><button class="modal-close" onclick="closeMod('modal-add-tx')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
+    <div class="modal-body">
+      <div class="type-toggle"><button class="type-btn active-exp" id="type-exp" onclick="setTxType('expense')">↓ Uitgave</button><button class="type-btn" id="type-inc" onclick="setTxType('income')">↑ Inkomst</button></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Bedrag (€)</label><input type="number" class="form-input" id="add-amount" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="form-group"><label class="form-label">Datum</label><input type="date" class="form-input" id="add-date"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Omschrijving</label><input type="text" class="form-input" id="add-desc" placeholder="Bijv. Albert Heijn, Salaris..."></div>
+      <div class="form-group"><label class="form-label">Categorie</label><div class="cat-scroll" id="cat-chips"></div></div>
+      <div class="form-group"><label class="form-label">Rekening</label><select class="form-input" id="add-acc-sel"></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeMod('modal-add-tx')">Annuleren</button><button class="btn btn-primary" onclick="saveTx()"><iconify-icon icon="ph:floppy-disk-bold"></iconify-icon>Opslaan</button></div>
+  </div>
+</div>
+
+<!-- TX Detail -->
+<div class="modal-overlay" id="modal-tx-detail" onclick="closeMod('modal-tx-detail')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><span class="modal-title">Transactie detail</span><button class="modal-close" onclick="closeMod('modal-tx-detail')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
+    <div class="modal-body" id="tx-detail-body"></div>
+    <div class="modal-footer" id="tx-detail-footer"></div>
+  </div>
+</div>
+
+<!-- Add Account -->
+<div class="modal-overlay" id="modal-add-account" onclick="closeMod('modal-add-account')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><span class="modal-title">Rekening toevoegen</span><button class="modal-close" onclick="closeMod('modal-add-account')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Naam</label><input type="text" class="form-input" id="acc-name" placeholder="Betaalrekening"></div>
+        <div class="form-group"><label class="form-label">Bank</label><input type="text" class="form-input" id="acc-bank" placeholder="ING, ABN AMRO..."></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Rekeningnummer</label><input type="text" class="form-input" id="acc-num" placeholder="**** 1234"></div>
+        <div class="form-group"><label class="form-label">Beginsaldo (€)</label><input type="number" class="form-input" id="acc-bal" placeholder="0.00" step="0.01"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Kleur</label><div style="display:flex;gap:8px;">
+        <button class="btn btn-sm" style="flex:1;background:linear-gradient(135deg,#0179FE,#4893FF);color:#fff;" onclick="setAccGrad('blue')">Blauw</button>
+        <button class="btn btn-sm" style="flex:1;background:linear-gradient(135deg,#01797A,#489399);color:#fff;" onclick="setAccGrad('teal')">Teal</button>
+        <button class="btn btn-sm" style="flex:1;background:linear-gradient(135deg,#6172F3,#A855F7);color:#fff;" onclick="setAccGrad('purple')">Paars</button>
+        <button class="btn btn-sm" style="flex:1;background:linear-gradient(135deg,#059669,#34D399);color:#fff;" onclick="setAccGrad('green')">Groen</button>
+      </div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeMod('modal-add-account')">Annuleren</button><button class="btn btn-primary" onclick="saveAccount()">Opslaan</button></div>
+  </div>
+</div>
+
+<!-- Add Budget -->
+<div class="modal-overlay" id="modal-add-budget" onclick="closeMod('modal-add-budget')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><span class="modal-title">Budget instellen</span><button class="modal-close" onclick="closeMod('modal-add-budget')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Categorie</label><select class="form-input" id="bud-cat-sel"></select></div>
+      <div class="form-group"><label class="form-label">Maandlimiet (€)</label><input type="number" class="form-input" id="bud-limit" placeholder="250" min="0"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeMod('modal-add-budget')">Annuleren</button><button class="btn btn-primary" onclick="saveBudget()">Opslaan</button></div>
+  </div>
+</div>
+
+<!-- Add Goal -->
+<div class="modal-overlay" id="modal-add-goal" onclick="closeMod('modal-add-goal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><span class="modal-title">Nieuw doel</span><button class="modal-close" onclick="closeMod('modal-add-goal')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Naam</label><input type="text" class="form-input" id="goal-name" placeholder="Vakantie, Auto..."></div>
+        <div class="form-group"><label class="form-label">Emoji</label><input type="text" class="form-input" id="goal-emoji" placeholder="🎯" maxlength="2"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Doelbedrag (€)</label><input type="number" class="form-input" id="goal-target" placeholder="5000" min="0"></div>
+        <div class="form-group"><label class="form-label">Huidig bedrag (€)</label><input type="number" class="form-input" id="goal-current" placeholder="0" min="0"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Deadline</label><input type="date" class="form-input" id="goal-deadline"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeMod('modal-add-goal')">Annuleren</button><button class="btn btn-primary" onclick="saveGoal()">Opslaan</button></div>
+  </div>
+</div>
+
+<!-- Deposit Goal -->
+<div class="modal-overlay" id="modal-deposit" onclick="closeMod('modal-deposit')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><span class="modal-title">Storting toevoegen</span><button class="modal-close" onclick="closeMod('modal-deposit')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Bedrag (€)</label><input type="number" class="form-input" id="dep-amount" placeholder="100" min="0"></div>
+      <input type="hidden" id="dep-goal-id">
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeMod('modal-deposit')">Annuleren</button><button class="btn btn-primary" onclick="saveDeposit()">Opslaan</button></div>
+  </div>
+</div>
+
+<!-- Confirm -->
+<div class="modal-overlay" id="modal-confirm" onclick="closeMod('modal-confirm')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:400px;">
+    <div class="modal-header"><span class="modal-title" id="conf-title">Bevestigen</span><button class="modal-close" onclick="closeMod('modal-confirm')"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>
+    <div class="modal-body"><p style="font-size:14px;color:var(--text2);" id="conf-msg"></p></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeMod('modal-confirm')">Annuleren</button><button class="btn btn-danger" id="conf-btn">Verwijderen</button></div>
   </div>
 </div>
 
@@ -714,919 +810,654 @@ input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;}
 // ================================================================
 // CONFIG
 // ================================================================
-const SUPABASE_URL = 'https://lttxjfrtfrjnlazmbcyq.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_SLofdkgzrdibQzeP5v_bew_bIBDTFAD';
-const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
-const CLAUDE_MODEL = 'claude-sonnet-4-5';
-
-const SYSTEM_PROMPT = `Je bent Family AI, de persoonlijke financiële assistent van Abdul Aziz. Je hebt toegang tot zijn financiële data via tools. Je antwoordt altijd in het Nederlands, bent direct en praktisch, en geeft concrete financiële adviezen. Je kunt transacties toevoegen, uitgaven analyseren, en budgetten bewaken. Gebruik altijd het €-teken en Nederlandse datumnotatie (bijv. 31 mei 2026).`;
-
-const TOOLS = [
-  {name:'get_transactions',description:'Haal transacties op uit de database voor een periode',input_schema:{type:'object',properties:{month:{type:'number',description:'Maand 1-12'},year:{type:'number',description:'Jaar'},category:{type:'string',description:'Filter op categorie (optioneel)'}}}},
-  {name:'add_transaction',description:'Voeg een nieuwe transactie toe aan de database',input_schema:{type:'object',properties:{amount:{type:'number'},type:{type:'string',enum:['income','expense']},description:{type:'string'},category:{type:'string'},date:{type:'string',description:'YYYY-MM-DD'}},required:['amount','type','description','category']}},
-  {name:'get_budget_status',description:'Haal budget status op per categorie voor een maand',input_schema:{type:'object',properties:{month:{type:'number'},year:{type:'number'}}}},
-  {name:'get_summary',description:'Geef een financieel overzicht van de huidige maand',input_schema:{type:'object',properties:{}}}
+const SUPABASE_URL='https://lttxjfrtfrjnlazmbcyq.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_SLofdkgzrdibQzeP5v_bew_bIBDTFAD';
+const CLAUDE_MODEL='claude-sonnet-4-5';
+const SYS_PROMPT=`Je bent Family AI, de persoonlijke financiële assistent van Abdul Aziz. Je antwoordt altijd in het Nederlands, bent direct en praktisch. Gebruik het €-teken en Nederlandse datumnotatie. Je hebt toegang tot financiële data via tools.`;
+const TOOLS=[
+  {name:'get_transactions',description:'Transacties ophalen voor een periode',input_schema:{type:'object',properties:{month:{type:'number'},year:{type:'number'},category:{type:'string'}}}},
+  {name:'add_transaction',description:'Transactie toevoegen',input_schema:{type:'object',properties:{amount:{type:'number'},type:{type:'string',enum:['income','expense']},description:{type:'string'},category:{type:'string'},date:{type:'string'}},required:['amount','type','description','category']}},
+  {name:'get_budget_status',description:'Budget status ophalen',input_schema:{type:'object',properties:{month:{type:'number'},year:{type:'number'}}}},
+  {name:'get_summary',description:'Financieel overzicht huidige maand',input_schema:{type:'object',properties:{}}}
 ];
-
-const CATS = [
-  {id:'Boodschappen',label:'Boodschappen',icon:'ph:shopping-cart-bold',color:'#6366f1'},
-  {id:'Eten',label:'Eten & Drinken',icon:'ph:fork-knife-bold',color:'#f59e0b'},
-  {id:'Transport',label:'Transport',icon:'ph:car-bold',color:'#3b82f6'},
-  {id:'Wonen',label:'Wonen',icon:'ph:house-bold',color:'#22c55e'},
-  {id:'Gezondheid',label:'Gezondheid',icon:'ph:pill-bold',color:'#ec4899'},
-  {id:'Vrije tijd',label:'Vrije tijd',icon:'ph:confetti-bold',color:'#8b5cf6'},
-  {id:'Kleding',label:'Kleding',icon:'ph:t-shirt-bold',color:'#06b6d4'},
-  {id:'Abonnementen',label:'Abonnementen',icon:'ph:device-mobile-bold',color:'#f97316'},
-  {id:'Zakelijk',label:'Zakelijk',icon:'ph:briefcase-bold',color:'#84cc16'},
-  {id:'Salaris',label:'Salaris',icon:'ph:money-bold',color:'#22c55e'},
-  {id:'Overig',label:'Overig',icon:'ph:package-bold',color:'#94a3b8'},
+const CATS=[
+  {id:'Boodschappen',label:'Boodschappen',icon:'ph:shopping-cart-bold',color:'#6366F1',bg:'#EEF2FF'},
+  {id:'Eten',label:'Eten & Drinken',icon:'ph:fork-knife-bold',color:'#F59E0B',bg:'#FFFBEB'},
+  {id:'Transport',label:'Transport',icon:'ph:car-bold',color:'#3B82F6',bg:'#EFF6FF'},
+  {id:'Wonen',label:'Wonen',icon:'ph:house-bold',color:'#22C55E',bg:'#F0FDF4'},
+  {id:'Gezondheid',label:'Gezondheid',icon:'ph:first-aid-bold',color:'#EC4899',bg:'#FDF2F8'},
+  {id:'Vrije tijd',label:'Vrije tijd',icon:'ph:confetti-bold',color:'#8B5CF6',bg:'#F5F3FF'},
+  {id:'Kleding',label:'Kleding',icon:'ph:t-shirt-bold',color:'#06B6D4',bg:'#ECFEFF'},
+  {id:'Abonnementen',label:'Abonnementen',icon:'ph:device-mobile-bold',color:'#F97316',bg:'#FFF7ED'},
+  {id:'Zakelijk',label:'Zakelijk',icon:'ph:briefcase-bold',color:'#84CC16',bg:'#F7FEE7'},
+  {id:'Salaris',label:'Salaris',icon:'ph:money-bold',color:'#059669',bg:'#F0FDF4'},
+  {id:'Overig',label:'Overig',icon:'ph:receipt-bold',color:'#9CA3AF',bg:'#F9FAFB'},
 ];
-
-const ACC_GRADS = {
-  blue:'linear-gradient(135deg,#0179FE,#4893FF)',
-  teal:'linear-gradient(135deg,#01797A,#489399)',
-  indigo:'linear-gradient(135deg,#6366f1,#818cf8)'
-};
+const ACC_GRADS={blue:'linear-gradient(135deg,#0179FE,#4893FF)',teal:'linear-gradient(135deg,#01797A,#489399)',purple:'linear-gradient(135deg,#6172F3,#A855F7)',green:'linear-gradient(135deg,#059669,#34D399)'};
+const MONTHS=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
 
 // ================================================================
 // STATE
 // ================================================================
-let sb = null, currentUser = null, deviceKey = null;
-let transactions = [], budgets = [], goals = [], accounts = [];
-let activeTab = 'home', txFilter = 'all', balanceVisible = true;
-let budgetMonth = new Date(), photoB64 = null, selectedCat = 'Boodschappen';
-let txType = 'expense', accGrad = 'blue', chatHistory = [];
-let selectedAccountId = null;
+let sb=null,currentUser=null,deviceKey=null;
+let transactions=[],budgets=[],goals=[],accounts=[];
+let activeTab='home',txFilter='all',txPage=1;
+let budgetMonth=new Date(),accGrad='blue',selCat='Boodschappen',txType='expense';
+let chatHistory=[],chatOpen=false,selectedAccId=null;
 
 // ================================================================
 // INIT
 // ================================================================
-(function init(){
-  deviceKey = localStorage.getItem('fam_device') || crypto.randomUUID();
-  localStorage.setItem('fam_device', deviceKey);
-  document.getElementById('add-date').value = new Date().toISOString().split('T')[0];
+(function(){
+  deviceKey=localStorage.getItem('fam_dev')||crypto.randomUUID();
+  localStorage.setItem('fam_dev',deviceKey);
+  document.getElementById('add-date').value=new Date().toISOString().split('T')[0];
   buildCatChips();
   updateBudgetMonthLabel();
-  try {
-    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    checkSession();
-  } catch(e) {
-    loadLocal(); renderAll(); showLogin(false);
-  }
-  checkClaudeKey();
+  updateTopbar();
+  populateTxFilters();
+  try{
+    sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+    sb.auth.onAuthStateChange((ev,sess)=>{
+      if(sess){currentUser=sess.user;onLogin();}
+      else if(ev==='SIGNED_OUT'){onLogout();}
+    });
+    sb.auth.getSession().then(({data:{session}})=>{
+      if(session){currentUser=session.user;onLogin();}
+      else{loadLocal();showLogin();}
+    });
+  }catch(e){loadLocal();showLogin();}
 })();
 
-function checkClaudeKey() {
-  const k = localStorage.getItem('claude_api_key');
-  const banner1 = document.getElementById('api-banner-home');
-  const banner2 = document.getElementById('ai-api-banner');
-  if (!k) {
-    if (banner1) banner1.style.display = 'flex';
-    if (banner2) banner2.style.display = 'flex';
-  } else {
-    if (banner1) banner1.style.display = 'none';
-    if (banner2) banner2.style.display = 'none';
-    document.getElementById('claude-key-input').value = '••••••••••••••••';
-  }
+function updateTopbar(){
+  const now=new Date();
+  const h=now.getHours();
+  const greeting=h<12?'Goedemorgen':'h<18'?'Goedemiddag':'Goedenavond';
+  const name=currentUser?.email?.split('@')[0]||'';
+  document.getElementById('topbar-greeting').textContent=(h<12?'Goedemorgen':h<18?'Goedemiddag':'Goedenavond')+(name?', '+name:'');
+  document.getElementById('topbar-date').textContent=now.toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
 
-async function checkSession() {
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      currentUser = session.user;
-      showApp();
-      await loadData();
-    } else {
-      loadLocal();
-      renderAll();
-      showLogin(false);
-    }
-  } catch(e) {
-    loadLocal(); renderAll(); showLogin(false);
+function populateTxFilters(){
+  const ms=document.getElementById('tx-month-filter');
+  if(!ms)return;
+  const now=new Date();
+  ms.innerHTML='<option value="all">Alle maanden</option>';
+  for(let i=0;i<12;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const val=d.getFullYear()+'-'+(d.getMonth()+1);
+    ms.innerHTML+=`<option value="${val}"${i===0?' selected':''}>${MONTHS[d.getMonth()]} ${d.getFullYear()}</option>`;
   }
+  const cs=document.getElementById('tx-cat-filter');
+  if(cs){cs.innerHTML='<option value="all">Alle categorieën</option>'+CATS.map(c=>`<option value="${c.id}">${c.label}</option>`).join('');}
 }
 
 // ================================================================
 // AUTH
 // ================================================================
-function loginMsg(type, text) {
-  const err = document.getElementById('login-error');
-  const suc = document.getElementById('login-success');
-  err.style.display = 'none'; suc.style.display = 'none';
-  if (type === 'error') { err.textContent = text; err.style.display = 'block'; }
-  if (type === 'success') { suc.textContent = text; suc.style.display = 'block'; }
-}
-function setBtnLoading(id, loading, label) {
-  const b = document.getElementById(id);
-  if (!b) return;
-  b.disabled = loading;
-  b.style.opacity = loading ? '0.6' : '1';
-  if (label) b.innerHTML = loading ? '<iconify-icon icon="ph:spinner-bold"></iconify-icon> Bezig...' : label;
+function showLogin(){document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';}
+function showApp(){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='flex';}
+
+function setLoginMsg(type,text,elId){
+  const e=document.getElementById(elId+'_err')||document.getElementById(elId+'err')||document.getElementById('login-err');
+  const s=document.getElementById(elId+'_suc')||document.getElementById(elId+'suc')||document.getElementById('login-suc');
+  if(e)e.style.display='none';
+  if(s)s.style.display='none';
+  if(type==='error'&&e){e.textContent=text;e.style.display='block';}
+  if(type==='success'&&s){s.textContent=text;s.style.display='block';}
 }
 
-async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  if (!email) { loginMsg('error','Voer je e-mailadres in.'); return; }
-  if (!pass) { loginMsg('error','Voer je wachtwoord in.'); return; }
-  loginMsg('', '');
-  setBtnLoading('btn-login', true);
-  try {
-    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-    if (error) {
-      if (error.code === 'invalid_credentials') loginMsg('error','E-mail of wachtwoord klopt niet. Controleer je gegevens.');
-      else if (error.code === 'email_not_confirmed') loginMsg('error','Bevestig eerst je e-mailadres via de link in je inbox.');
-      else loginMsg('error', error.message);
-      return;
+async function doLogin(){
+  const email=document.getElementById('l-email').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  const el=document.getElementById('login-err');const sl=document.getElementById('login-suc');
+  if(el)el.style.display='none';if(sl)sl.style.display='none';
+  if(!email){if(el){el.textContent='Voer je e-mailadres in.';el.style.display='block';}return;}
+  if(!pass){if(el){el.textContent='Voer je wachtwoord in.';el.style.display='block';}return;}
+  const btn=document.getElementById('btn-login');if(btn){btn.disabled=true;btn.innerHTML='<iconify-icon icon="ph:spinner-bold"></iconify-icon> Bezig...';}
+  try{
+    const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error){
+      const msg=error.code==='invalid_credentials'?'E-mail of wachtwoord klopt niet.':error.code==='email_not_confirmed'?'Bevestig eerst je e-mail via de link in je inbox.':error.message;
+      if(el){el.textContent=msg;el.style.display='block';}
     }
-    currentUser = data.user;
-    loginMsg('', '');
-    showApp();
-    await loadData();
-    toast('Welkom terug!','success');
-  } catch(e) {
-    loginMsg('error', 'Verbindingsfout: ' + e.message);
-  } finally {
-    setBtnLoading('btn-login', false, '<iconify-icon icon="ph:sign-in-bold"></iconify-icon>Inloggen');
-  }
+  }catch(e){if(el){el.textContent='Verbindingsfout: '+e.message;el.style.display='block';}}
+  finally{if(btn){btn.disabled=false;btn.innerHTML='<iconify-icon icon="ph:sign-in-bold"></iconify-icon>Inloggen';}}
 }
 
-async function doRegister() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  if (!email) { loginMsg('error','Voer je e-mailadres in.'); return; }
-  if (!pass || pass.length < 6) { loginMsg('error','Wachtwoord moet minimaal 6 tekens zijn.'); return; }
-  loginMsg('', '');
-  setBtnLoading('btn-register', true);
-  try {
-    const { data, error } = await sb.auth.signUp({ email, password: pass });
-    if (error) {
-      if (error.code === 'over_email_send_rate_limit') loginMsg('error','Te veel pogingen. Wacht een paar minuten en probeer opnieuw.');
-      else if (error.code === 'email_address_invalid') loginMsg('error','Ongeldig e-mailadres. Gebruik een echt e-mailadres.');
-      else loginMsg('error', error.message);
-      return;
+async function doRegister(){
+  const email=document.getElementById('r-email').value.trim();
+  const pass=document.getElementById('r-pass').value;
+  const pass2=document.getElementById('r-pass2').value;
+  const el=document.getElementById('reg-err');const sl=document.getElementById('reg-suc');
+  if(el)el.style.display='none';if(sl)sl.style.display='none';
+  if(!email){if(el){el.textContent='Voer je e-mailadres in.';el.style.display='block';}return;}
+  if(pass.length<6){if(el){el.textContent='Wachtwoord minimaal 6 tekens.';el.style.display='block';}return;}
+  if(pass!==pass2){if(el){el.textContent='Wachtwoorden komen niet overeen.';el.style.display='block';}return;}
+  const btn=document.getElementById('btn-register');if(btn){btn.disabled=true;btn.innerHTML='<iconify-icon icon="ph:spinner-bold"></iconify-icon> Bezig...';}
+  try{
+    const{data,error}=await sb.auth.signUp({email,password:pass});
+    if(error){
+      const msg=error.code==='over_email_send_rate_limit'?'Te veel pogingen. Wacht even en probeer opnieuw.':error.code==='email_address_invalid'?'Ongeldig e-mailadres.':error.message;
+      if(el){el.textContent=msg;el.style.display='block';}
+    }else if(data.session){
+      // direct ingelogd (email confirm off)
+    }else{
+      if(sl){sl.textContent='Account aangemaakt! Controleer je inbox ('+email+') en klik op de bevestigingslink.';sl.style.display='block';}
     }
-    if (data.session) {
-      // Email confirmation uitgeschakeld — direct inloggen
-      currentUser = data.user;
-      showApp();
-      await loadData();
-      toast('Account aangemaakt!','success');
-    } else {
-      // Email confirmation vereist
-      loginMsg('success','Account aangemaakt! ✓ Controleer je inbox (' + email + ') en klik op de bevestigingslink. Daarna kun je inloggen.');
-    }
-  } catch(e) {
-    loginMsg('error', 'Verbindingsfout: ' + e.message);
-  } finally {
-    setBtnLoading('btn-register', false, '<iconify-icon icon="ph:user-plus-bold"></iconify-icon>Registreren');
-  }
+  }catch(e){if(el){el.textContent='Fout: '+e.message;el.style.display='block';}}
+  finally{if(btn){btn.disabled=false;btn.innerHTML='<iconify-icon icon="ph:user-plus-bold"></iconify-icon>Account aanmaken';}}
 }
 
-function doGuestLogin() {
-  currentUser = { id: deviceKey, email: 'gast@family-app.nl' };
+function doGuestLogin(){
+  currentUser={id:deviceKey,email:'gast@family-app.nl'};
+  onLogin();
+}
+
+async function doLogout(){
+  if(sb)try{await sb.auth.signOut();}catch(e){}
+  onLogout();
+}
+
+function onLogin(){
   showApp();
-  loadLocal();
-  renderAll();
+  const email=currentUser?.email||'';
+  const name=email.split('@')[0]||'Abdul';
+  const initials=name.slice(0,2).toUpperCase();
+  ['sb-avatar','topbar-avatar','profile-avatar-big'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=initials;});
+  ['sb-name'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=name;});
+  ['sb-email','profile-email-big'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=email;});
+  document.getElementById('profile-name-big').textContent=name;
+  updateTopbar();
+  loadData();
 }
-
-async function doLogout() {
-  if (sb) { try { await sb.auth.signOut(); } catch(e){} }
-  currentUser = null;
-  showLogin(true);
-}
-
-function showApp() {
-  document.getElementById('login-screen').style.display = 'none';
-  const email = currentUser?.email || '';
-  document.getElementById('profile-email').textContent = email;
-  document.getElementById('profile-name').textContent = email.split('@')[0] || 'Abdul Aziz';
-  const initials = (email.split('@')[0] || 'AA').slice(0,2).toUpperCase();
-  document.getElementById('profile-avatar').textContent = initials;
-  document.getElementById('sb-avatar').textContent = initials;
-  document.getElementById('sb-name').textContent = email.split('@')[0] || 'Abdul';
-}
-
-function showLogin(reload) {
-  document.getElementById('login-screen').style.display = 'flex';
-  if (reload) { transactions=[]; budgets=[]; goals=[]; accounts=[]; renderAll(); }
-}
+function onLogout(){currentUser=null;transactions=[];budgets=[];goals=[];accounts=[];showLogin();}
+function showForm(f){document.getElementById('form-login').style.display=f==='login'?'block':'none';document.getElementById('form-register').style.display=f==='register'?'block':'none';}
 
 // ================================================================
 // DATA
 // ================================================================
-function loadLocal() {
-  transactions = JSON.parse(localStorage.getItem('fam_tx') || '[]');
-  budgets = JSON.parse(localStorage.getItem('fam_budgets') || '[]');
-  goals = JSON.parse(localStorage.getItem('fam_goals') || '[]');
-  accounts = JSON.parse(localStorage.getItem('fam_accounts') || '[]');
-  if (!budgets.length) budgets = defaultBudgets();
-  if (!accounts.length) accounts = defaultAccounts();
+function loadLocal(){
+  transactions=JSON.parse(localStorage.getItem('fam_tx')||'[]');
+  budgets=JSON.parse(localStorage.getItem('fam_budgets')||'[]');
+  goals=JSON.parse(localStorage.getItem('fam_goals')||'[]');
+  accounts=JSON.parse(localStorage.getItem('fam_accounts')||'[]');
+  if(!budgets.length)budgets=defaultBudgets();
+  if(!accounts.length)accounts=defaultAccounts();
 }
-
-function saveLocal() {
-  localStorage.setItem('fam_tx', JSON.stringify(transactions));
-  localStorage.setItem('fam_budgets', JSON.stringify(budgets));
-  localStorage.setItem('fam_goals', JSON.stringify(goals));
-  localStorage.setItem('fam_accounts', JSON.stringify(accounts));
+function saveLocal(){
+  localStorage.setItem('fam_tx',JSON.stringify(transactions));
+  localStorage.setItem('fam_budgets',JSON.stringify(budgets));
+  localStorage.setItem('fam_goals',JSON.stringify(goals));
+  localStorage.setItem('fam_accounts',JSON.stringify(accounts));
 }
+function defaultBudgets(){return[{id:'b1',category:'Boodschappen',monthly_limit:400},{id:'b2',category:'Eten',monthly_limit:200},{id:'b3',category:'Transport',monthly_limit:150},{id:'b4',category:'Wonen',monthly_limit:1200},{id:'b5',category:'Vrije tijd',monthly_limit:100}];}
+function defaultAccounts(){return[{id:'acc1',name:'Betaalrekening',bank_name:'ING',balance:0,color_gradient:'blue',account_number_masked:'**** 1234'}];}
 
-async function loadData() {
+async function loadData(){
   setSyncIcon('sync');
-  loadLocal();
-  renderAll();
-  if (!sb || !currentUser || currentUser.id === deviceKey) { setSyncIcon('offline'); return; }
-  try {
-    const uid = currentUser.id;
-    const [{ data: td }, { data: bd }, { data: gd }, { data: ad }] = await Promise.all([
-      sb.from('transactions').select('*').eq('user_id', uid).order('date', { ascending: false }),
-      sb.from('budgets').select('*').eq('user_id', uid),
-      sb.from('goals').select('*').eq('user_id', uid),
-      sb.from('accounts').select('*').eq('user_id', uid)
+  loadLocal();renderAll();
+  if(!sb||!currentUser||currentUser.id===deviceKey){setSyncIcon('offline');return;}
+  try{
+    const uid=currentUser.id;
+    const[{data:td},{data:bd},{data:gd},{data:ad}]=await Promise.all([
+      sb.from('transactions').select('*').eq('user_id',uid).order('date',{ascending:false}),
+      sb.from('budgets').select('*').eq('user_id',uid),
+      sb.from('goals').select('*').eq('user_id',uid),
+      sb.from('accounts').select('*').eq('user_id',uid)
     ]);
-    if (td?.length) { transactions = td; saveLocal(); }
-    if (bd?.length) { budgets = bd; saveLocal(); }
-    if (gd?.length) { goals = gd; saveLocal(); }
-    if (ad?.length) { accounts = ad; saveLocal(); }
-    renderAll();
-    setSyncIcon('ok');
-    loadAiTip();
-  } catch(e) {
-    setSyncIcon('offline');
+    if(td?.length){transactions=td;saveLocal();}
+    if(bd?.length){budgets=bd;saveLocal();}
+    if(gd?.length){goals=gd;saveLocal();}
+    if(ad?.length){accounts=ad;saveLocal();}
+    renderAll();setSyncIcon('ok');
+  }catch(e){setSyncIcon('offline');}
+}
+function setSyncIcon(s){
+  const icon=s==='ok'?'☁️':s==='sync'?'⏳':'📵';
+  ['sync-icon','sync-badge'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=icon;});
+}
+
+// ================================================================
+// NAV
+// ================================================================
+function nav(tab){
+  activeTab=tab;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const s=document.getElementById('screen-'+tab);if(s)s.classList.add('active');
+  document.querySelectorAll('.nav-item,.bnav-item').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  if(tab==='home')renderHome();
+  if(tab==='transactions')renderTx();
+  if(tab==='accounts')renderAccounts();
+  if(tab==='budgets')renderBudgets();
+  if(tab==='goals')renderGoals();
+}
+
+// ================================================================
+// RENDER
+// ================================================================
+function renderAll(){
+  if(activeTab==='home')renderHome();
+  else if(activeTab==='transactions')renderTx();
+  else if(activeTab==='accounts')renderAccounts();
+  else if(activeTab==='budgets')renderBudgets();
+  else if(activeTab==='goals')renderGoals();
+  renderRightPanel();
+}
+
+function renderHome(){
+  const now=new Date(),m=now.getMonth(),y=now.getFullYear();
+  const mTx=transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y;});
+  const inc=mTx.filter(t=>t.type==='income').reduce((s,t)=>s+parseFloat(t.amount),0);
+  const exp=mTx.filter(t=>t.type==='expense').reduce((s,t)=>s+parseFloat(t.amount),0);
+  const net=inc-exp;
+  const bal=transactions.reduce((s,t)=>s+(t.type==='income'?1:-1)*parseFloat(t.amount),0);
+  document.getElementById('kpi-bal').textContent=fmt(bal);
+  document.getElementById('kpi-inc').textContent=fmt(inc);
+  document.getElementById('kpi-exp').textContent=fmt(exp);
+  const netEl=document.getElementById('kpi-net');netEl.textContent=fmt(Math.abs(net));netEl.className='kpi-value '+(net>=0?'pos':'neg');
+  const recent=[...transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
+  const rl=document.getElementById('home-tx-list');
+  rl.innerHTML=recent.length?recent.map(txRow).join(''):'<div class="empty"><iconify-icon icon="ph:receipt-bold"></iconify-icon><div class="empty-title">Nog geen transacties</div><div class="empty-sub">Voeg je eerste transactie toe</div></div>';
+  renderRightPanel();
+}
+
+function renderRightPanel(){
+  // Accounts
+  const pa=document.getElementById('panel-accounts');
+  if(pa){
+    const grads={'blue':'#0179FE','teal':'#01797A','purple':'#6172F3','green':'#059669'};
+    pa.innerHTML=accounts.slice(0,3).map(a=>`<div class="bank-mini"><div class="bank-mini-bar" style="background:${grads[a.color_gradient]||grads.blue}"></div><div class="bank-mini-info"><div class="bank-mini-name">${a.name}</div><div class="bank-mini-num">${a.account_number_masked||'—'}</div></div><div class="bank-mini-bal">${fmt(a.balance||0)}</div></div>`).join('')||'<div style="font-size:13px;color:var(--text3);padding:8px 0;">Nog geen rekeningen</div>';
+  }
+  // Budgets
+  const pb=document.getElementById('panel-budgets');
+  if(pb){
+    const now=new Date(),m=now.getMonth(),y=now.getFullYear();
+    const mTx=transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y&&t.type==='expense';});
+    pb.innerHTML=budgets.slice(0,4).map(b=>{
+      const sp=mTx.filter(t=>t.category===b.category).reduce((s,t)=>s+parseFloat(t.amount),0);
+      const pct=parseFloat(b.monthly_limit)>0?Math.min(100,(sp/parseFloat(b.monthly_limit))*100):0;
+      const bc=pct<70?'green':pct<90?'amber':'red';
+      return`<div class="budget-mini"><div class="budget-mini-header"><span class="budget-mini-name">${b.category}</span><span class="budget-mini-amounts">${fmt(sp)} / ${fmt(b.monthly_limit)}</span></div><div class="progress-bg"><div class="progress-fill ${bc}" style="width:${pct}%"></div></div></div>`;
+    }).join('')||'<div style="font-size:13px;color:var(--text3);">Geen budgetten</div>';
+  }
+  // Goals
+  const pg=document.getElementById('panel-goals');
+  if(pg){
+    pg.innerHTML=goals.slice(0,2).map(g=>{
+      const pct=g.target_amount>0?Math.min(100,(g.current_amount/g.target_amount)*100):0;
+      return`<div class="goal-mini"><div class="goal-mini-circle">${g.emoji||'🎯'}</div><div class="goal-mini-info"><div class="goal-mini-name">${g.name}</div><div class="goal-mini-pct">${Math.round(pct)}% — ${fmt(g.current_amount)} / ${fmt(g.target_amount)}</div></div></div>`;
+    }).join('')||'<div style="font-size:13px;color:var(--text3);">Geen doelen</div>';
   }
 }
 
-function defaultBudgets() {
-  return [
-    {id:'b1',category:'Boodschappen',monthly_limit:400},
-    {id:'b2',category:'Eten',monthly_limit:200},
-    {id:'b3',category:'Transport',monthly_limit:150},
-    {id:'b4',category:'Wonen',monthly_limit:1200},
-    {id:'b5',category:'Vrije tijd',monthly_limit:100},
-  ];
-}
-
-function defaultAccounts() {
-  return [{id:'acc1',name:'Betaalrekening',bank_name:'ING',balance:0,color_gradient:'blue',account_number_masked:'**** 1234'}];
-}
-
-// ================================================================
-// SYNC ICON
-// ================================================================
-function setSyncIcon(s) {
-  const icon = s==='ok'?'☁️':s==='sync'?'⏳':'📵';
-  const text = s==='ok'?'Gesynchroniseerd':s==='sync'?'Bezig...':'Offline';
-  ['sync-icon','sync-icon-m'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.textContent = icon; el.classList.toggle('spin', s==='sync'); }
-  });
-  const st = document.getElementById('sync-text');
-  if (st) st.textContent = text;
-}
-
-// ================================================================
-// NAVIGATION
-// ================================================================
-function nav(tab) {
-  activeTab = tab;
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const s = document.getElementById('screen-' + tab);
-  if (s) s.classList.add('active');
-  document.querySelectorAll('.nav-btn, .bnav-item').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  if (tab === 'home') { renderHome(); loadAiTip(); }
-  if (tab === 'transactions') renderTx();
-  if (tab === 'accounts') renderAccounts();
-  if (tab === 'budgets') renderBudgets();
-  if (tab === 'goals') renderGoals();
-}
-
-// ================================================================
-// RENDER HOME
-// ================================================================
-function renderHome() {
-  const now = new Date(), m = now.getMonth(), y = now.getFullYear();
-  const monthTx = transactions.filter(t => { const d = new Date(t.date); return d.getMonth()===m && d.getFullYear()===y; });
-  const inc = monthTx.filter(t => t.type==='income').reduce((s,t)=>s+parseFloat(t.amount),0);
-  const exp = monthTx.filter(t => t.type==='expense').reduce((s,t)=>s+parseFloat(t.amount),0);
-  const net = inc - exp;
-  const bal = transactions.reduce((s,t)=>s+(t.type==='income'?1:-1)*parseFloat(t.amount),0);
-
-  document.getElementById('bal-amount').textContent = fmt(bal);
-  document.getElementById('bal-inc').textContent = fmt(inc);
-  document.getElementById('bal-exp').textContent = fmt(exp);
-  document.getElementById('kpi-netto').textContent = fmt(Math.abs(net));
-  document.getElementById('kpi-netto').className = 'kpi-value ' + (net>=0?'pos':'neg');
-  document.getElementById('kpi-count').textContent = monthTx.length;
-
-  // Top category
-  const byCat = {};
-  monthTx.filter(t=>t.type==='expense').forEach(t=>{ byCat[t.category]=(byCat[t.category]||0)+parseFloat(t.amount); });
-  const topCat = Object.entries(byCat).sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById('kpi-top').textContent = topCat ? topCat[0] : '—';
-
-  // Budget %
-  const totalBudget = budgets.reduce((s,b)=>s+parseFloat(b.monthly_limit),0);
-  const pct = totalBudget > 0 ? Math.round((exp/totalBudget)*100) : 0;
-  const budgetEl = document.getElementById('kpi-budget');
-  budgetEl.textContent = totalBudget > 0 ? pct + '%' : '—';
-  budgetEl.className = 'kpi-value ' + (pct > 90 ? 'neg' : pct > 70 ? '' : 'pos');
-
-  // Donut
-  renderDonut(byCat);
-
-  // Bar chart
-  renderBarChart();
-
-  // Recent
-  const recent = [...transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
-  const rl = document.getElementById('recent-list');
-  rl.innerHTML = recent.length ? recent.map(txRow).join('') : '<div class="empty" style="padding:20px 0;"><iconify-icon icon="ph:receipt-bold"></iconify-icon><p>Nog geen transacties</p></div>';
-}
-
-function renderDonut(byCat) {
-  const colors = ['#0179FE','#6366f1','#22c55e','#f59e0b','#ef4444','#8b5cf6','#06b6d4'];
-  const total = Object.values(byCat).reduce((s,v)=>s+v, 0);
-  document.getElementById('donut-val').textContent = '€' + Math.round(total);
-  const cats = Object.entries(byCat).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  if (!cats.length) {
-    document.getElementById('donut').style.background = 'conic-gradient(var(--border) 0deg 360deg)';
-    document.getElementById('donut-legend').innerHTML = '<div class="legend-item"><div class="legend-dot" style="background:var(--border)"></div><div class="legend-name" style="color:var(--text3)">Geen data</div></div>';
-    return;
-  }
-  let g = '', ang = 0;
-  cats.forEach((c,i) => { const p=(c[1]/total)*360; g+=`${colors[i%colors.length]} ${ang}deg ${ang+p}deg, `; ang+=p; });
-  g += `var(--border) ${ang}deg 360deg`;
-  document.getElementById('donut').style.background = `conic-gradient(${g})`;
-  document.getElementById('donut-legend').innerHTML = cats.map((c,i) =>
-    `<div class="legend-item"><div class="legend-dot" style="background:${colors[i%colors.length]}"></div><div class="legend-name">${c[0]}</div><div class="legend-amt">${fmt(c[1])}</div><div class="legend-pct">${Math.round(c[1]/total*100)}%</div></div>`
-  ).join('');
-}
-
-function renderBarChart() {
-  const months = [], now = new Date();
-  for (let i=5; i>=0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-    months.push({ m: d.getMonth(), y: d.getFullYear(), label: ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'][d.getMonth()] });
-  }
-  const maxVal = months.reduce((mx, mo) => {
-    const inc = transactions.filter(t => { const d=new Date(t.date); return d.getMonth()===mo.m&&d.getFullYear()===mo.y&&t.type==='income'; }).reduce((s,t)=>s+parseFloat(t.amount),0);
-    const exp = transactions.filter(t => { const d=new Date(t.date); return d.getMonth()===mo.m&&d.getFullYear()===mo.y&&t.type==='expense'; }).reduce((s,t)=>s+parseFloat(t.amount),0);
-    return Math.max(mx, inc, exp);
-  }, 1);
-  const bc = document.getElementById('bar-chart');
-  bc.innerHTML = months.map(mo => {
-    const inc = transactions.filter(t => { const d=new Date(t.date); return d.getMonth()===mo.m&&d.getFullYear()===mo.y&&t.type==='income'; }).reduce((s,t)=>s+parseFloat(t.amount),0);
-    const exp = transactions.filter(t => { const d=new Date(t.date); return d.getMonth()===mo.m&&d.getFullYear()===mo.y&&t.type==='expense'; }).reduce((s,t)=>s+parseFloat(t.amount),0);
-    const ih = Math.round((inc/maxVal)*90); const eh = Math.round((exp/maxVal)*90);
-    return `<div class="bar-group"><div class="bar-pair"><div class="bar inc" style="height:${ih}px" title="Inkomsten: ${fmt(inc)}"></div><div class="bar exp" style="height:${eh}px" title="Uitgaven: ${fmt(exp)}"></div></div><div class="bar-label">${mo.label}</div></div>`;
-  }).join('');
-}
-
-// ================================================================
-// RENDER TRANSACTIONS
-// ================================================================
-function renderTx() {
-  const search = (document.getElementById('tx-search')?.value||'').toLowerCase();
-  let fl = [...transactions].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if (txFilter !== 'all') {
-    if (txFilter==='income'||txFilter==='expense') fl = fl.filter(t=>t.type===txFilter);
-    else fl = fl.filter(t=>t.category===txFilter);
-  }
-  if (search) fl = fl.filter(t=>(t.description||'').toLowerCase().includes(search)||(t.category||'').toLowerCase().includes(search));
-  document.getElementById('tx-count-label').textContent = fl.length + ' transacties';
-  const c = document.getElementById('tx-list');
-  if (!fl.length) { c.innerHTML='<div class="empty"><iconify-icon icon="ph:receipt-bold"></iconify-icon><h3>Geen transacties</h3><p>Voeg je eerste transactie toe</p></div>'; return; }
-  const grps = {};
-  fl.forEach(t => { if (!grps[t.date]) grps[t.date]=[]; grps[t.date].push(t); });
-  c.innerHTML = Object.entries(grps).map(([d,ts]) => `<div class="tx-group-label">${dateLabel(d)}</div>${ts.map(txRow).join('')}`).join('');
-}
-
-function txRow(t) {
-  const cat = CATS.find(c=>c.id===t.category)||CATS[CATS.length-1];
-  return `<div class="tx-item" onclick="openTxDetail('${t.id}')">
-    <div class="tx-icon" style="background:${cat.color}22;color:${cat.color}"><iconify-icon icon="${cat.icon}"></iconify-icon></div>
-    <div class="tx-info"><div class="tx-name">${t.description||cat.label}</div><span class="cat-badge" style="background:${cat.color}22;color:${cat.color}">${cat.label}</span></div>
-    <div class="tx-right"><div class="tx-amount ${t.type}">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div><div class="tx-date">${shortDate(t.date)}</div></div>
+function txRow(t){
+  const cat=CATS.find(c=>c.id===t.category)||CATS[CATS.length-1];
+  const merchant=getMerchantInfo(t.description||'');
+  return`<div class="tx-row" onclick="openTxDetail('${t.id}')">
+    <div class="tx-merchant"><div class="tx-icon" style="background:${cat.bg};color:${cat.color}"><iconify-icon icon="${merchant.icon||cat.icon}"></iconify-icon></div><div><div class="tx-name">${t.description||cat.label}</div><div class="tx-cat-small">${cat.label}</div></div></div>
+    <div class="tx-amount ${t.type}">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div>
+    <div class="tx-date-col tx-col-hide">${shortDate(t.date)}</div>
+    <div class="tx-col-hide"><span class="badge badge-cat">${cat.label}</span></div>
+    <div class="tx-col-hide"><span class="badge badge-success">Verwerkt</span></div>
+    <div class="tx-col-hide" style="font-size:11px;color:var(--text3);">Manueel</div>
   </div>`;
 }
 
-function setTxFilter(el, f) {
-  txFilter = f;
-  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  renderTx();
+function getMerchantInfo(name){
+  const n=name.toLowerCase();
+  if(/albert|jumbo|lidl|aldi|plus|dirk/i.test(n))return{icon:'ph:shopping-cart-bold'};
+  if(/mcdonald|burger|kfc|subway|pizza|domino/i.test(n))return{icon:'ph:hamburger-bold'};
+  if(/shell|bp|esso|tinq|total|tankstation/i.test(n))return{icon:'ph:gas-pump-bold'};
+  if(/ns|ov-chip|gvb|ret|connexxion|trein/i.test(n))return{icon:'ph:train-bold'};
+  if(/netflix|spotify|disney|hbo|videoland/i.test(n))return{icon:'ph:monitor-play-bold'};
+  if(/bol\.com|amazon|zalando|coolblue/i.test(n))return{icon:'ph:package-bold'};
+  if(/zara|h&m|primark|mango|uniqlo/i.test(n))return{icon:'ph:t-shirt-bold'};
+  if(/apotheek|etos|kruidvat|dokter/i.test(n))return{icon:'ph:first-aid-bold'};
+  return{icon:null};
+}
+
+function renderTx(){
+  let fl=[...transactions].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const search=(document.getElementById('tx-search')?.value||'').toLowerCase();
+  const type=document.getElementById('tx-type-filter')?.value||'all';
+  const cat=document.getElementById('tx-cat-filter')?.value||'all';
+  const mon=document.getElementById('tx-month-filter')?.value||'all';
+  if(search)fl=fl.filter(t=>(t.description||'').toLowerCase().includes(search)||(t.category||'').toLowerCase().includes(search));
+  if(type!=='all')fl=fl.filter(t=>t.type===type);
+  if(cat!=='all')fl=fl.filter(t=>t.category===cat);
+  if(mon!=='all'){const[y,m]=mon.split('-').map(Number);fl=fl.filter(t=>{const d=new Date(t.date);return d.getFullYear()===y&&d.getMonth()===m-1;});}
+  document.getElementById('tx-count-label').textContent=fl.length+' transacties';
+  // Stats
+  const inc=fl.filter(t=>t.type==='income').reduce((s,t)=>s+parseFloat(t.amount),0);
+  const exp=fl.filter(t=>t.type==='expense').reduce((s,t)=>s+parseFloat(t.amount),0);
+  const sb2=document.getElementById('tx-stats');
+  if(sb2)sb2.innerHTML=`<div class="stats-banner-item"><div class="stats-banner-label">Inkomsten</div><div class="stats-banner-val" style="color:#059669;">${fmt(inc)}</div></div><div class="stats-banner-item"><div class="stats-banner-label">Uitgaven</div><div class="stats-banner-val" style="color:var(--red);">${fmt(exp)}</div></div><div class="stats-banner-item"><div class="stats-banner-label">Netto</div><div class="stats-banner-val" style="color:${inc-exp>=0?'#059669':'var(--red)'};">${fmt(inc-exp)}</div></div>`;
+  const perPage=20;const totalPages=Math.ceil(fl.length/perPage)||1;txPage=Math.min(txPage,totalPages);
+  const paged=fl.slice((txPage-1)*perPage,txPage*perPage);
+  const tl=document.getElementById('tx-list');
+  tl.innerHTML=paged.length?paged.map(txRow).join(''):'<div class="empty"><iconify-icon icon="ph:receipt-bold"></iconify-icon><div class="empty-title">Geen transacties gevonden</div></div>';
+  const pg=document.getElementById('tx-pagination');
+  if(pg){
+    pg.innerHTML=`<div class="pagination-info">Pagina ${txPage} van ${totalPages} (${fl.length} totaal)</div><div class="pagination-btns"><button class="page-btn" onclick="txPage=Math.max(1,txPage-1);renderTx()" ${txPage<=1?'disabled':''}>←</button><button class="page-btn active">${txPage}</button><button class="page-btn" onclick="txPage=Math.min(${totalPages},txPage+1);renderTx()" ${txPage>=totalPages?'disabled':''}>→</button></div>`;
+  }
+}
+
+function renderAccounts(){
+  const grads=ACC_GRADS;
+  const ag=document.getElementById('accounts-grid');
+  ag.innerHTML=accounts.length?accounts.map(a=>`<div class="bank-card" style="background:${grads[a.color_gradient]||grads.blue}" onclick="selectAcc('${a.id}')">
+    <div class="bc-top"><div class="bc-bank"><iconify-icon icon="ph:bank-bold"></iconify-icon>${a.bank_name||'Bank'}</div><div class="bc-chip"></div></div>
+    <div class="bc-number">${a.account_number_masked||'•••• •••• •••• 0000'}</div>
+    <div class="bc-bottom"><div class="bc-holder">${a.name}</div><div class="bc-balance">${fmt(a.balance||0)}</div></div>
+  </div>`):'<div class="empty" style="grid-column:1/-1;"><iconify-icon icon="ph:bank-bold"></iconify-icon><div class="empty-title">Geen rekeningen</div></div>';
+  renderAccTx();
+}
+
+function selectAcc(id){
+  selectedAccId=id;
+  const a=accounts.find(x=>x.id===id);
+  document.getElementById('acc-tx-title').textContent=(a?a.name:'Alle') +' — Transacties';
+  renderAccTx();
+}
+function renderAccTx(){
+  let fl=selectedAccId?transactions.filter(t=>t.account_id===selectedAccId):transactions;
+  fl=fl.sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,20);
+  document.getElementById('acc-tx-list').innerHTML=fl.length?fl.map(txRow).join(''):'<div class="empty" style="padding:20px 0;"><iconify-icon icon="ph:receipt-bold"></iconify-icon><div class="empty-sub">Geen transacties</div></div>';
+}
+
+function renderBudgets(){
+  const m=budgetMonth.getMonth(),y=budgetMonth.getFullYear();
+  const mTx=transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y&&t.type==='expense';});
+  const totB=budgets.reduce((s,b)=>s+parseFloat(b.monthly_limit),0);
+  const totS=mTx.reduce((s,t)=>s+parseFloat(t.amount),0);
+  const pct=totB>0?Math.min(100,(totS/totB)*100):0;
+  const bc=pct<70?'green':pct<90?'amber':'red';
+  document.getElementById('budget-overview-card').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;"><div><div style="font-size:13px;color:var(--text2);margin-bottom:4px;">Totaal budget ${MONTHS[m]}</div><div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;">${fmt(totS)}<span style="font-size:16px;color:var(--text2);font-weight:500;"> / ${fmt(totB)}</span></div></div><span style="font-size:20px;font-weight:700;color:var(--${bc==='green'?'green':bc==='amber'?'amber':'red'})">${Math.round(pct)}%</span></div><div class="progress-bg" style="height:10px;"><div class="progress-fill ${bc}" style="width:${pct}%"></div></div>`;
+  const bl=document.getElementById('budget-list');
+  bl.innerHTML=budgets.map(b=>{
+    const sp=mTx.filter(t=>t.category===b.category).reduce((s,t)=>s+parseFloat(t.amount),0);
+    const bp=parseFloat(b.monthly_limit)>0?Math.min(100,(sp/parseFloat(b.monthly_limit))*100):0;
+    const bbc=bp<70?'green':bp<90?'amber':'red';
+    const cat=CATS.find(c=>c.id===b.category)||CATS[CATS.length-1];
+    return`<div class="budget-cat-card"><div class="budget-cat-header"><div class="budget-cat-icon" style="background:${cat.bg};color:${cat.color}"><iconify-icon icon="${cat.icon}"></iconify-icon></div><div><div class="budget-cat-name">${cat.label}</div><div class="budget-cat-amounts">${fmt(sp)} van ${fmt(b.monthly_limit)}</div></div><span style="margin-left:auto;font-size:13px;font-weight:700;color:var(--${bbc==='green'?'green':bbc==='amber'?'amber':'red'})">${Math.round(bp)}%</span></div><div class="progress-bg"><div class="progress-fill ${bbc}" style="width:${bp}%"></div></div></div>`;
+  }).join('')||'<div class="empty" style="grid-column:1/-1;"><iconify-icon icon="ph:chart-pie-bold"></iconify-icon><div class="empty-title">Geen budgetten</div></div>';
+  document.getElementById('bud-cat-sel').innerHTML=CATS.map(c=>`<option value="${c.id}">${c.label}</option>`).join('');
+}
+
+function changeBudgetMonth(d){budgetMonth.setMonth(budgetMonth.getMonth()+d);updateBudgetMonthLabel();renderBudgets();}
+function updateBudgetMonthLabel(){const el=document.getElementById('budget-month-lbl');if(el)el.textContent=MONTHS[budgetMonth.getMonth()]+' '+budgetMonth.getFullYear();}
+
+function renderGoals(){
+  const gg=document.getElementById('goals-grid');
+  gg.innerHTML=goals.length?goals.map(g=>{
+    const pct=g.target_amount>0?Math.min(100,(g.current_amount/g.target_amount)*100):0;
+    const r=38,circ=2*Math.PI*r,dash=circ*(pct/100),gap=circ-dash;
+    const daysLeft=g.deadline?Math.ceil((new Date(g.deadline)-new Date())/86400000):null;
+    return`<div class="goal-card"><div class="goal-circle-wrap"><svg class="goal-circle-svg" width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--bg3)" stroke-width="6"/><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--accent)" stroke-width="6" stroke-dasharray="${dash} ${gap}" stroke-linecap="round"/></svg><div class="goal-emoji">${g.emoji||'🎯'}</div></div><div class="goal-name">${g.name}</div><div class="goal-amounts">${fmt(g.current_amount)} / ${fmt(g.target_amount)}</div><div class="goal-deadline">${daysLeft!==null?daysLeft+' dagen resterend':'—'}</div><button class="btn btn-secondary btn-sm btn-full" onclick="openDeposit('${g.id}')">+ Storting</button></div>`;
+  }).join(''):'<div class="empty" style="grid-column:1/-1;"><iconify-icon icon="ph:target-bold"></iconify-icon><div class="empty-title">Geen doelen</div><div class="empty-sub">Maak je eerste spaardoel aan</div></div>';
 }
 
 // ================================================================
-// RENDER ACCOUNTS
+// ADD TX
 // ================================================================
-function renderAccounts() {
-  const grads = { blue:'linear-gradient(135deg,#0179FE,#4893FF)', teal:'linear-gradient(135deg,#01797A,#489399)', indigo:'linear-gradient(135deg,#6366f1,#818cf8)' };
-  const ag = document.getElementById('accounts-grid');
-  ag.innerHTML = accounts.length ? accounts.map(a => {
-    const gr = grads[a.color_gradient] || grads.blue;
-    return `<div class="bank-card" style="background:${gr}" onclick="selectAccount('${a.id}')">
-      <div class="bank-card-type">${a.bank_name||'Bank'}</div>
-      <div class="bank-card-number">${a.account_number_masked||'**** ****'}</div>
-      <div class="bank-card-name">${a.name}</div>
-      <div class="bank-card-balance">${fmt(a.balance||0)}</div>
-    </div>`;
-  }).join('') : '<div class="empty"><iconify-icon icon="ph:bank-bold"></iconify-icon><h3>Geen rekeningen</h3><p>Voeg een rekening toe</p></div>';
-
-  renderAccountTx();
-  updateAccountSelect();
+function buildCatChips(){
+  const c=document.getElementById('cat-chips');if(!c)return;
+  c.innerHTML=CATS.map(cat=>`<div class="cat-chip ${cat.id===selCat?'sel':''}" onclick="setCat('${cat.id}',this)"><iconify-icon icon="${cat.icon}" style="color:${cat.color}"></iconify-icon>${cat.label.split(' ')[0]}</div>`).join('');
 }
+function setCat(id,el){selCat=id;document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function setTxType(t){txType=t;document.getElementById('type-exp').className='type-btn '+(t==='expense'?'active-exp':'');document.getElementById('type-inc').className='type-btn '+(t==='income'?'active-inc':'');}
 
-function selectAccount(id) {
-  selectedAccountId = id;
-  const acc = accounts.find(a=>a.id===id);
-  document.getElementById('selected-account-name').textContent = acc ? acc.name : 'Alle rekeningen';
-  renderAccountTx();
-}
-
-function renderAccountTx() {
-  let fl = selectedAccountId ? transactions.filter(t=>t.account_id===selectedAccountId) : transactions;
-  fl = fl.sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,20);
-  const c = document.getElementById('account-tx-list');
-  c.innerHTML = fl.length ? fl.map(txRow).join('') : '<div class="empty" style="padding:20px 0;"><iconify-icon icon="ph:receipt-bold"></iconify-icon><p>Geen transacties</p></div>';
-}
-
-function updateAccountSelect() {
-  const sel = document.getElementById('add-account-sel');
-  sel.innerHTML = accounts.map(a=>`<option value="${a.id}">${a.name} (${a.bank_name||''})</option>`).join('');
-}
-
-// ================================================================
-// RENDER BUDGETS
-// ================================================================
-function renderBudgets() {
-  const m = budgetMonth.getMonth(), y = budgetMonth.getFullYear();
-  const mTx = transactions.filter(t=>{ const d=new Date(t.date); return d.getMonth()===m&&d.getFullYear()===y&&t.type==='expense'; });
-  const totB = budgets.reduce((s,b)=>s+parseFloat(b.monthly_limit),0);
-  const totS = mTx.reduce((s,t)=>s+parseFloat(t.amount),0);
-  const pct = totB>0?Math.min(100,(totS/totB)*100):0;
-  const barClass = pct<70?'green':pct<90?'amber':'red';
-
-  const ov = document.getElementById('budget-overview');
-  ov.innerHTML = `<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:8px;"><span>Totaal budget</span><span>Besteed</span></div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;">${fmt(totB)}</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--text2);">${fmt(totS)}</span>
-    </div>
-    <div class="progress-bg"><div class="progress-fill ${barClass}" style="width:${pct}%"></div></div>`;
-
-  const bl = document.getElementById('budget-list');
-  bl.innerHTML = budgets.map(b => {
-    const sp = mTx.filter(t=>t.category===b.category).reduce((s,t)=>s+parseFloat(t.amount),0);
-    const bp = parseFloat(b.monthly_limit)>0?Math.min(100,(sp/parseFloat(b.monthly_limit))*100):0;
-    const bc = bp<70?'green':bp<90?'amber':'red';
-    const cat = CATS.find(c=>c.id===b.category)||CATS[CATS.length-1];
-    return `<div class="card-sm" style="margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <div class="tx-icon" style="background:${cat.color}22;color:${cat.color};width:36px;height:36px;border-radius:10px;"><iconify-icon icon="${cat.icon}"></iconify-icon></div>
-        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">${cat.label}</div><div style="font-size:12px;color:var(--text2);">${fmt(sp)} van ${fmt(b.monthly_limit)}</div></div>
-        <span style="font-size:13px;font-weight:600;color:var(--${bc==='green'?'green':bc==='amber'?'amber':'red'})">${Math.round(bp)}%</span>
-      </div>
-      <div class="progress-bg"><div class="progress-fill ${bc}" style="width:${bp}%"></div></div>
-    </div>`;
-  }).join('');
-
-  const sel = document.getElementById('budget-cat-sel');
-  if (sel) sel.innerHTML = CATS.map(c=>`<option value="${c.id}">${c.label}</option>`).join('');
-}
-
-function changeBudgetMonth(d) {
-  budgetMonth.setMonth(budgetMonth.getMonth()+d);
-  updateBudgetMonthLabel();
-  renderBudgets();
-}
-
-function updateBudgetMonthLabel() {
-  const M=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
-  const el = document.getElementById('budget-month-lbl');
-  if (el) el.textContent = M[budgetMonth.getMonth()] + ' ' + budgetMonth.getFullYear();
-}
-
-// ================================================================
-// RENDER GOALS
-// ================================================================
-function renderGoals() {
-  const gg = document.getElementById('goals-grid');
-  gg.innerHTML = goals.length ? goals.map(g => {
-    const pct = g.target_amount>0?Math.min(100,(g.current_amount/g.target_amount)*100):0;
-    const col = `conic-gradient(var(--accent) ${pct*3.6}deg, var(--border) ${pct*3.6}deg)`;
-    return `<div class="goal-card">
-      <div class="goal-circle"><div class="goal-circle-bg" style="background:${col}"></div><div style="position:absolute;inset:12px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;"><span class="goal-emoji">${g.emoji||'🎯'}</span></div></div>
-      <div class="goal-name">${g.name}</div>
-      <div class="goal-amounts">${fmt(g.current_amount)} / ${fmt(g.target_amount)}</div>
-      <div class="progress-bg" style="margin-bottom:8px;"><div class="progress-fill ${pct>70?'green':'amber'}" style="width:${pct}%"></div></div>
-      <div style="font-size:11px;color:var(--text3);">${g.deadline ? fullDate(g.deadline) : '—'}</div>
-      <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:12px;padding:8px;" onclick="depositGoal('${g.id}')">+ Storting</button>
-    </div>`;
-  }).join('') : '<div class="empty"><iconify-icon icon="ph:target-bold"></iconify-icon><h3>Geen doelen</h3><p>Maak je eerste spaardoel aan</p></div>';
-}
-
-// ================================================================
-// RENDER ALL
-// ================================================================
-function renderAll() {
-  if (activeTab==='home') renderHome();
-  if (activeTab==='transactions') renderTx();
-  if (activeTab==='accounts') renderAccounts();
-  if (activeTab==='budgets') renderBudgets();
-  if (activeTab==='goals') renderGoals();
-}
-
-// ================================================================
-// ADD TRANSACTION
-// ================================================================
-function openAddTx() {
-  updateAccountSelect();
+function openAddTx(){
+  document.getElementById('add-acc-sel').innerHTML=accounts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
   document.getElementById('add-amount').value='';
   document.getElementById('add-desc').value='';
   document.getElementById('add-date').value=new Date().toISOString().split('T')[0];
-  photoB64=null;
-  document.getElementById('photo-area').innerHTML='<div class="photo-upload" onclick="document.getElementById(\'photo-input\').click()"><iconify-icon icon="ph:camera-bold"></iconify-icon><p>Tik om foto toe te voegen</p></div>';
-  openModal('modal-add-tx');
+  openMod('modal-add-tx');
 }
 
-function buildCatChips() {
-  const c = document.getElementById('cat-chips-add');
-  if (!c) return;
-  c.innerHTML = CATS.map(cat=>`<div class="cat-chip ${cat.id===selectedCat?'sel':''}" onclick="selCat('${cat.id}',this)"><iconify-icon icon="${cat.icon}" style="color:${cat.color}"></iconify-icon><span>${cat.label.split(' ')[0]}</span></div>`).join('');
-}
-
-function selCat(id, el) {
-  selectedCat=id;
-  document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('sel'));
-  el.classList.add('sel');
-}
-
-function setTxType(t) {
-  txType=t;
-  document.getElementById('type-exp').className='type-btn '+(t==='expense'?'exp':'');
-  document.getElementById('type-inc').className='type-btn '+(t==='income'?'inc':'');
-}
-
-function handlePhoto(e) {
-  const f = e.target.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = ev => {
-    photoB64 = ev.target.result;
-    document.getElementById('photo-area').innerHTML=`<div class="photo-preview"><img src="${photoB64}"><button class="photo-remove" onclick="removePhoto()"><iconify-icon icon="ph:x-bold"></iconify-icon></button></div>`;
-  };
-  r.readAsDataURL(f);
-}
-
-function removePhoto() {
-  photoB64=null;
-  document.getElementById('photo-area').innerHTML='<div class="photo-upload" onclick="document.getElementById(\'photo-input\').click()"><iconify-icon icon="ph:camera-bold"></iconify-icon><p>Tik om foto toe te voegen</p></div>';
-  document.getElementById('photo-input').value='';
-}
-
-async function saveTx() {
-  const amount = parseFloat(document.getElementById('add-amount').value);
-  const desc = document.getElementById('add-desc').value.trim();
-  const date = document.getElementById('add-date').value;
-  const accountId = document.getElementById('add-account-sel').value;
-  if (!amount||amount<=0) { toast('Voer een geldig bedrag in','error'); return; }
-  if (!date) { toast('Selecteer een datum','error'); return; }
-  const tx = {id:crypto.randomUUID(),created_at:new Date().toISOString(),user_id:currentUser?.id||deviceKey,amount,type:txType,description:desc||selectedCat,category:selectedCat,date,photo_base64:photoB64,account_id:accountId};
-  transactions.unshift(tx);
-  saveLocal(); renderAll();
-  closeModal('modal-add-tx');
-  toast('Transactie opgeslagen','success');
-  setTxType('expense');
-  if (sb && currentUser && currentUser.id!==deviceKey) {
-    try { await sb.from('transactions').insert(tx); setSyncIcon('ok'); } catch(e) { setSyncIcon('offline'); }
-  }
+async function saveTx(){
+  const amount=parseFloat(document.getElementById('add-amount').value);
+  const desc=document.getElementById('add-desc').value.trim();
+  const date=document.getElementById('add-date').value;
+  const accId=document.getElementById('add-acc-sel').value;
+  if(!amount||amount<=0){toast('Voer een geldig bedrag in','error');return;}
+  if(!date){toast('Selecteer een datum','error');return;}
+  const tx={id:crypto.randomUUID(),created_at:new Date().toISOString(),user_id:currentUser?.id||deviceKey,amount,type:txType,description:desc||selCat,category:selCat,date,account_id:accId};
+  transactions.unshift(tx);saveLocal();renderAll();
+  closeMod('modal-add-tx');toast('Transactie opgeslagen','success');
+  if(sb&&currentUser&&currentUser.id!==deviceKey){try{await sb.from('transactions').insert(tx);setSyncIcon('ok');}catch(e){setSyncIcon('offline');}}
 }
 
 // ================================================================
 // TX DETAIL
 // ================================================================
-function openTxDetail(id) {
-  const t = transactions.find(x=>x.id===id); if (!t) return;
-  const cat = CATS.find(c=>c.id===t.category)||CATS[CATS.length-1];
+function openTxDetail(id){
+  const t=transactions.find(x=>x.id===id);if(!t)return;
+  const cat=CATS.find(c=>c.id===t.category)||CATS[CATS.length-1];
   document.getElementById('tx-detail-body').innerHTML=`
-    <div style="text-align:center;margin-bottom:16px;">
-      <div style="width:64px;height:64px;border-radius:20px;background:${cat.color}22;color:${cat.color};display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;"><iconify-icon icon="${cat.icon}"></iconify-icon></div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:${t.type==='income'?'var(--green)':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div>
+    <div style="text-align:center;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:16px;">
+      <div style="width:56px;height:56px;border-radius:16px;background:${cat.bg};color:${cat.color};display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;"><iconify-icon icon="${cat.icon}"></iconify-icon></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:${t.type==='income'?'#059669':'var(--red)'};">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div>
       <div style="font-size:16px;font-weight:600;margin-top:4px;">${t.description||cat.label}</div>
-      <div style="font-size:12px;color:var(--text2);margin-top:4px;">${cat.label} · ${fullDate(t.date)}</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px;">${cat.label} · ${fullDate(t.date)}</div>
     </div>
-    ${t.photo_base64?`<div class="photo-preview" style="margin-bottom:16px;"><img src="${t.photo_base64}"></div>`:''}
-    <div style="display:flex;gap:10px;">
-      <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('modal-tx-detail')">Sluiten</button>
-      <button class="btn btn-danger" style="flex:1;" onclick="deleteTx('${t.id}')"><iconify-icon icon="ph:trash-bold"></iconify-icon>Verwijderen</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div><div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Type</div><span class="badge ${t.type==='income'?'badge-success':'badge-pending'}">${t.type==='income'?'Inkomst':'Uitgave'}</span></div>
+      <div><div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Status</div><span class="badge badge-success">Verwerkt</span></div>
     </div>`;
-  openModal('modal-tx-detail');
+  document.getElementById('tx-detail-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeMod('modal-tx-detail')">Sluiten</button><button class="btn btn-danger" onclick="deleteTx('${t.id}')"><iconify-icon icon="ph:trash-bold"></iconify-icon>Verwijderen</button>`;
+  openMod('modal-tx-detail');
 }
 
-async function deleteTx(id) {
-  showConfirm('Transactie verwijderen?','Deze actie kan niet ongedaan worden gemaakt.', async ()=>{
-    transactions = transactions.filter(t=>t.id!==id);
-    saveLocal(); renderAll();
-    closeModal('modal-tx-detail');
-    toast('Transactie verwijderd','info');
-    if (sb && currentUser && currentUser.id!==deviceKey) {
-      try { await sb.from('transactions').delete().eq('id',id); } catch(e) {}
-    }
+async function deleteTx(id){
+  confirm2('Transactie verwijderen?','Dit kan niet ongedaan worden gemaakt.',async()=>{
+    transactions=transactions.filter(t=>t.id!==id);saveLocal();renderAll();closeMod('modal-tx-detail');toast('Verwijderd','info');
+    if(sb&&currentUser&&currentUser.id!==deviceKey){try{await sb.from('transactions').delete().eq('id',id);}catch(e){}}
   });
 }
 
 // ================================================================
 // ACCOUNTS
 // ================================================================
-function openAddAccount() { accGrad='blue'; openModal('modal-add-account'); }
-function setAccGrad(g) { accGrad=g; }
+function openAddAccount(){accGrad='blue';openMod('modal-add-account');}
+function setAccGrad(g){accGrad=g;}
 
-async function saveAccount() {
-  const name = document.getElementById('acc-name').value.trim();
-  const bank = document.getElementById('acc-bank').value.trim();
-  const num = document.getElementById('acc-number').value.trim();
-  const bal = parseFloat(document.getElementById('acc-balance').value)||0;
-  if (!name) { toast('Vul een naam in','error'); return; }
-  const acc = {id:crypto.randomUUID(),user_id:currentUser?.id||deviceKey,name,bank_name:bank,balance:bal,color_gradient:accGrad,account_number_masked:num||'**** ****'};
-  accounts.push(acc); saveLocal(); renderAccounts();
-  closeModal('modal-add-account');
-  toast('Rekening toegevoegd','success');
-  if (sb && currentUser && currentUser.id!==deviceKey) {
-    try { await sb.from('accounts').insert(acc); } catch(e) {}
-  }
+async function saveAccount(){
+  const name=document.getElementById('acc-name').value.trim();
+  const bank=document.getElementById('acc-bank').value.trim();
+  const num=document.getElementById('acc-num').value.trim();
+  const bal=parseFloat(document.getElementById('acc-bal').value)||0;
+  if(!name){toast('Naam is verplicht','error');return;}
+  const a={id:crypto.randomUUID(),user_id:currentUser?.id||deviceKey,name,bank_name:bank,balance:bal,color_gradient:accGrad,account_number_masked:num||'**** 0000'};
+  accounts.push(a);saveLocal();renderAccounts();renderRightPanel();closeMod('modal-add-account');toast('Rekening toegevoegd','success');
+  if(sb&&currentUser&&currentUser.id!==deviceKey){try{await sb.from('accounts').insert(a);}catch(e){}}
 }
 
 // ================================================================
 // BUDGETS
 // ================================================================
-function openAddBudget() { openModal('modal-add-budget'); renderBudgets(); }
-
-async function saveBudget() {
-  const cat = document.getElementById('budget-cat-sel').value;
-  const lim = parseFloat(document.getElementById('budget-limit').value);
-  if (!lim||lim<=0) { toast('Voer een geldig bedrag in','error'); return; }
-  const i = budgets.findIndex(b=>b.category===cat);
-  if (i>=0) budgets[i].monthly_limit=lim;
+function openAddBudget(){renderBudgets();openMod('modal-add-budget');}
+async function saveBudget(){
+  const cat=document.getElementById('bud-cat-sel').value;
+  const lim=parseFloat(document.getElementById('bud-limit').value);
+  if(!lim||lim<=0){toast('Voer een bedrag in','error');return;}
+  const i=budgets.findIndex(b=>b.category===cat);
+  if(i>=0)budgets[i].monthly_limit=lim;
   else budgets.push({id:crypto.randomUUID(),user_id:currentUser?.id||deviceKey,category:cat,monthly_limit:lim});
-  saveLocal(); renderBudgets(); closeModal('modal-add-budget');
-  toast('Budget opgeslagen','success');
-  if (sb && currentUser && currentUser.id!==deviceKey) {
-    try { await sb.from('budgets').upsert(budgets); } catch(e) {}
-  }
+  saveLocal();renderBudgets();closeMod('modal-add-budget');toast('Budget opgeslagen','success');
+  if(sb&&currentUser&&currentUser.id!==deviceKey){try{await sb.from('budgets').upsert(budgets);}catch(e){}}
 }
 
 // ================================================================
 // GOALS
 // ================================================================
-function openAddGoal() { openModal('modal-add-goal'); }
-
-async function saveGoal() {
-  const name = document.getElementById('goal-name').value.trim();
-  const emoji = document.getElementById('goal-emoji').value||'🎯';
-  const target = parseFloat(document.getElementById('goal-target').value)||0;
-  const current = parseFloat(document.getElementById('goal-current').value)||0;
-  const deadline = document.getElementById('goal-deadline').value;
-  if (!name||!target) { toast('Vul naam en doelbedrag in','error'); return; }
-  const g = {id:crypto.randomUUID(),user_id:currentUser?.id||deviceKey,name,emoji,target_amount:target,current_amount:current,deadline};
-  goals.push(g); saveLocal(); renderGoals(); closeModal('modal-add-goal');
-  toast('Doel aangemaakt','success');
-  if (sb && currentUser && currentUser.id!==deviceKey) {
-    try { await sb.from('goals').insert(g); } catch(e) {}
-  }
+function openAddGoal(){openMod('modal-add-goal');}
+async function saveGoal(){
+  const name=document.getElementById('goal-name').value.trim();
+  const emoji=document.getElementById('goal-emoji').value||'🎯';
+  const target=parseFloat(document.getElementById('goal-target').value)||0;
+  const current=parseFloat(document.getElementById('goal-current').value)||0;
+  const deadline=document.getElementById('goal-deadline').value;
+  if(!name||!target){toast('Naam en doelbedrag zijn verplicht','error');return;}
+  const g={id:crypto.randomUUID(),user_id:currentUser?.id||deviceKey,name,emoji,target_amount:target,current_amount:current,deadline};
+  goals.push(g);saveLocal();renderGoals();renderRightPanel();closeMod('modal-add-goal');toast('Doel aangemaakt','success');
+  if(sb&&currentUser&&currentUser.id!==deviceKey){try{await sb.from('goals').insert(g);}catch(e){}}
 }
 
-function depositGoal(id) {
-  const amt = prompt('Storting bedrag (€):');
-  if (!amt || isNaN(parseFloat(amt))) return;
-  const i = goals.findIndex(g=>g.id===id);
-  if (i>=0) { goals[i].current_amount=(parseFloat(goals[i].current_amount)||0)+parseFloat(amt); saveLocal(); renderGoals(); toast('Storting toegevoegd','success'); }
+function openDeposit(id){document.getElementById('dep-goal-id').value=id;document.getElementById('dep-amount').value='';openMod('modal-deposit');}
+async function saveDeposit(){
+  const id=document.getElementById('dep-goal-id').value;
+  const amt=parseFloat(document.getElementById('dep-amount').value);
+  if(!amt||amt<=0){toast('Voer een bedrag in','error');return;}
+  const i=goals.findIndex(g=>g.id===id);
+  if(i>=0){goals[i].current_amount=(parseFloat(goals[i].current_amount)||0)+amt;saveLocal();renderGoals();renderRightPanel();}
+  closeMod('modal-deposit');toast('Storting toegevoegd','success');
 }
 
 // ================================================================
 // SETTINGS
 // ================================================================
-function saveClaudeKey() {
-  const k = document.getElementById('claude-key-input').value.trim();
-  if (k && k !== '••••••••••••••••') {
-    localStorage.setItem('claude_api_key', k);
-    document.getElementById('claude-key-input').value = '••••••••••••••••';
-    toast('Claude API key opgeslagen','success');
-    checkClaudeKey();
-  }
+function setSettingsTab(tab){
+  document.querySelectorAll('.settings-nav-item').forEach(n=>n.classList.toggle('active',n.dataset.stab===tab));
+  document.querySelectorAll('.settings-section').forEach(s=>s.classList.toggle('active',s.id==='stab-'+tab));
 }
 
-async function testSupabase() {
-  const url = document.getElementById('supa-url-input').value.trim();
-  const key = document.getElementById('supa-key-input').value.trim();
-  const s = document.getElementById('supa-status');
-  s.style.display='block'; s.style.color='var(--amber)'; s.textContent='Testen...';
-  try {
-    const cl = supabase.createClient(url, key);
-    const { error } = await cl.from('transactions').select('id').limit(1);
-    if (error) throw error;
-    s.style.color='var(--green)'; s.textContent='✓ Verbinding geslaagd';
-    sb = cl; setSyncIcon('ok');
-  } catch(e) {
-    s.style.color='var(--red)'; s.textContent='✗ ' + (e.message||'Mislukt');
-  }
+function saveClaudeKey(){
+  const k=document.getElementById('claude-key-inp').value.trim();
+  if(k&&k!=='••••••••••••••••'){localStorage.setItem('claude_api_key',k);document.getElementById('claude-key-inp').value='••••••••••••••••';toast('API key opgeslagen','success');}
 }
 
-// ================================================================
-// BALANCE TOGGLE
-// ================================================================
-function toggleBalance() {
-  balanceVisible = !balanceVisible;
-  document.getElementById('bal-amount').classList.toggle('hidden', !balanceVisible);
-  document.getElementById('eye-icon').setAttribute('icon', balanceVisible?'ph:eye-bold':'ph:eye-slash-bold');
+async function testClaude(){
+  const k=localStorage.getItem('claude_api_key');const s=document.getElementById('claude-status');
+  if(!k){s.style.display='block';s.style.color='var(--red)';s.textContent='Geen API key ingesteld.';return;}
+  s.style.display='block';s.style.color='var(--amber-text)';s.textContent='Testen...';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:CLAUDE_MODEL,max_tokens:10,messages:[{role:'user',content:'Hi'}]})});
+    const d=await r.json();
+    if(d.error){s.style.color='var(--red-text)';s.textContent='✗ '+d.error.message;}
+    else{s.style.color='var(--green-text)';s.textContent='✓ Verbinding geslaagd';}
+  }catch(e){s.style.color='var(--red-text)';s.textContent='✗ '+e.message;}
+}
+
+async function testSupabase(){
+  const s=document.getElementById('supa-status');s.style.display='block';s.style.color='var(--amber-text)';s.textContent='Testen...';
+  try{
+    const{error}=await sb.from('transactions').select('id').limit(1);
+    if(error)throw error;s.style.color='var(--green-text)';s.textContent='✓ Verbinding geslaagd';
+  }catch(e){s.style.color='var(--red-text)';s.textContent='✗ '+e.message;}
 }
 
 // ================================================================
-// CLAUDE AI
+// AI CHAT
 // ================================================================
-async function callClaude(messages, tools=[]) {
-  const apiKey = localStorage.getItem('claude_api_key');
-  if (!apiKey) { toast('Geen Claude API key ingesteld','error'); return null; }
-  const resp = await fetch(CLAUDE_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: CLAUDE_MODEL,
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      messages,
-      tools: tools.length ? tools : undefined
-    })
-  });
-  return await resp.json();
+function toggleChat(){
+  chatOpen=!chatOpen;
+  const w=document.getElementById('ai-chat-window');
+  w.classList.toggle('open',chatOpen);
 }
+document.addEventListener('click',e=>{
+  const w=document.getElementById('ai-chat-window');
+  const fab=document.getElementById('ai-fab');
+  if(chatOpen&&w&&!w.contains(e.target)&&!fab.contains(e.target)){chatOpen=false;w.classList.remove('open');}
+});
 
-async function loadAiTip() {
-  if (!localStorage.getItem('claude_api_key')) return;
-  const tip = document.getElementById('ai-tip');
-  tip.innerHTML = '<span class="typing-indicator"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></span>';
-  const now = new Date();
-  const m = now.getMonth(), y = now.getFullYear();
-  const monthTx = transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y;});
-  const exp = monthTx.filter(t=>t.type==='expense').reduce((s,t)=>s+parseFloat(t.amount),0);
-  const inc = monthTx.filter(t=>t.type==='income').reduce((s,t)=>s+parseFloat(t.amount),0);
-  const byCat = {};
-  monthTx.filter(t=>t.type==='expense').forEach(t=>{byCat[t.category]=(byCat[t.category]||0)+parseFloat(t.amount);});
-  const catSummary = Object.entries(byCat).map(([k,v])=>`${k}: ${fmt(v)}`).join(', ') || 'geen data';
-  try {
-    const r = await callClaude([{role:'user',content:`Mijn financiën deze maand: Inkomsten ${fmt(inc)}, Uitgaven ${fmt(exp)}, Netto ${fmt(inc-exp)}. Categorieën: ${catSummary}. Geef 1 concrete, praktische tip in maximaal 2 zinnen.`}]);
-    tip.textContent = r?.content?.[0]?.text || 'Geen tip beschikbaar.';
-  } catch(e) {
-    tip.textContent = 'Kon geen tip laden.';
-  }
-}
+function chatKeydown(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+function sendSuggestion(t){document.getElementById('chat-input').value=t;sendChat();}
 
-// ================================================================
-// CHAT
-// ================================================================
-async function sendChat() {
-  const input = document.getElementById('chat-input');
-  const msg = input.value.trim();
-  if (!msg) return;
-  input.value = '';
-  addChatMsg(msg, 'user');
-  chatHistory.push({role:'user', content:msg});
+async function sendChat(){
+  const inp=document.getElementById('chat-input');
+  const msg=inp.value.trim();if(!msg)return;
+  inp.value='';
+  addChatMsg(msg,'user');
+  chatHistory.push({role:'user',content:msg});
   addTyping();
-  try {
-    await processClaudeResponse(chatHistory.slice());
-  } catch(e) {
-    removeTyping();
-    addChatMsg('Er ging iets mis: ' + e.message, 'ai');
-  }
+  try{await processAI(chatHistory.slice());}
+  catch(e){removeTyping();addChatMsg('Fout: '+e.message,'ai');}
 }
 
-function sendSuggestion(text) {
-  document.getElementById('chat-input').value = text;
-  sendChat();
-}
-
-function chatKeydown(e) {
-  if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
-}
-
-async function processClaudeResponse(msgs) {
-  const r = await callClaude(msgs, TOOLS);
+async function processAI(msgs){
+  const k=localStorage.getItem('claude_api_key');
+  if(!k){removeTyping();addChatMsg('Stel eerst een Claude API key in via Instellingen → Claude AI.','ai');return;}
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:CLAUDE_MODEL,max_tokens:1024,system:SYS_PROMPT,messages:msgs,tools:TOOLS})});
+  const d=await r.json();
   removeTyping();
-  if (!r || r.error) { addChatMsg('API fout: ' + (r?.error?.message||'Onbekend'), 'ai'); return; }
-  if (r.stop_reason === 'tool_use') {
-    const toolUse = r.content.find(c=>c.type==='tool_use');
-    if (toolUse) {
-      const result = await executeTool(toolUse.name, toolUse.input);
-      const newMsgs = [...msgs,
-        {role:'assistant', content: r.content},
-        {role:'user', content:[{type:'tool_result',tool_use_id:toolUse.id,content:JSON.stringify(result)}]}
-      ];
-      chatHistory.push({role:'assistant',content:r.content});
-      chatHistory.push({role:'user',content:[{type:'tool_result',tool_use_id:toolUse.id,content:JSON.stringify(result)}]});
+  if(d.error){addChatMsg('API fout: '+d.error.message,'ai');return;}
+  if(d.stop_reason==='tool_use'){
+    const tu=d.content.find(c=>c.type==='tool_use');
+    if(tu){
+      const res=await runTool(tu.name,tu.input);
+      const nm=[...msgs,{role:'assistant',content:d.content},{role:'user',content:[{type:'tool_result',tool_use_id:tu.id,content:JSON.stringify(res)}]}];
+      chatHistory.push({role:'assistant',content:d.content});
+      chatHistory.push({role:'user',content:[{type:'tool_result',tool_use_id:tu.id,content:JSON.stringify(res)}]});
       addTyping();
-      await processClaudeResponse(newMsgs);
+      await processAI(nm);
     }
-  } else {
-    const text = r.content?.find(c=>c.type==='text')?.text || 'Geen antwoord';
+  }else{
+    const text=d.content?.find(c=>c.type==='text')?.text||'Geen antwoord';
     chatHistory.push({role:'assistant',content:text});
     addChatMsg(text,'ai');
   }
 }
 
-async function executeTool(name, input) {
-  const now = new Date();
-  const m = input.month !== undefined ? input.month-1 : now.getMonth();
-  const y = input.year || now.getFullYear();
-  if (name==='get_transactions') {
-    let fl = transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y;});
-    if (input.category) fl = fl.filter(t=>t.category===input.category);
-    return { transactions: fl.map(t=>({date:t.date,amount:t.amount,type:t.type,description:t.description,category:t.category})), count:fl.length };
+async function runTool(name,input){
+  const now=new Date();
+  const m=input.month!==undefined?input.month-1:now.getMonth();
+  const y=input.year||now.getFullYear();
+  if(name==='get_transactions'){
+    let fl=transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y;});
+    if(input.category)fl=fl.filter(t=>t.category===input.category);
+    return{transactions:fl.map(t=>({date:t.date,amount:t.amount,type:t.type,description:t.description,category:t.category})),count:fl.length};
   }
-  if (name==='add_transaction') {
-    const tx = {id:crypto.randomUUID(),created_at:new Date().toISOString(),user_id:currentUser?.id||deviceKey,...input,date:input.date||new Date().toISOString().split('T')[0]};
-    transactions.unshift(tx); saveLocal(); renderAll();
-    if (sb && currentUser && currentUser.id!==deviceKey) { try { await sb.from('transactions').insert(tx); } catch(e){} }
-    return { success:true, transaction: tx };
+  if(name==='add_transaction'){
+    const tx={id:crypto.randomUUID(),created_at:new Date().toISOString(),user_id:currentUser?.id||deviceKey,...input,date:input.date||new Date().toISOString().split('T')[0]};
+    transactions.unshift(tx);saveLocal();renderAll();
+    if(sb&&currentUser&&currentUser.id!==deviceKey){try{await sb.from('transactions').insert(tx);}catch(e){}}
+    return{success:true,transaction:tx};
   }
-  if (name==='get_budget_status') {
-    const mTx = transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y&&t.type==='expense';});
-    return budgets.map(b=>{const sp=mTx.filter(t=>t.category===b.category).reduce((s,t)=>s+parseFloat(t.amount),0);return{category:b.category,budget:b.monthly_limit,spent:sp,remaining:b.monthly_limit-sp,pct:Math.round((sp/b.monthly_limit)*100)};});
+  if(name==='get_budget_status'){
+    const mTx=transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y&&t.type==='expense';});
+    return budgets.map(b=>{const sp=mTx.filter(t=>t.category===b.category).reduce((s,t)=>s+parseFloat(t.amount),0);return{category:b.category,budget:b.monthly_limit,spent:sp,remaining:b.monthly_limit-sp,percentage:Math.round((sp/b.monthly_limit)*100)};});
   }
-  if (name==='get_summary') {
-    const mTx = transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
-    const inc = mTx.filter(t=>t.type==='income').reduce((s,t)=>s+parseFloat(t.amount),0);
-    const exp = mTx.filter(t=>t.type==='expense').reduce((s,t)=>s+parseFloat(t.amount),0);
-    const byCat = {};
-    mTx.filter(t=>t.type==='expense').forEach(t=>{byCat[t.category]=(byCat[t.category]||0)+parseFloat(t.amount);});
-    return {month:now.toLocaleString('nl-NL',{month:'long',year:'numeric'}),income:inc,expenses:exp,net:inc-exp,by_category:byCat,transaction_count:mTx.length};
+  if(name==='get_summary'){
+    const mTx=transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+    const inc=mTx.filter(t=>t.type==='income').reduce((s,t)=>s+parseFloat(t.amount),0);
+    const exp=mTx.filter(t=>t.type==='expense').reduce((s,t)=>s+parseFloat(t.amount),0);
+    const byCat={};mTx.filter(t=>t.type==='expense').forEach(t=>{byCat[t.category]=(byCat[t.category]||0)+parseFloat(t.amount);});
+    return{month:MONTHS[now.getMonth()]+' '+now.getFullYear(),income:inc,expenses:exp,net:inc-exp,by_category:byCat,count:mTx.length};
   }
-  return { error: 'Onbekende tool' };
+  return{error:'Onbekende tool'};
 }
 
-function addChatMsg(text, role) {
-  const c = document.getElementById('chat-messages');
-  const isAi = role==='ai';
-  const div = document.createElement('div');
-  div.className = 'msg ' + (isAi?'ai':'user');
-  const time = new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
-  div.innerHTML = `<div class="msg-avatar ${isAi?'ai':'user-av'}">${isAi?'<iconify-icon icon="ph:robot-bold" style="color:#fff;font-size:14px;"></iconify-icon>':'<iconify-icon icon="ph:user-bold" style="color:#fff;font-size:14px;"></iconify-icon>'}</div><div><div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-time">${time}</div></div>`;
-  c.appendChild(div);
-  c.scrollTop = c.scrollHeight;
+function addChatMsg(text,role){
+  const c=document.getElementById('chat-messages');
+  const isAi=role==='ai';
+  const div=document.createElement('div');
+  div.className='chat-msg '+(isAi?'ai':'user');
+  const time=new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
+  div.innerHTML=isAi?`<div class="ai-chat-avatar" style="width:28px;height:28px;flex-shrink:0;"><iconify-icon icon="ph:robot-bold" style="color:#fff;font-size:14px;"></iconify-icon></div><div><div class="chat-bubble">${text.replace(/\n/g,'<br>')}</div><div class="chat-time">${time}</div></div>`:`<div><div class="chat-bubble">${text}</div><div class="chat-time" style="text-align:right;">${time}</div></div>`;
+  c.appendChild(div);c.scrollTop=c.scrollHeight;
 }
-
-function addTyping() {
-  const c = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'msg ai'; div.id = 'typing-msg';
-  div.innerHTML = '<div class="msg-avatar ai"><iconify-icon icon="ph:robot-bold" style="color:#fff;font-size:14px;"></iconify-icon></div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
-  c.appendChild(div); c.scrollTop = c.scrollHeight;
-}
-
-function removeTyping() {
-  const t = document.getElementById('typing-msg'); if (t) t.remove();
-}
+function addTyping(){const c=document.getElementById('chat-messages');const d=document.createElement('div');d.className='chat-msg ai';d.id='typing-msg';d.innerHTML='<div class="ai-chat-avatar" style="width:28px;height:28px;flex-shrink:0;"><iconify-icon icon="ph:robot-bold" style="color:#fff;font-size:14px;"></iconify-icon></div><div class="chat-bubble"><div class="chat-typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';c.appendChild(d);c.scrollTop=c.scrollHeight;}
+function removeTyping(){const t=document.getElementById('typing-msg');if(t)t.remove();}
 
 // ================================================================
-// MODALS
+// MODALS + UTILS
 // ================================================================
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openMod(id){document.getElementById(id).classList.add('open');}
+function closeMod(id){document.getElementById(id).classList.remove('open');}
+function confirm2(title,msg,cb){document.getElementById('conf-title').textContent=title;document.getElementById('conf-msg').textContent=msg;document.getElementById('conf-btn').onclick=()=>{closeMod('modal-confirm');cb();};openMod('modal-confirm');}
+function togglePw(id,icon){const i=document.getElementById(id);if(!i)return;const s=i.type==='password';i.type=s?'text':'password';icon.setAttribute('icon',s?'ph:eye-slash-bold':'ph:eye-bold');}
 
-function showConfirm(title, msg, onConfirm) {
-  document.getElementById('confirm-title').textContent = title;
-  document.getElementById('confirm-msg').textContent = msg;
-  document.getElementById('confirm-btn').onclick = ()=>{ closeModal('modal-confirm'); onConfirm(); };
-  openModal('modal-confirm');
+function fmt(n){return'€'+(parseFloat(n)||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function shortDate(ds){return new Date(ds).toLocaleDateString('nl-NL',{day:'numeric',month:'short'});}
+function fullDate(ds){return new Date(ds).toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'});}
+function toast(msg,type='info'){
+  const t=document.getElementById('toast');
+  t.className='toast '+type+' show';
+  t.innerHTML=`<iconify-icon icon="${type==='success'?'ph:check-circle-bold':type==='error'?'ph:x-circle-bold':'ph:info-bold'}"></iconify-icon>${msg}`;
+  clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),3000);
 }
-
-// ================================================================
-// HELPERS
-// ================================================================
-function fmt(n) { return '€'+(parseFloat(n)||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
-
-function dateLabel(ds) {
-  const d=new Date(ds), t=new Date(), y=new Date(t); y.setDate(t.getDate()-1);
-  if (d.toDateString()===t.toDateString()) return 'Vandaag';
-  if (d.toDateString()===y.toDateString()) return 'Gisteren';
-  if ((t-d)/86400000<7) return 'Deze week';
-  return fullDate(ds);
-}
-function shortDate(ds) { return new Date(ds).toLocaleDateString('nl-NL',{day:'numeric',month:'short'}); }
-function fullDate(ds) { return new Date(ds).toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'}); }
-
-function toast(msg, type='info') {
-  const t = document.getElementById('toast');
-  t.className = 'toast ' + type + ' show';
-  t.innerHTML = `<iconify-icon icon="${type==='success'?'ph:check-circle-bold':type==='error'?'ph:x-circle-bold':'ph:info-bold'}"></iconify-icon>${msg}`;
-  clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 3000);
-}
-
 window.addEventListener('online',()=>{setSyncIcon('sync');loadData();});
 window.addEventListener('offline',()=>setSyncIcon('offline'));
 
