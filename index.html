@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Abdul OS</title>
+<title>AbdulOS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
@@ -264,7 +264,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="login-logo">
       <div class="login-logo-icon">💎</div>
       <div>
-        <div class="login-logo-text">Abdul OS</div>
+        <div class="login-logo-text">AbdulOS</div>
         <div class="login-logo-sub">Persoonlijk Financieel Dashboard</div>
       </div>
     </div>
@@ -301,7 +301,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="sidebar-logo">
         <div class="sidebar-logo-icon">💎</div>
         <div>
-          <div class="sidebar-logo-name">Abdul OS</div>
+          <div class="sidebar-logo-name">AbdulOS</div>
           <div class="sidebar-logo-sub">Financieel Dashboard</div>
         </div>
       </div>
@@ -344,7 +344,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="topbar">
       <div class="topbar-left">
         <div class="page-title" id="pageTitle">Dashboard</div>
-        <div class="page-breadcrumb" id="pageBreadcrumb">Abdul OS · Financieel overzicht</div>
+        <div class="page-breadcrumb" id="pageBreadcrumb">AbdulOS · Financieel overzicht</div>
       </div>
       <div class="topbar-right">
         <select class="month-sel" id="monthSel" onchange="onMonthChange()"></select>
@@ -944,7 +944,7 @@ function nav(page){
     if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'")) n.classList.add('active');
   });
   document.getElementById('pageTitle').textContent=PAGE_TITLES[page]||page;
-  document.getElementById('pageBreadcrumb').textContent='Abdul OS · '+PAGE_TITLES[page];
+  document.getElementById('pageBreadcrumb').textContent='AbdulOS · '+PAGE_TITLES[page];
   S.currentPage=page;
   renderPage(page);
 }
