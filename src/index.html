@@ -282,7 +282,7 @@ select.form-input{appearance:none;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 /* TOAST */
-.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:var(--r-btn);font-size:14px;font-weight:500;z-index:200;opacity:0;transform:translateX(20px);transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:8px;max-width:320px;box-shadow:var(--shadow);}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:var(--r-btn);font-size:14px;font-weight:500;z-index:600;opacity:0;transform:translateX(20px);transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:8px;max-width:320px;box-shadow:var(--shadow);}
 .toast.show{opacity:1;transform:translateX(0);}
 .toast.success{background:#14532d;color:#86efac;border:1px solid #166534;}
 .toast.error{background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b;}
@@ -692,13 +692,17 @@ input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;}
       <div style="font-family:'IBM Plex Serif',serif;font-size:28px;font-weight:700;margin-bottom:6px;">Family-App</div>
       <div style="color:var(--text2);font-size:14px;">Persoonlijke finance manager</div>
     </div>
+    <div id="login-error" style="display:none;background:var(--red-bg);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:12px;"></div>
+    <div id="login-success" style="display:none;background:var(--green-bg);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:12px;"></div>
     <div class="card" style="margin-bottom:16px;">
-      <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="form-input" id="login-email" placeholder="abdul@email.com"></div>
-      <div class="form-group" style="margin-bottom:0;"><label class="form-label">Wachtwoord</label><input type="password" class="form-input" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="form-input" id="login-email" placeholder="jouw@email.com"></div>
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">Wachtwoord</label><input type="password" class="form-input" id="login-pass" placeholder="Min. 6 tekens" onkeydown="if(event.key==='Enter')doLogin()"></div>
     </div>
-    <button class="btn btn-primary btn-full" style="margin-bottom:12px;" onclick="doLogin()"><iconify-icon icon="ph:sign-in-bold"></iconify-icon>Inloggen</button>
-    <button class="btn btn-secondary btn-full" style="margin-bottom:12px;" onclick="doRegister()"><iconify-icon icon="ph:user-plus-bold"></iconify-icon>Registreren</button>
-    <button class="btn btn-secondary btn-full" onclick="doGuestLogin()"><iconify-icon icon="ph:user-bold"></iconify-icon>Doorgaan als gast</button>
+    <button class="btn btn-primary btn-full" style="margin-bottom:10px;" onclick="doLogin()" id="btn-login"><iconify-icon icon="ph:sign-in-bold"></iconify-icon>Inloggen</button>
+    <button class="btn btn-secondary btn-full" style="margin-bottom:10px;" onclick="doRegister()" id="btn-register"><iconify-icon icon="ph:user-plus-bold"></iconify-icon>Registreren</button>
+    <div style="text-align:center;color:var(--text3);font-size:12px;margin-bottom:10px;">of</div>
+    <button class="btn btn-secondary btn-full" onclick="doGuestLogin()"><iconify-icon icon="ph:user-bold"></iconify-icon>Doorgaan als gast (lokaal)</button>
+    <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:12px;">Gast modus slaat data lokaal op, geen sync tussen apparaten.</p>
   </div>
 </div>
 
@@ -806,32 +810,77 @@ async function checkSession() {
 // ================================================================
 // AUTH
 // ================================================================
+function loginMsg(type, text) {
+  const err = document.getElementById('login-error');
+  const suc = document.getElementById('login-success');
+  err.style.display = 'none'; suc.style.display = 'none';
+  if (type === 'error') { err.textContent = text; err.style.display = 'block'; }
+  if (type === 'success') { suc.textContent = text; suc.style.display = 'block'; }
+}
+function setBtnLoading(id, loading, label) {
+  const b = document.getElementById(id);
+  if (!b) return;
+  b.disabled = loading;
+  b.style.opacity = loading ? '0.6' : '1';
+  if (label) b.innerHTML = loading ? '<iconify-icon icon="ph:spinner-bold"></iconify-icon> Bezig...' : label;
+}
+
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-pass').value;
-  if (!email || !pass) { toast('Vul email en wachtwoord in','error'); return; }
+  if (!email) { loginMsg('error','Voer je e-mailadres in.'); return; }
+  if (!pass) { loginMsg('error','Voer je wachtwoord in.'); return; }
+  loginMsg('', '');
+  setBtnLoading('btn-login', true);
   try {
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'invalid_credentials') loginMsg('error','E-mail of wachtwoord klopt niet. Controleer je gegevens.');
+      else if (error.code === 'email_not_confirmed') loginMsg('error','Bevestig eerst je e-mailadres via de link in je inbox.');
+      else loginMsg('error', error.message);
+      return;
+    }
     currentUser = data.user;
+    loginMsg('', '');
     showApp();
     await loadData();
     toast('Welkom terug!','success');
   } catch(e) {
-    toast('Inloggen mislukt: ' + e.message, 'error');
+    loginMsg('error', 'Verbindingsfout: ' + e.message);
+  } finally {
+    setBtnLoading('btn-login', false, '<iconify-icon icon="ph:sign-in-bold"></iconify-icon>Inloggen');
   }
 }
 
 async function doRegister() {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-pass').value;
-  if (!email || !pass) { toast('Vul email en wachtwoord in','error'); return; }
+  if (!email) { loginMsg('error','Voer je e-mailadres in.'); return; }
+  if (!pass || pass.length < 6) { loginMsg('error','Wachtwoord moet minimaal 6 tekens zijn.'); return; }
+  loginMsg('', '');
+  setBtnLoading('btn-register', true);
   try {
     const { data, error } = await sb.auth.signUp({ email, password: pass });
-    if (error) throw error;
-    toast('Account aangemaakt! Controleer je email.','success');
+    if (error) {
+      if (error.code === 'over_email_send_rate_limit') loginMsg('error','Te veel pogingen. Wacht een paar minuten en probeer opnieuw.');
+      else if (error.code === 'email_address_invalid') loginMsg('error','Ongeldig e-mailadres. Gebruik een echt e-mailadres.');
+      else loginMsg('error', error.message);
+      return;
+    }
+    if (data.session) {
+      // Email confirmation uitgeschakeld — direct inloggen
+      currentUser = data.user;
+      showApp();
+      await loadData();
+      toast('Account aangemaakt!','success');
+    } else {
+      // Email confirmation vereist
+      loginMsg('success','Account aangemaakt! ✓ Controleer je inbox (' + email + ') en klik op de bevestigingslink. Daarna kun je inloggen.');
+    }
   } catch(e) {
-    toast('Registreren mislukt: ' + e.message, 'error');
+    loginMsg('error', 'Verbindingsfout: ' + e.message);
+  } finally {
+    setBtnLoading('btn-register', false, '<iconify-icon icon="ph:user-plus-bold"></iconify-icon>Registreren');
   }
 }
 
