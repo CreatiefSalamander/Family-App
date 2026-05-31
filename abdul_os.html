@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Abdul OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+/* ── RESET & BASE ── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B0F1A;--bg2:#111827;--bg3:#1a2235;--bg4:#1f2d45;--bg5:#263348;
+  --border:#1e2d45;--border2:#2d3f5c;--border3:#3d5070;
+  --text:#f1f5ff;--text2:#8fa4c8;--text3:#4d6285;--text4:#2d3f5c;
+  --accent:#6366f1;--accent2:#818cf8;--accent3:#4f46e5;--accent-bg:rgba(99,102,241,.15);--accent-glow:rgba(99,102,241,.3);
+  --green:#22c55e;--green2:#16a34a;--green-bg:rgba(34,197,94,.12);
+  --red:#ef4444;--red2:#dc2626;--red-bg:rgba(239,68,68,.12);
+  --amber:#f59e0b;--amber-bg:rgba(245,158,11,.12);
+  --blue:#3b82f6;--blue-bg:rgba(59,130,246,.12);
+  --purple:#a855f7;--purple-bg:rgba(168,85,247,.12);
+  --teal:#14b8a6;--teal-bg:rgba(20,184,166,.12);
+  --r:12px;--rs:8px;--rl:16px;--rxl:20px;
+  font-family:'Inter',system-ui,sans-serif;
+}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── LOGIN ── */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);position:relative;overflow:hidden}
+#loginScreen::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.15) 0%,transparent 70%);top:-100px;left:-100px;pointer-events:none}
+#loginScreen::after{content:'';position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.1) 0%,transparent 70%);bottom:-50px;right:-50px;pointer-events:none}
+.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rxl);padding:2.5rem;width:420px;position:relative;z-index:1}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:2rem}
+.login-logo-icon{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 8px 24px var(--accent-glow)}
+.login-logo-text{font-size:22px;font-weight:700;letter-spacing:-.5px}
+.login-logo-sub{font-size:13px;color:var(--text2);margin-top:1px}
+.login-title{font-size:26px;font-weight:700;margin-bottom:.4rem;letter-spacing:-.5px}
+.login-sub{font-size:14px;color:var(--text2);margin-bottom:2rem}
+.form-group{margin-bottom:1rem}
+.form-label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:.4rem;letter-spacing:.02em}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:.65rem 1rem;color:var(--text);font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;font-family:inherit}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.form-input::placeholder{color:var(--text3)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:.65rem 1.25rem;border-radius:var(--rs);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit;letter-spacing:.01em}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;box-shadow:0 4px 14px var(--accent-glow)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px var(--accent-glow)}
+.btn-primary:active{transform:scale(.98)}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text);border-color:var(--border3)}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-danger:hover{background:var(--red);color:#fff}
+.btn-full{width:100%}
+.btn-sm{padding:.4rem .85rem;font-size:12px}
+.btn-xs{padding:.25rem .65rem;font-size:11px}
+.login-error{background:var(--red-bg);border:1px solid rgba(239,68,68,.3);border-radius:var(--rs);padding:.65rem 1rem;font-size:13px;color:var(--red);margin-bottom:1rem;display:none}
+.login-divider{text-align:center;color:var(--text3);font-size:12px;margin:1rem 0;position:relative}
+.login-divider::before,.login-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border)}
+.login-divider::before{left:0}.login-divider::after{right:0}
+
+/* ── APP SHELL ── */
+#app{display:none;flex-direction:column;min-height:100vh}
+#app.visible{display:flex}
+
+/* ── SIDEBAR ── */
+.sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .25s}
+.sidebar-header{padding:1.4rem 1.25rem 1rem;border-bottom:1px solid var(--border)}
+.sidebar-logo{display:flex;align-items:center;gap:10px}
+.sidebar-logo-icon{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 4px 12px var(--accent-glow)}
+.sidebar-logo-name{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.sidebar-logo-sub{font-size:11px;color:var(--text2);margin-top:1px}
+.sidebar-user{padding:.85rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.user-name{font-size:13px;font-weight:500;color:var(--text)}
+.user-email{font-size:11px;color:var(--text3);margin-top:1px}
+.sidebar-nav{flex:1;overflow-y:auto;padding:.75rem .75rem}
+.nav-section{font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--text4);margin:1rem 0 .3rem .5rem;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.55rem .75rem;border-radius:var(--rs);cursor:pointer;font-size:13.5px;color:var(--text2);transition:all .15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;position:relative}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-bg);color:var(--accent2);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 2px 2px 0}
+.nav-item i{font-size:17px;flex-shrink:0;opacity:.8}
+.nav-item.active i{opacity:1}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:600;background:var(--red);color:#fff;padding:1px 6px;border-radius:10px}
+.sidebar-footer{padding:.75rem;border-top:1px solid var(--border)}
+
+/* ── MAIN ── */
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:62px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;flex-direction:column}
+.page-title{font-size:17px;font-weight:600;letter-spacing:-.3px}
+.page-breadcrumb{font-size:11px;color:var(--text3);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.month-sel{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);font-size:13px;padding:.38rem .85rem;cursor:pointer;font-family:inherit;outline:none}
+.month-sel:focus{border-color:var(--accent)}
+.content{padding:1.75rem 2rem;flex:1}
+
+/* ── PAGES ── */
+.page{display:none;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── KPI CARDS ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:1.5rem}
+.kpi-grid-5{grid-template-columns:repeat(5,1fr)}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.35rem;position:relative;overflow:hidden;transition:border-color .2s,transform .15s}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-green::after{background:linear-gradient(90deg,var(--green),var(--teal))}
+.kpi-red::after{background:linear-gradient(90deg,var(--red),var(--amber))}
+.kpi-blue::after{background:linear-gradient(90deg,var(--blue),var(--accent))}
+.kpi-purple::after{background:linear-gradient(90deg,var(--purple),var(--accent))}
+.kpi-amber::after{background:linear-gradient(90deg,var(--amber),var(--red))}
+.kpi-teal::after{background:linear-gradient(90deg,var(--teal),var(--green))}
+.kpi-label{font-size:12px;color:var(--text2);margin-bottom:.45rem;display:flex;align-items:center;gap:6px}
+.kpi-label i{font-size:14px}
+.kpi-val{font-size:26px;font-weight:700;letter-spacing:-.8px;color:var(--text)}
+.kpi-sub{font-size:12px;color:var(--text3);margin-top:.25rem}
+.kpi-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;margin-top:.5rem}
+.badge-up{background:var(--green-bg);color:var(--green)}
+.badge-down{background:var(--red-bg);color:var(--red)}
+.badge-neutral{background:var(--bg4);color:var(--text2)}
+.badge-amber{background:var(--amber-bg);color:var(--amber)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+.badge-purple{background:var(--purple-bg);color:var(--purple)}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.35rem 1.5rem;margin-bottom:1rem}
+.card-sm{padding:1rem 1.25rem}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem}
+.card-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;color:var(--text)}
+.card-title i{font-size:16px;color:var(--text2)}
+.card-actions{display:flex;gap:8px;align-items:center}
+.section-row{display:flex;gap:14px;margin-bottom:1rem;align-items:stretch}
+.section-row .card{flex:1;margin-bottom:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g-6040{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
+.g-4060{display:grid;grid-template-columns:1fr 1.6fr;gap:14px}
+
+/* ── TABLES ── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:.55rem .85rem;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:.7rem .85rem;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.02);color:var(--text)}
+.td-bold{color:var(--text);font-weight:500}
+.td-pos{color:var(--green);font-weight:500}
+.td-neg{color:var(--red);font-weight:500}
+.td-amber{color:var(--amber);font-weight:500}
+
+/* ── TAGS / PILLS ── */
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.tag-green{background:var(--green-bg);color:var(--green)}
+.tag-red{background:var(--red-bg);color:var(--red)}
+.tag-blue{background:var(--blue-bg);color:var(--blue)}
+.tag-amber{background:var(--amber-bg);color:var(--amber)}
+.tag-purple{background:var(--purple-bg);color:var(--purple)}
+.tag-teal{background:var(--teal-bg);color:var(--teal)}
+.tag-gray{background:var(--bg4);color:var(--text2)}
+
+/* ── PROGRESS ── */
+.prog{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.prog-sm{height:4px}
+.prog-lg{height:8px}
+
+/* ── TIMELINE / LIST ROWS ── */
+.list-row{display:flex;align-items:center;gap:12px;padding:.65rem 0;border-bottom:1px solid var(--border)}
+.list-row:last-child{border-bottom:none}
+.list-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.list-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.list-main{flex:1;min-width:0}
+.list-title{font-size:13.5px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.list-amount{font-size:14px;font-weight:600;flex-shrink:0}
+
+/* ── MODAL ── */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-ov.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:1.75rem;width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.3px}
+.modal-close{cursor:pointer;color:var(--text3);background:var(--bg3);border:none;border-radius:7px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.modal-close:hover{background:var(--bg4);color:var(--text)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.form-select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:.65rem 1rem;color:var(--text);font-size:14px;outline:none;font-family:inherit;transition:border-color .2s}
+.form-select:focus{border-color:var(--accent)}
+.form-help{font-size:11px;color:var(--text3);margin-top:.3rem}
+textarea.form-input{resize:vertical;min-height:80px}
+
+/* ── CHART CONTAINERS ── */
+.chart-wrap{position:relative;width:100%}
+
+/* ── DONUT CENTER ── */
+.donut-outer{position:relative}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.donut-val{font-size:22px;font-weight:700;letter-spacing:-.5px}
+.donut-lbl{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* ── AI CHAT ── */
+.chat-messages{height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:.5rem 0;margin-bottom:1rem}
+.chat-msg{display:flex;gap:10px;align-items:flex-start}
+.chat-msg.user{flex-direction:row-reverse}
+.chat-bubble{max-width:78%;padding:.75rem 1rem;border-radius:14px;font-size:13.5px;line-height:1.6}
+.chat-bubble.ai{background:var(--bg3);color:var(--text);border-bottom-left-radius:4px}
+.chat-bubble.user{background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;border-bottom-right-radius:4px}
+.chat-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.chat-input-row{display:flex;gap:8px}
+.chat-input-row .form-input{flex:1}
+
+/* ── HABIT DOTS ── */
+.habit-dots{display:flex;gap:5px}
+.hdot{width:22px;height:22px;border-radius:50%;cursor:pointer;transition:all .15s;border:1.5px solid var(--border2)}
+.hdot.done{border-color:var(--green)}
+.hdot.miss{border-color:var(--red)}
+.hdot-inner-done{background:var(--green-bg)}
+.hdot-inner-miss{background:var(--red-bg)}
+.hdot-inner-empty{background:var(--bg4)}
+
+/* ── UPLOAD ZONE ── */
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r);padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:var(--accent-bg)}
+.upload-zone i{font-size:40px;color:var(--text3);margin-bottom:.75rem}
+.upload-zone.drag i{color:var(--accent)}
+.upload-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:.4rem}
+.upload-sub{font-size:13px;color:var(--text3)}
+#fileInput{display:none}
+
+/* ── NOTIFICATION ── */
+.notif{position:fixed;bottom:24px;right:24px;padding:.85rem 1.25rem;border-radius:var(--r);font-size:13.5px;font-weight:500;z-index:9999;transform:translateY(100px);transition:transform .3s;max-width:340px;display:flex;align-items:center;gap:10px}
+.notif.show{transform:translateY(0)}
+.notif-success{background:var(--green-bg);border:1px solid var(--green);color:var(--green)}
+.notif-error{background:var(--red-bg);border:1px solid var(--red);color:var(--red)}
+.notif-info{background:var(--accent-bg);border:1px solid var(--accent);color:var(--accent2)}
+
+/* ── MISC ── */
+.divider{height:1px;background:var(--border);margin:1rem 0}
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text3)}
+.empty-state i{font-size:48px;margin-bottom:1rem;display:block;opacity:.4}
+.empty-state p{font-size:14px}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:13px}
+.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text2)}
+.stat-val{font-weight:500;color:var(--text)}
+.glow-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.setup-banner{background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--amber)}
+.setup-banner i{font-size:20px;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">💎</div>
+      <div>
+        <div class="login-logo-text">Abdul OS</div>
+        <div class="login-logo-sub">Persoonlijk Financieel Dashboard</div>
+      </div>
+    </div>
+    <h1 class="login-title">Welkom terug</h1>
+    <p class="login-sub">Log in om je dashboard te bekijken</p>
+    <div class="login-error" id="loginError"></div>
+    <div class="form-group">
+      <label class="form-label">E-mailadres</label>
+      <input class="form-input" type="email" id="loginEmail" placeholder="jij@email.nl" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Wachtwoord</label>
+      <input class="form-input" type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()" style="margin-bottom:1rem">
+      <i class="ti ti-login"></i> Inloggen
+    </button>
+    <div class="login-divider">of</div>
+    <button class="btn btn-ghost btn-full" onclick="showRegister()" style="margin-top:.75rem">
+      <i class="ti ti-user-plus"></i> Nieuw account aanmaken
+    </button>
+    <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:1.25rem">
+      <i class="ti ti-lock" style="font-size:12px"></i> Beveiligd via Supabase — jouw data is privé
+    </p>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">💎</div>
+        <div>
+          <div class="sidebar-logo-name">Abdul OS</div>
+          <div class="sidebar-logo-sub">Financieel Dashboard</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="avatar" id="sideAvatar">AA</div>
+      <div>
+        <div class="user-name" id="sideUserName">Abdul Aziz</div>
+        <div class="user-email" id="sideUserEmail">laden...</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Financiën</div>
+      <button class="nav-item active" onclick="nav('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+      <button class="nav-item" onclick="nav('transacties')"><i class="ti ti-arrows-exchange"></i> Transacties <span class="nav-badge" id="uncatBadge" style="display:none">!</span></button>
+      <button class="nav-item" onclick="nav('begroting')"><i class="ti ti-chart-pie"></i> Begroting</button>
+      <button class="nav-item" onclick="nav('schulden')"><i class="ti ti-credit-card"></i> Schulden</button>
+      <button class="nav-item" onclick="nav('doelen')"><i class="ti ti-target"></i> Doelen</button>
+      <button class="nav-item" onclick="nav('jaar')"><i class="ti ti-calendar-stats"></i> Jaaroverzicht</button>
+
+      <div class="nav-section">Zakelijk</div>
+      <button class="nav-item" onclick="nav('zakelijk')"><i class="ti ti-building"></i> Aziz Holding BV</button>
+
+      <div class="nav-section">Persoonlijk</div>
+      <button class="nav-item" onclick="nav('gewoontes')"><i class="ti ti-checks"></i> Gewoontes</button>
+      <button class="nav-item" onclick="nav('vliegen')"><i class="ti ti-plane"></i> Vliegopleiding</button>
+      <button class="nav-item" onclick="nav('ai')"><i class="ti ti-robot"></i> AI Assistent</button>
+
+      <div class="nav-section">Beheer</div>
+      <button class="nav-item" onclick="nav('import')"><i class="ti ti-upload"></i> Import & Bank</button>
+      <button class="nav-item" onclick="nav('instellingen')"><i class="ti ti-settings"></i> Instellingen</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-item" onclick="doLogout()"><i class="ti ti-logout"></i> Uitloggen</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="page-breadcrumb" id="pageBreadcrumb">Abdul OS · Financieel overzicht</div>
+      </div>
+      <div class="topbar-right">
+        <select class="month-sel" id="monthSel" onchange="onMonthChange()"></select>
+        <button class="btn btn-ghost btn-sm" onclick="refreshData()"><i class="ti ti-refresh"></i></button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()"><i class="ti ti-plus"></i> Toevoegen</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="page-dashboard">
+        <div id="setupBanner"></div>
+        <div class="kpi-grid" id="dashKpi"></div>
+        <div class="g-6040" style="margin-bottom:1rem">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-chart-bar"></i> 6-maand trend</div>
+              <div style="display:flex;gap:8px;font-size:11px;color:var(--text3)">
+                <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:var(--accent);display:inline-block;border-radius:1px"></span>Inkomsten</span>
+                <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:var(--red);display:inline-block;border-radius:1px"></span>Uitgaven</span>
+              </div>
+            </div>
+            <div class="chart-wrap" style="height:220px"><canvas id="mainChart" role="img" aria-label="Inkomsten en uitgaven trend"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-chart-donut"></i> Verdeling inkomen</div></div>
+            <div class="donut-outer" style="height:180px">
+              <div class="chart-wrap" style="height:180px"><canvas id="donutChart" role="img" aria-label="Inkomen verdeling"></canvas></div>
+              <div class="donut-center"><div class="donut-val" id="donutVal">€0</div><div class="donut-lbl">netto/mnd</div></div>
+            </div>
+            <div id="donutLegend" style="margin-top:.75rem"></div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-clock"></i> Recente transacties</div>
+              <button class="btn btn-ghost btn-sm" onclick="nav('transacties')">Alle →</button>
+            </div>
+            <div id="recentTx"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-alert-triangle"></i> Top-5 overschrijdingen</div></div>
+            <div id="topOverschrijdingen"></div>
+          </div>
+        </div>
+        <div class="g2" style="margin-top:1rem">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-credit-card"></i> Schulden overzicht</div><button class="btn btn-ghost btn-sm" onclick="nav('schulden')">Detail →</button></div>
+            <div id="dashSchulden"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-calculator"></i> Doel-calculator</div></div>
+            <div id="doelCalc"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TRANSACTIES ── -->
+      <div class="page" id="page-transacties">
+        <div class="kpi-grid" id="txKpi"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-list"></i> Transacties</div>
+            <div class="card-actions">
+              <select class="month-sel" id="txCatFilter" onchange="renderTx()">
+                <option value="">Alle categorieën</option>
+              </select>
+              <select class="month-sel" id="txSoortFilter" onchange="renderTx()">
+                <option value="">Alle soorten</option>
+                <option>Inkomst</option><option>Uitgave</option><option>Aflossing</option><option>Spaar</option><option>Intern</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" onclick="exportTx()"><i class="ti ti-download"></i> Export</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Datum</th><th>Tegenpartij</th><th>Omschrijving</th><th>Categorie</th><th>Soort</th><th>Bedrag</th><th>Status</th><th></th></tr></thead>
+              <tbody id="txTable"></tbody>
+            </table>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;font-size:12px;color:var(--text3)">
+            <span id="txCount">0 transacties</span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-xs" id="txPrev" onclick="txPage--; renderTx()">‹ Vorige</button>
+              <span id="txPageInfo" style="display:flex;align-items:center;padding:0 8px"></span>
+              <button class="btn btn-ghost btn-xs" id="txNext" onclick="txPage++; renderTx()">Volgende ›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BEGROTING ── -->
+      <div class="page" id="page-begroting">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-chart-pie"></i> Begroting vs Werkelijk</div>
+            <div class="card-actions">
+              <button class="btn btn-ghost btn-sm" onclick="openBudgetEdit()"><i class="ti ti-edit"></i> Bewerk budgetten</button>
+            </div>
+          </div>
+          <div id="begrotingTable"></div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-trending-up"></i> Netto trend</div></div>
+            <div class="chart-wrap" style="height:200px"><canvas id="nettoTrendChart" role="img" aria-label="Netto trend"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-report-money"></i> Saldo analyse</div></div>
+            <div id="saldoAnalyse"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCHULDEN ── -->
+      <div class="page" id="page-schulden">
+        <div class="kpi-grid" id="schuldenKpi"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-credit-card"></i> Schulden register</div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('schuld')"><i class="ti ti-plus"></i> Schuld toevoegen</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Schuldeiser</th><th>Type</th><th>Oorspronkelijk</th><th>Afgelost</th><th>Restant</th><th>Termijn/mnd</th><th>Resterende mnd</th><th>Status</th><th></th></tr></thead>
+              <tbody id="schuldenTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DOELEN ── -->
+      <div class="page" id="page-doelen">
+        <div class="kpi-grid" id="doelenKpi"></div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-target"></i> Privé doelen</div>
+              <button class="btn btn-primary btn-sm" onclick="openModal('doel','Privé')"><i class="ti ti-plus"></i></button>
+            </div>
+            <div id="doelenPrive"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-building"></i> Zakelijke doelen</div>
+              <button class="btn btn-primary btn-sm" onclick="openModal('doel','Zakelijk')"><i class="ti ti-plus"></i></button>
+            </div>
+            <div id="doelenZakelijk"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="ti ti-car"></i> Vaste activa zakelijk</div></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Asset</th><th>Boekwaarde</th><th>Verwachte opbrengst</th><th>Status</th><th>Notitie</th></tr></thead>
+            <tbody id="activaTable"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- ── JAAR ── -->
+      <div class="page" id="page-jaar">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-calendar-stats"></i> Jaaroverzicht</div>
+            <select class="month-sel" id="jaarSel" onchange="renderJaar()">
+              <option>2025</option><option>2024</option>
+            </select>
+          </div>
+          <div class="chart-wrap" style="height:260px;margin-bottom:1.5rem"><canvas id="jaarChart" role="img" aria-label="Jaaroverzicht grafiek"></canvas></div>
+          <div class="table-wrap" id="jaarTable"></div>
+        </div>
+      </div>
+
+      <!-- ── ZAKELIJK ── -->
+      <div class="page" id="page-zakelijk">
+        <div class="kpi-grid" id="zakelijkKpi"></div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-users"></i> Opdrachtgevers</div>
+              <button class="btn btn-primary btn-sm" onclick="openModal('opdracht')"><i class="ti ti-plus"></i></button>
+            </div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Opdrachtgever</th><th>Ex BTW</th><th>BTW 21%</th><th>Incl BTW</th><th></th></tr></thead>
+              <tbody id="opdrachtTable"></tbody>
+            </table></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-receipt"></i> Vaste kosten BV</div></div>
+            <div id="bvKostenList"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="ti ti-calculator"></i> BTW afdracht & netto winst</div></div>
+          <div class="g3" id="zakelijkCalc"></div>
+        </div>
+      </div>
+
+      <!-- ── GEWOONTES ── -->
+      <div class="page" id="page-gewoontes">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-checks"></i> Gewoontes tracker</div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('habit')"><i class="ti ti-plus"></i> Gewoonte</button>
+          </div>
+          <div id="habitTracker"></div>
+        </div>
+      </div>
+
+      <!-- ── VLIEGEN ── -->
+      <div class="page" id="page-vliegen">
+        <div class="kpi-grid" id="vliegenKpi"></div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-plane"></i> Vliegsessies</div>
+              <button class="btn btn-primary btn-sm" onclick="openModal('vlucht')"><i class="ti ti-plus"></i></button>
+            </div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Datum</th><th>Type</th><th>Uren</th><th>Kosten</th><th>Notitie</th><th></th></tr></thead>
+              <tbody id="vluchtTable"></tbody>
+            </table></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-book"></i> Theorie modules</div></div>
+            <div id="theoryList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── AI ── -->
+      <div class="page" id="page-ai">
+        <div class="g-6040">
+          <div class="card" style="height:fit-content">
+            <div class="card-header"><div class="card-title"><i class="ti ti-robot"></i> AI Financieel Assistent</div></div>
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-msg">
+                <div class="chat-avatar" style="background:var(--accent-bg);color:var(--accent)">AI</div>
+                <div class="chat-bubble ai">Hallo! Ik ben je persoonlijke financiële assistent. Ik kan je helpen met vragen over je inkomsten, uitgaven, schulden, spaardoelen en vliegopleiding. Wat wil je weten?</div>
+              </div>
+            </div>
+            <div class="chat-input-row">
+              <input class="form-input" type="text" id="chatInput" placeholder="Stel een vraag over je financiën..." onkeydown="if(event.key==='Enter')sendChat()">
+              <button class="btn btn-primary" onclick="sendChat()"><i class="ti ti-send"></i></button>
+            </div>
+          </div>
+          <div>
+            <div class="card card-sm" style="margin-bottom:1rem">
+              <div class="card-title" style="margin-bottom:.75rem;font-size:13px"><i class="ti ti-bolt"></i> Snelle vragen</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="askAI('Hoe staat het met mijn schulden?')">💸 Schulden overzicht</button>
+                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="askAI('Waar geef ik het meest aan uit?')">📊 Top uitgaven</button>
+                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="askAI('Hoeveel spaar ik deze maand?')">🎯 Spaartempo</button>
+                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="askAI('Geef me bezuinigingstips')">✂️ Bezuinigingstips</button>
+                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="askAI('Wanneer ben ik schuldenvrij?')">🏁 Schuldenvrij datum</button>
+                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="askAI('Hoe gaat het met mijn BV?')">🏢 Aziz Holding check</button>
+              </div>
+            </div>
+            <div class="card card-sm">
+              <div class="card-title" style="margin-bottom:.75rem;font-size:13px"><i class="ti ti-key"></i> API Sleutel</div>
+              <div class="form-group" style="margin-bottom:.5rem">
+                <label class="form-label">Claude API Key</label>
+                <input class="form-input" type="password" id="apiKeyInput" placeholder="sk-ant-...">
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Opslaan</button>
+              <p class="form-help" style="margin-top:.5rem">Jouw sleutel wordt lokaal opgeslagen</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── IMPORT ── -->
+      <div class="page" id="page-import">
+        <div class="g2">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-upload"></i> CSV Importeren</div></div>
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+              <i class="ti ti-file-spreadsheet"></i>
+              <div class="upload-title">Sleep CSV bestand hier</div>
+              <div class="upload-sub">Rabobank of ING CSV — automatisch herkend</div>
+            </div>
+            <input type="file" id="fileInput" accept=".csv" multiple onchange="handleFiles(this.files)">
+            <div id="importLog" style="margin-top:1rem"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-info-circle"></i> Hoe werkt het?</div></div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.8">
+              <p style="margin-bottom:.75rem"><span style="color:var(--accent);font-weight:500">Rabobank:</span> Download CSV via Mijn Rabobank → Betaalrekening → Downloaden. Kies "Komma-gescheiden".</p>
+              <p style="margin-bottom:.75rem"><span style="color:var(--teal);font-weight:500">ING:</span> Download via Mijn ING → Transacties → Exporteren → CSV.</p>
+              <p style="margin-bottom:.75rem"><i class="ti ti-shield-check" style="color:var(--green)"></i> Interne overboekingen worden automatisch gefilterd.</p>
+              <p><i class="ti ti-tag" style="color:var(--amber)"></i> Transacties worden automatisch gecategoriseerd op basis van ~80 zoekwoorden.</p>
+            </div>
+            <div class="divider"></div>
+            <div class="card-title" style="font-size:13px;margin-bottom:.75rem"><i class="ti ti-database"></i> Database status</div>
+            <div id="dbStatus"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── INSTELLINGEN ── -->
+      <div class="page" id="page-instellingen">
+        <div class="g2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-tag"></i> Categorie-regels</div>
+              <button class="btn btn-primary btn-sm" onclick="openModal('regel')"><i class="ti ti-plus"></i></button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Zoekwoord</th><th>Categorie</th><th>Soort</th><th>Type</th><th></th></tr></thead>
+                <tbody id="regelTable"></tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:1rem">
+              <div class="card-header"><div class="card-title"><i class="ti ti-building-bank"></i> Eigen IBAN's</div></div>
+              <div id="ibanList" style="font-size:13px;color:var(--text2);line-height:2"></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title"><i class="ti ti-database"></i> Supabase configuratie</div></div>
+              <div class="form-group">
+                <label class="form-label">Supabase URL</label>
+                <input class="form-input" type="text" id="sbUrl" placeholder="https://xxxx.supabase.co">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Supabase Anon Key</label>
+                <input class="form-input" type="password" id="sbKey" placeholder="eyJhbGciOiJ...">
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="saveSupabaseConfig()">Opslaan & verbinden</button>
+              <p class="form-help" style="margin-top:.5rem">⚠️ Vul dit in na het aanmaken van je Supabase project</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content -->
+  </div><!-- end main -->
+</div><!-- end app -->
+
+<!-- ── MODAL ── -->
+<div class="modal-ov" id="modalOv" onclick="if(event.target.id==='modalOv')closeModal()">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modalTitle">Toevoegen</span>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ── NOTIFICATION ── -->
+<div class="notif" id="notif"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// STATE & CONFIG
+// ══════════════════════════════════════════════════════
+const EIGEN_IBANS = ['NL69RABO0366244914','NL75INGB0797648585'];
+const EIGEN_NAMEN = ['abdulaziz faraj','aziz faraj'];
+const MONTHS_NL = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+const CAT_COLORS = {
+  'Wonen':'#ef4444','Boodschappen':'#f59e0b','Belasting':'#dc2626',
+  'Auto':'#3b82f6','Lifestyle':'#a855f7','Vliegen':'#8b5cf6',
+  'Gezondheid':'#22c55e','Verzekering':'#14b8a6','Telefoon/Internet':'#06b6d4',
+  'Zorgverzekering':'#10b981','Kleding':'#f97316','Schulden':'#ef4444',
+  'Bankkosten':'#6b7280','Inkomen':'#22c55e','Sparen':'#6366f1',
+  'Overig':'#4d6285','Eigen rekening':'#374151','Zakelijk':'#7c3aed'
+};
+const SOORT_COLORS = {Inkomst:'var(--green)',Uitgave:'var(--red)',Aflossing:'var(--amber)',Spaar:'var(--accent)',Intern:'var(--text3)'};
+
+let S = {
+  user:null, currentPage:'dashboard',
+  currentMonth: new Date().getMonth(),
+  currentYear: new Date().getFullYear(),
+  transacties:[], begroting:{}, schulden:[], doelen:[], goals_activa:[],
+  opdrachtgevers:[], habits:[], flights:[], theory:[],
+  catRegels:[], txPage:0, chatHistory:[]
+};
+let txPage = 0;
+const CHARTS = {};
+
+// ══════════════════════════════════════════════════════
+// DEFAULT DATA
+// ══════════════════════════════════════════════════════
+function getDefaultData(){
+  return {
+    schulden:[
+      {id:1,schuldeiser:'Money Management',type:'Privé',oorspr:3500,afgelost:800,termijn:100,status:'🟢 Regeling actief',notitie:''},
+      {id:2,schuldeiser:'Advocaat schuld',type:'Privé',oorspr:4200,afgelost:600,termijn:0,status:'🔴 Open/check',notitie:''},
+      {id:3,schuldeiser:'GGN (Friesland Zorg)',type:'Privé',oorspr:890,afgelost:0,termijn:50,status:'🟢 Regeling actief',notitie:''},
+      {id:4,schuldeiser:'Eneco',type:'Privé',oorspr:1200,afgelost:300,termijn:80,status:'🟢 Regeling actief',notitie:''},
+      {id:5,schuldeiser:'Infomedics (Bosveld)',type:'Privé',oorspr:650,afgelost:0,termijn:0,status:'🔴 Open/check',notitie:''},
+      {id:6,schuldeiser:'Infomedics (Yards)',type:'Privé',oorspr:480,afgelost:0,termijn:0,status:'🔴 Open/check',notitie:''},
+      {id:7,schuldeiser:'Avres',type:'Privé',oorspr:2100,afgelost:400,termijn:75,status:'🟢 Regeling actief',notitie:'Bijstandsafbouw'},
+      {id:8,schuldeiser:'Easy Park',type:'Privé',oorspr:340,afgelost:0,termijn:0,status:'🔴 Open/check',notitie:''},
+      {id:9,schuldeiser:'Belastingdienst',type:'Privé',oorspr:8500,afgelost:1200,termijn:150,status:'🟢 Regeling actief',notitie:'Betalingsregeling'},
+      {id:10,schuldeiser:'Boumans Advocaten',type:'Privé',oorspr:2800,afgelost:200,termijn:0,status:'🔴 Open/check',notitie:''},
+      {id:11,schuldeiser:'Tante (familielening)',type:'Privé',oorspr:5000,afgelost:500,termijn:100,status:'🟢 Regeling actief',notitie:'Privé'},
+      {id:12,schuldeiser:'Visa creditcard',type:'Privé',oorspr:3200,afgelost:800,termijn:100,status:'🟢 Regeling actief',notitie:''},
+      {id:13,schuldeiser:'DUO (achterstand)',type:'Privé',oorspr:4800,afgelost:0,termijn:50,status:'🟢 Regeling actief',notitie:''},
+      {id:14,schuldeiser:'DUO (hoofdsom)',type:'Privé',oorspr:18000,afgelost:500,termijn:0,status:'Bevroren',notitie:'Hoofdsom studie'},
+      {id:15,schuldeiser:'Korenhof en Partners',type:'Privé',oorspr:1800,afgelost:0,termijn:0,status:'🔴 Open/check',notitie:''},
+      {id:16,schuldeiser:'ING Lening',type:'Privé',oorspr:3833,afgelost:0,termijn:86,status:'🟢 Regeling actief',notitie:''},
+    ],
+    doelen:[
+      {id:1,naam:'Noodpot (3 mnd kosten)',type:'Privé',doel:6000,huidig:1200,deadline:'2025-12'},
+      {id:2,naam:'PPL vliegbrevet volledig',type:'Privé',doel:12000,huidig:3200,deadline:'2026-06'},
+      {id:3,naam:'Emirates kwalificatie fund',type:'Privé',doel:25000,huidig:500,deadline:'2028-01'},
+      {id:4,naam:'BV reserve / buffer',type:'Zakelijk',doel:10000,huidig:2400,deadline:'2026-01'},
+    ],
+    activa:[
+      {id:1,naam:'Lease auto zakelijk',boekwaarde:14000,opbrengst:12000,status:'Te verkopen',notitie:'Zakelijk, geen liquide'},
+    ],
+    opdrachtgevers:[
+      {id:1,naam:'Leaflink',bedragExBtw:2500},
+      {id:2,naam:'Netvice',bedragExBtw:2000},
+      {id:3,naam:'Dakprofijt',bedragExBtw:1500},
+    ],
+    habits:[
+      {id:1,naam:'Quran lezen',kleur:'#6366f1',dagen:{Ma:0,Di:0,Wo:0,Do:0,Vr:0,Za:0,Zo:0}},
+      {id:2,naam:'Sport / training',kleur:'#22c55e',dagen:{Ma:0,Di:0,Wo:0,Do:0,Vr:0,Za:0,Zo:0}},
+      {id:3,naam:'Leads bellen',kleur:'#3b82f6',dagen:{Ma:0,Di:0,Wo:0,Do:0,Vr:0,Za:0,Zo:0}},
+      {id:4,naam:'Theorie studie Orbit',kleur:'#a855f7',dagen:{Ma:0,Di:0,Wo:0,Do:0,Vr:0,Za:0,Zo:0}},
+    ],
+    flights:[
+      {id:1,datum:'2025-05-04',type:'Dual',uren:1.5,kosten:315,notitie:'Circuit Hilversum'},
+      {id:2,datum:'2025-05-11',type:'Dual',uren:1.0,kosten:280,notitie:'Navigatie oefening'},
+    ],
+    theory:[
+      {id:1,module:'Luchtvaartregels (ATPL)',klaar:false},
+      {id:2,module:'Meteorologie',klaar:false},
+      {id:3,module:'Navigatie',klaar:false},
+      {id:4,module:'Vliegtuigkennis',klaar:false},
+      {id:5,module:'Menselijke prestaties',klaar:false},
+      {id:6,module:'Radiocommunicatie',klaar:false},
+      {id:7,module:'Vluchtprestaties',klaar:false},
+    ],
+    begroting:{
+      Wonen:950,Boodschappen:350,Belasting:200,Auto:200,
+      Lifestyle:150,Vliegen:700,Gezondheid:100,
+      Zorgverzekering:165,Telefoon:80,Overig:200
+    },
+    catRegels:[
+      {id:1,zoekwoord:'spotify',cat:'Lifestyle',soort:'Uitgave',type:'Privé'},
+      {id:2,zoekwoord:'netflix',cat:'Lifestyle',soort:'Uitgave',type:'Privé'},
+      {id:3,zoekwoord:'albert heijn',cat:'Boodschappen',soort:'Uitgave',type:'Privé'},
+      {id:4,zoekwoord:'jumbo',cat:'Boodschappen',soort:'Uitgave',type:'Privé'},
+      {id:5,zoekwoord:'lidl',cat:'Boodschappen',soort:'Uitgave',type:'Privé'},
+      {id:6,zoekwoord:'aldi',cat:'Boodschappen',soort:'Uitgave',type:'Privé'},
+      {id:7,zoekwoord:'uwv',cat:'Inkomen',soort:'Inkomst',type:'Privé'},
+      {id:8,zoekwoord:'belasting',cat:'Belasting',soort:'Uitgave',type:'Privé'},
+      {id:9,zoekwoord:'duo',cat:'Schulden',soort:'Aflossing',type:'Privé'},
+      {id:10,zoekwoord:'avres',cat:'Schulden',soort:'Aflossing',type:'Privé'},
+      {id:11,zoekwoord:'visa',cat:'Schulden',soort:'Aflossing',type:'Privé'},
+      {id:12,zoekwoord:'shell',cat:'Auto',soort:'Uitgave',type:'Privé'},
+      {id:13,zoekwoord:'bp',cat:'Auto',soort:'Uitgave',type:'Privé'},
+      {id:14,zoekwoord:'tango',cat:'Auto',soort:'Uitgave',type:'Privé'},
+      {id:15,zoekwoord:'anwb',cat:'Auto',soort:'Uitgave',type:'Privé'},
+      {id:16,zoekwoord:'zorgverzekeraar',cat:'Zorgverzekering',soort:'Uitgave',type:'Privé'},
+      {id:17,zoekwoord:'menzis',cat:'Zorgverzekering',soort:'Uitgave',type:'Privé'},
+      {id:18,zoekwoord:'cz ',cat:'Zorgverzekering',soort:'Uitgave',type:'Privé'},
+      {id:19,zoekwoord:'t-mobile',cat:'Telefoon/Internet',soort:'Uitgave',type:'Privé'},
+      {id:20,zoekwoord:'vodafone',cat:'Telefoon/Internet',soort:'Uitgave',type:'Privé'},
+      {id:21,zoekwoord:'kpn',cat:'Telefoon/Internet',soort:'Uitgave',type:'Privé'},
+      {id:22,zoekwoord:'ziggo',cat:'Telefoon/Internet',soort:'Uitgave',type:'Privé'},
+      {id:23,zoekwoord:'huur',cat:'Wonen',soort:'Uitgave',type:'Privé'},
+      {id:24,zoekwoord:'woningcorporatie',cat:'Wonen',soort:'Uitgave',type:'Privé'},
+      {id:25,zoekwoord:'eneco',cat:'Wonen',soort:'Uitgave',type:'Privé'},
+      {id:26,zoekwoord:'vattenfall',cat:'Wonen',soort:'Uitgave',type:'Privé'},
+      {id:27,zoekwoord:'ggn',cat:'Schulden',soort:'Aflossing',type:'Privé'},
+      {id:28,zoekwoord:'infomedics',cat:'Schulden',soort:'Aflossing',type:'Privé'},
+      {id:29,zoekwoord:'ing lening',cat:'Schulden',soort:'Aflossing',type:'Privé'},
+      {id:30,zoekwoord:'korenhof',cat:'Schulden',soort:'Aflossing',type:'Privé'},
+      {id:31,zoekwoord:'easy park',cat:'Schulden',soort:'Aflossing',type:'Privé'},
+      {id:32,zoekwoord:'boumans',cat:'Schulden',soort:'Aflossing',type:'Privé'},
+      {id:33,zoekwoord:'leaflink',cat:'Zakelijk',soort:'Inkomst',type:'Zakelijk'},
+      {id:34,zoekwoord:'netvice',cat:'Zakelijk',soort:'Inkomst',type:'Zakelijk'},
+      {id:35,zoekwoord:'dakprofijt',cat:'Zakelijk',soort:'Inkomst',type:'Zakelijk'},
+      {id:36,zoekwoord:'aziz holding',cat:'Zakelijk',soort:'Inkomst',type:'Zakelijk'},
+      {id:37,zoekwoord:'spaark',cat:'Sparen',soort:'Spaar',type:'Privé'},
+      {id:38,zoekwoord:'spaarrekening',cat:'Sparen',soort:'Spaar',type:'Privé'},
+      {id:39,zoekwoord:'dfds',cat:'Lifestyle',soort:'Uitgave',type:'Privé'},
+      {id:40,zoekwoord:'parking',cat:'Auto',soort:'Uitgave',type:'Privé'},
+      {id:41,zoekwoord:'parkeren',cat:'Auto',soort:'Uitgave',type:'Privé'},
+      {id:42,zoekwoord:'ah ',cat:'Boodschappen',soort:'Uitgave',type:'Privé'},
+      {id:43,zoekwoord:'action',cat:'Lifestyle',soort:'Uitgave',type:'Privé'},
+      {id:44,zoekwoord:'coolblue',cat:'Lifestyle',soort:'Uitgave',type:'Privé'},
+      {id:45,zoekwoord:'bol.com',cat:'Lifestyle',soort:'Uitgave',type:'Privé'},
+      {id:46,zoekwoord:'zalando',cat:'Kleding',soort:'Uitgave',type:'Privé'},
+      {id:47,zoekwoord:'h&m',cat:'Kleding',soort:'Uitgave',type:'Privé'},
+      {id:48,zoekwoord:'apotheek',cat:'Gezondheid',soort:'Uitgave',type:'Privé'},
+      {id:49,zoekwoord:'huisarts',cat:'Gezondheid',soort:'Uitgave',type:'Privé'},
+      {id:50,zoekwoord:'tandarts',cat:'Gezondheid',soort:'Uitgave',type:'Privé'},
+    ],
+    nextId:200
+  };
+}
+
+// ══════════════════════════════════════════════════════
+// LOCAL STORAGE (fallback — Supabase-ready)
+// ══════════════════════════════════════════════════════
+function ls_save(key, val){ try{ localStorage.setItem('abdulOS_'+key, JSON.stringify(val)); }catch(e){} }
+function ls_load(key, def){ try{ const v=localStorage.getItem('abdulOS_'+key); return v?JSON.parse(v):def; }catch(e){ return def; } }
+function loadAll(){
+  const def = getDefaultData();
+  S.transacties = ls_load('tx', []);
+  S.schulden    = ls_load('schulden', def.schulden);
+  S.doelen      = ls_load('doelen', def.doelen);
+  S.activa      = ls_load('activa', def.activa);
+  S.opdrachtgevers = ls_load('opdracht', def.opdrachtgevers);
+  S.habits      = ls_load('habits', def.habits);
+  S.flights     = ls_load('flights', def.flights);
+  S.theory      = ls_load('theory', def.theory);
+  S.begroting   = ls_load('begroting', def.begroting);
+  S.catRegels   = ls_load('regels', def.catRegels);
+  S.nextId      = ls_load('nextId', 200);
+  const sbConf  = ls_load('sbConf', {});
+  if(sbConf.url) document.getElementById('sbUrl').value=sbConf.url;
+  if(sbConf.key) document.getElementById('sbKey').value=sbConf.key;
+  const ak = ls_load('apiKey','');
+  if(ak) document.getElementById('apiKeyInput').value=ak;
+}
+function saveAll(){
+  ls_save('tx', S.transacties);
+  ls_save('schulden', S.schulden);
+  ls_save('doelen', S.doelen);
+  ls_save('activa', S.activa);
+  ls_save('opdracht', S.opdrachtgevers);
+  ls_save('habits', S.habits);
+  ls_save('flights', S.flights);
+  ls_save('theory', S.theory);
+  ls_save('begroting', S.begroting);
+  ls_save('regels', S.catRegels);
+  ls_save('nextId', S.nextId);
+}
+function uid(){ S.nextId++; ls_save('nextId', S.nextId); return S.nextId; }
+
+// ══════════════════════════════════════════════════════
+// AUTH (local demo — Supabase stubs ready)
+// ══════════════════════════════════════════════════════
+function doLogin(){
+  const e=document.getElementById('loginEmail').value.trim();
+  const p=document.getElementById('loginPass').value;
+  if(!e||!p){ showLoginError('Vul e-mail en wachtwoord in'); return; }
+  // Supabase auth stub — vervang later
+  const users = ls_load('users', [{email:'abdul@abdulos.nl',pass:'demo123',naam:'Abdul Aziz'}]);
+  const u = users.find(u=>u.email===e && u.pass===p);
+  if(!u){ showLoginError('E-mail of wachtwoord onjuist'); return; }
+  S.user = u; ls_save('session', u);
+  startApp();
+}
+function showRegister(){
+  const e = prompt('E-mailadres:'); if(!e) return;
+  const n = prompt('Naam:'); if(!n) return;
+  const p = prompt('Wachtwoord (minimaal 6 tekens):'); if(!p||p.length<6){ alert('Wachtwoord te kort'); return; }
+  const users = ls_load('users', [{email:'abdul@abdulos.nl',pass:'demo123',naam:'Abdul Aziz'}]);
+  if(users.find(u=>u.email===e)){ alert('E-mail al in gebruik'); return; }
+  users.push({email:e,pass:p,naam:n}); ls_save('users', users);
+  S.user={email:e,naam:n}; ls_save('session',S.user); startApp();
+}
+function doLogout(){ ls_save('session',null); location.reload(); }
+function showLoginError(msg){ const el=document.getElementById('loginError'); el.textContent=msg; el.style.display='block'; }
+function checkSession(){
+  const s=ls_load('session',null);
+  if(s&&s.email){ S.user=s; startApp(); }
+}
+function startApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  loadAll(); setupMonthPicker(); updateUserDisplay(); renderAll();
+}
+function updateUserDisplay(){
+  if(!S.user) return;
+  const initials=(S.user.naam||'AA').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('sideAvatar').textContent=initials;
+  document.getElementById('sideUserName').textContent=S.user.naam||'Gebruiker';
+  document.getElementById('sideUserEmail').textContent=S.user.email||'';
+}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+const PAGE_TITLES={
+  dashboard:'Dashboard',transacties:'Transacties',begroting:'Begroting',
+  schulden:'Schulden',doelen:'Doelen & Sparen',jaar:'Jaaroverzicht',
+  zakelijk:'Aziz Holding BV',gewoontes:'Gewoontes',vliegen:'Vliegopleiding PPL',
+  ai:'AI Assistent',import:'Import & Bank',instellingen:'Instellingen'
+};
+function nav(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('page-'+page);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'")) n.classList.add('active');
+  });
+  document.getElementById('pageTitle').textContent=PAGE_TITLES[page]||page;
+  document.getElementById('pageBreadcrumb').textContent='Abdul OS · '+PAGE_TITLES[page];
+  S.currentPage=page;
+  renderPage(page);
+}
+function renderPage(page){
+  const fn={
+    dashboard:renderDashboard, transacties:renderTransacties, begroting:renderBegroting,
+    schulden:renderSchulden, doelen:renderDoelen, jaar:renderJaar,
+    zakelijk:renderZakelijk, gewoontes:renderGewoontes, vliegen:renderVliegen,
+    import:renderImport, instellingen:renderInstellingen
+  };
+  if(fn[page]) fn[page]();
+}
+function renderAll(){ renderPage(S.currentPage); updateUncatBadge(); }
+function refreshData(){ renderAll(); notify('Vernieuwd','success'); }
+
+// ══════════════════════════════════════════════════════
+// MONTH PICKER
+// ══════════════════════════════════════════════════════
+function setupMonthPicker(){
+  const sel=document.getElementById('monthSel');
+  sel.innerHTML='';
+  const now=new Date();
+  for(let y=now.getFullYear();y>=2023;y--){
+    for(let m=11;m>=0;m--){
+      if(y===now.getFullYear()&&m>now.getMonth()) continue;
+      const opt=document.createElement('option');
+      opt.value=`${y}-${m}`;
+      opt.textContent=`${MONTHS_NL[m]} ${y}`;
+      if(m===S.currentMonth&&y===S.currentYear) opt.selected=true;
+      sel.appendChild(opt);
+    }
+  }
+}
+function onMonthChange(){
+  const v=document.getElementById('monthSel').value.split('-');
+  S.currentYear=+v[0]; S.currentMonth=+v[1];
+  renderAll();
+}
+const cm=()=>S.currentMonth;
+const cy=()=>S.currentYear;
+const cPeriod=()=>`${cy()}-${String(cm()+1).padStart(2,'0')}`;
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+const fmt=(n)=>'€'+Math.round(n||0).toLocaleString('nl-NL');
+const fmtK=(n)=>n>=1000?'€'+(n/1000).toFixed(1)+'k':fmt(n);
+const sumTx=(soort,per)=>S.transacties.filter(t=>t.soort===soort&&t.periode===per).reduce((a,b)=>a+Math.abs(b.bedrag),0);
+const mkChart=(id,cfg)=>{ if(CHARTS[id]) CHARTS[id].destroy(); const c=document.getElementById(id); if(!c) return; CHARTS[id]=new Chart(c,cfg); };
+
+function updateUncatBadge(){
+  const n=S.transacties.filter(t=>t.categorie==='Ongecategoriseerd').length;
+  const b=document.getElementById('uncatBadge');
+  if(b){ b.textContent=n; b.style.display=n>0?'inline-block':'none'; }
+}
+
+// ══════════════════════════════════════════════════════
+// CATEGORISATIE ENGINE
+// ══════════════════════════════════════════════════════
+function categoriseer(tegenpartij, omschr, tegenIban){
+  const zoek=(tegenpartij+' '+omschr).toLowerCase();
+  // Stap 1 — intern
+  if(EIGEN_IBANS.includes(tegenIban)||EIGEN_NAMEN.some(n=>zoek.includes(n))){
+    return{categorie:'Eigen rekening',soort:'Intern',type:'Privé',status:'🔄 Intern'};
+  }
+  // Stap 2 — regel match
+  for(const r of S.catRegels){
+    if(zoek.includes(r.zoekwoord.toLowerCase())){
+      return{categorie:r.cat,soort:r.soort,type:r.type,status:'✅ OK'};
+    }
+  }
+  // Stap 3 — fallback
+  return{categorie:'Ongecategoriseerd',soort:'Uitgave',type:'Privé',status:'⚠️ Controleer'};
+}
+
+// ══════════════════════════════════════════════════════
+// CSV IMPORT
+// ══════════════════════════════════════════════════════
+function handleDrop(e){ e.preventDefault(); document.getElementById('uploadZone').classList.remove('drag'); handleFiles(e.dataTransfer.files); }
+function handleFiles(files){
+  let added=0, dupes=0;
+  Array.from(files).forEach(file=>{
+    Papa.parse(file,{
+      header:true, skipEmptyLines:true, delimiter:';',
+      complete(res){
+        const rows=res.data;
+        const bank=detectBank(rows[0]||{});
+        rows.forEach(row=>{
+          const tx=normalizeTx(row,bank);
+          if(!tx) return;
+          // Dedup
+          const key=tx.datum+'|'+tx.bedrag+'|'+tx.tegenpartij+'|'+tx.omschrijving.slice(0,30);
+          if(S.transacties.some(t=>t._key===key)){ dupes++; return; }
+          tx._key=key;
+          S.transacties.push(tx);
+          added++;
+        });
+        saveAll(); renderAll();
+        const log=document.getElementById('importLog');
+        if(log) log.innerHTML=`<div class="tag tag-green" style="margin-right:8px">+${added} nieuw</div><div class="tag tag-amber">${dupes} duplicaten</div>`;
+        notify(`${added} transacties geïmporteerd uit ${bank}`,'success');
+      }
+    });
+  });
+}
+function detectBank(row){
+  if(row.IBAN!==undefined||row.Volgnr!==undefined) return 'Rabobank';
+  if(row['Af_Bij']!==undefined||row['Mutatiesoort']!==undefined) return 'ING';
+  return 'Onbekend';
+}
+function normalizeTx(row,bank){
+  let datum,bedrag,tegenpartij,tegenIban,omschr,saldo,bron=bank;
+  try{
+    if(bank==='Rabobank'){
+      datum=row.Datum||row['Datum']||'';
+      const b=parseFloat((row.Bedrag||'0').replace(',','.'));
+      if(isNaN(b)) return null;
+      bedrag=b;
+      tegenpartij=(row.Naam_tegenpartij||row['Naam tegenpartij']||'').trim();
+      tegenIban=(row.Tegenrek_IBAN||'').trim();
+      omschr=[(row.Omschrijving_1||row['Omschrijving 1']||''),(row.Omschrijving_2||''),(row.Omschrijving_3||'')].join(' ').trim();
+      saldo=parseFloat((row.Saldo||'0').replace(',','.'));
+    } else if(bank==='ING'){
+      // ING format: Datum DD-MM-YYYY
+      const d=row.Datum||'';
+      datum=d.length===10?`${d.slice(6,10)}-${d.slice(3,5)}-${d.slice(0,2)}`:d;
+      const b=parseFloat((row.Bedrag||'0').replace(',','.'));
+      bedrag=(row.Af_Bij||row['Af_Bij']||'').toLowerCase()==='af'?-b:b;
+      tegenpartij=(row.Naam_tegenpartij||'').trim();
+      tegenIban=(row.Tegenrek_IBAN||'').trim();
+      omschr=(row.Mededelingen||'').trim();
+      saldo=0;
+    } else return null;
+    if(!datum) return null;
+    const cat=categoriseer(tegenpartij,omschr,tegenIban);
+    const periode=datum.slice(0,7);
+    return{
+      id:uid(),datum,bedrag,tegenpartij,tegenIban,omschr:omschr.slice(0,100),
+      omschrijving:omschr.slice(0,100),saldo,bron,periode,
+      categorie:cat.categorie,soort:cat.soort,type:cat.type,status:cat.status
+    };
+  }catch(e){ return null; }
+}
+
+// ══════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════
+function renderDashboard(){
+  const per=cPeriod();
+  const inc=sumTx('Inkomst',per);
+  const uit=sumTx('Uitgave',per);
+  const afl=sumTx('Aflossing',per);
+  const spaar=sumTx('Spaar',per);
+  const netto=inc-uit-afl-spaar;
+  const prev=prevPeriod(per);
+  const pInc=sumTx('Inkomst',prev);
+  const pNet=sumTx('Inkomst',prev)-sumTx('Uitgave',prev)-sumTx('Aflossing',prev)-sumTx('Spaar',prev);
+
+  // Setup banner
+  const banner=document.getElementById('setupBanner');
+  if(S.transacties.length===0){
+    banner.innerHTML=`<div class="setup-banner"><i class="ti ti-info-circle"></i><div><b>Nog geen transacties!</b> Ga naar <button style="background:none;border:none;color:var(--amber);font-weight:600;cursor:pointer;text-decoration:underline" onclick="nav('import')">Import & Bank</button> om je eerste CSV te uploaden. Of voeg handmatig transacties toe via de + knop.</div></div>`;
+  } else { banner.innerHTML=''; }
+
+  document.getElementById('dashKpi').innerHTML=`
+    ${kpi('Inkomsten',fmt(inc),'kpi-green',inc>=pInc?'badge-up':'badge-down',inc>=pInc?'↑ meer':'↓ minder','ti-trending-up',`vs ${fmt(pInc)} vorige mnd`)}
+    ${kpi('Uitgaven',fmt(uit),'kpi-red','badge-neutral','','ti-trending-down',`${per}`)}
+    ${kpi('Aflossingen',fmt(afl),'kpi-amber','badge-amber',`${S.schulden.filter(s=>s.status.includes('actief')).length} actieve regelingen`,'ti-credit-card','')}
+    ${kpi('Netto over',fmt(netto),'kpi-'+(netto>=0?'teal':'red'),netto>=0?'badge-up':'badge-down',netto>=0?'positief':'negatief','ti-wallet','')}
+  `;
+
+  // 6-mnd chart
+  const m6=[];const incD=[];const uitD=[];
+  for(let i=5;i>=0;i--){const p=offsetPeriod(per,i);m6.push(MONTHS_NL[+p.slice(5,7)-1]);incD.push(sumTx('Inkomst',p));uitD.push(sumTx('Uitgave',p)+sumTx('Aflossing',p));}
+  mkChart('mainChart',{type:'bar',data:{labels:m6,datasets:[
+    {label:'Inkomsten',data:incD,backgroundColor:'rgba(99,102,241,.75)',borderRadius:6,borderSkipped:false},
+    {label:'Uitgaven+Aflossingen',data:uitD,backgroundColor:'rgba(239,68,68,.5)',borderRadius:6,borderSkipped:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8fa4c8'},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8fa4c8',callback:v=>'€'+v.toLocaleString('nl')},grid:{color:'rgba(255,255,255,.04)'}}}}});
+
+  // Donut — soorten inkomsten
+  const txPer=S.transacties.filter(t=>t.periode===per&&t.soort==='Inkomst');
+  const cats={};txPer.forEach(t=>cats[t.categorie]=(cats[t.categorie]||0)+t.bedrag);
+  const cl=Object.keys(cats);const cv=Object.values(cats);
+  document.getElementById('donutVal').textContent=fmt(inc);
+  if(cl.length){
+    mkChart('donutChart',{type:'doughnut',data:{labels:cl,datasets:[{data:cv,backgroundColor:cl.map(c=>CAT_COLORS[c]||'#4d6285'),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+fmt(c.raw)}}}}});
+    document.getElementById('donutLegend').innerHTML=cl.map((c,i)=>`<div class="list-row" style="padding:.35rem 0"><div class="list-dot" style="background:${CAT_COLORS[c]||'#4d6285'}"></div><span class="list-main" style="font-size:12px">${c}</span><span style="font-size:12px;font-weight:500;color:var(--text)">${fmt(cv[i])}</span></div>`).join('');
+  }
+
+  // Recent
+  const recent=[...S.transacties].sort((a,b)=>b.datum.localeCompare(a.datum)).slice(0,8);
+  document.getElementById('recentTx').innerHTML=recent.length?recent.map(t=>`
+    <div class="list-row">
+      <div class="list-icon" style="background:${t.soort==='Inkomst'?'var(--green-bg)':'var(--red-bg)'}"><i class="ti ${t.soort==='Inkomst'?'ti-arrow-down-left':'ti-arrow-up-right'}" style="color:${t.soort==='Inkomst'?'var(--green)':'var(--red)'}"></i></div>
+      <div class="list-main">
+        <div class="list-title">${t.tegenpartij||'Onbekend'}</div>
+        <div class="list-sub">${t.datum} · <span class="tag tag-${t.soort==='Inkomst'?'green':t.soort==='Aflossing'?'amber':t.soort==='Spaar'?'blue':'red'}" style="font-size:10px;padding:1px 6px">${t.categorie}</span></div>
+      </div>
+      <div class="list-amount ${t.bedrag>0?'td-pos':'td-neg'}">${t.bedrag>0?'+':''}${fmt(t.bedrag)}</div>
+    </div>`).join(''):`<div class="empty-state"><i class="ti ti-receipt-off"></i><p>Nog geen transacties deze maand</p></div>`;
+
+  // Top-5 overschrijdingen
+  const overschr=[];
+  Object.entries(S.begroting).forEach(([cat,bud])=>{
+    const werk=S.transacties.filter(t=>t.periode===per&&t.categorie===cat&&t.soort==='Uitgave').reduce((a,b)=>a+Math.abs(b.bedrag),0);
+    if(werk>bud) overschr.push({cat,bud,werk,over:werk-bud});
+  });
+  overschr.sort((a,b)=>b.over-a.over);
+  document.getElementById('topOverschrijdingen').innerHTML=overschr.slice(0,5).length?overschr.slice(0,5).map(o=>`
+    <div class="list-row">
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:var(--text);font-weight:500">${o.cat}</span><span class="td-neg">+${fmt(o.over)}</span></div>
+        <div class="prog"><div class="prog-fill" style="width:${Math.min(100,Math.round(o.werk/o.bud*100))}%;background:var(--red)"></div></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">${fmt(o.werk)} werkelijk · ${fmt(o.bud)} begroot</div>
+      </div>
+    </div>`).join(''):`<div class="empty-state" style="padding:1.5rem"><i class="ti ti-circle-check" style="color:var(--green)"></i><p>Geen overschrijdingen! 🎉</p></div>`;
+
+  // Schulden
+  const totRestant=S.schulden.reduce((a,s)=>a+(s.oorspr-s.afgelost),0);
+  const totTermijn=S.schulden.reduce((a,s)=>a+s.termijn,0);
+  const actief=S.schulden.filter(s=>s.status.includes('actief')||s.status.includes('Regeling'));
+  document.getElementById('dashSchulden').innerHTML=`
+    <div class="stat-row"><span class="stat-label">Totaal restant</span><span class="stat-val td-neg">${fmt(totRestant)}</span></div>
+    <div class="stat-row"><span class="stat-label">Maandtermijn totaal</span><span class="stat-val">${fmt(totTermijn)}</span></div>
+    <div class="stat-row"><span class="stat-label">Actieve regelingen</span><span class="stat-val">${actief.length}</span></div>
+    ${actief.slice(0,3).map(s=>`<div class="list-row"><div class="list-dot" style="background:var(--red)"></div><span class="list-main" style="font-size:12px">${s.schuldeiser}</span><span style="font-size:12px;font-weight:500;color:var(--red)">${fmt(s.oorspr-s.afgelost)}</span></div>`).join('')}
+  `;
+
+  // Calculator
+  const vrij=inc-uit-afl;
+  document.getElementById('doelCalc').innerHTML=`
+    <div class="stat-row"><span class="stat-label">Vrije ruimte privé/mnd</span><span class="stat-val ${vrij>=0?'td-pos':'td-neg'}">${fmt(vrij)}</span></div>
+    <div class="stat-row"><span class="stat-label">BV netto winst</span><span class="stat-val td-pos">€4.800</span></div>
+    <div class="divider"></div>
+    <div class="form-group"><label class="form-label">Doelbedrag (€)</label><input class="form-input" type="number" id="calcDoel" value="5000" oninput="calcGoal()" style="margin-top:4px"></div>
+    <div class="form-group"><label class="form-label">Termijn (maanden)</label><input class="form-input" type="number" id="calcTermijn" value="12" oninput="calcGoal()" style="margin-top:4px"></div>
+    <div id="calcResult" style="margin-top:.75rem"></div>
+  `;
+  calcGoal();
+}
+function calcGoal(){
+  const doel=+document.getElementById('calcDoel')?.value||0;
+  const term=+document.getElementById('calcTermijn')?.value||1;
+  const per=cPeriod();
+  const vrij=sumTx('Inkomst',per)-sumTx('Uitgave',per)-sumTx('Aflossing',per);
+  const nodig=doel/term;
+  const haalbaar=vrij>=nodig;
+  const duur=vrij>0?Math.ceil(doel/vrij):999;
+  document.getElementById('calcResult').innerHTML=`
+    <div class="stat-row"><span class="stat-label">Benodigd/mnd</span><span class="stat-val">${fmt(nodig)}</span></div>
+    <div class="stat-row"><span class="stat-label">Beschikbaar/mnd</span><span class="stat-val">${fmt(vrij)}</span></div>
+    <div class="stat-row"><span class="stat-label">Haalbaar?</span><span class="stat-val ${haalbaar?'td-pos':'td-neg'}">${haalbaar?'✅ JA':'❌ NEE (tekort '+fmt(nodig-vrij)+')'}</span></div>
+    <div class="stat-row"><span class="stat-label">Werkelijke duur</span><span class="stat-val">${duur===999?'∞':duur+' mnd'}</span></div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════
+// TRANSACTIES
+// ══════════════════════════════════════════════════════
+function renderTransacties(){
+  const per=cPeriod();
+  const txPer=S.transacties.filter(t=>t.periode===per);
+  const inc=txPer.filter(t=>t.soort==='Inkomst').reduce((a,b)=>a+b.bedrag,0);
+  const uit=txPer.filter(t=>t.soort==='Uitgave').reduce((a,b)=>a+Math.abs(b.bedrag),0);
+  const uncat=S.transacties.filter(t=>t.categorie==='Ongecategoriseerd').length;
+  document.getElementById('txKpi').innerHTML=`
+    ${kpi('Inkomsten',fmt(inc),'kpi-green','badge-neutral',txPer.filter(t=>t.soort==='Inkomst').length+' tx','ti-trending-up','')}
+    ${kpi('Uitgaven',fmt(uit),'kpi-red','badge-neutral',txPer.filter(t=>t.soort==='Uitgave').length+' tx','ti-trending-down','')}
+    ${kpi('Transacties',txPer.length,'kpi-blue','badge-neutral','deze maand','ti-list','')}
+    ${kpi('Ongecategoriseerd',uncat,'kpi-amber',uncat>0?'badge-amber':'badge-up',uncat>0?'vereist aandacht':'alles gecategoriseerd','ti-tag','')}
+  `;
+  // Fill category filter
+  const cf=document.getElementById('txCatFilter');
+  const cats=[...new Set(S.transacties.map(t=>t.categorie))].sort();
+  cf.innerHTML='<option value="">Alle categorieën</option>'+cats.map(c=>`<option>${c}</option>`).join('');
+  renderTx();
+}
+function renderTx(){
+  const per=cPeriod();
+  const catF=document.getElementById('txCatFilter')?.value||'';
+  const soortF=document.getElementById('txSoortFilter')?.value||'';
+  let tx=S.transacties.filter(t=>t.periode===per&&(catF?t.categorie===catF:true)&&(soortF?t.soort===soortF:true));
+  tx.sort((a,b)=>b.datum.localeCompare(a.datum));
+  const pageSize=25;const pages=Math.max(1,Math.ceil(tx.length/pageSize));
+  txPage=Math.max(0,Math.min(txPage,pages-1));
+  const slice=tx.slice(txPage*pageSize,(txPage+1)*pageSize);
+  document.getElementById('txCount').textContent=`${tx.length} transacties`;
+  document.getElementById('txPageInfo').textContent=`${txPage+1} / ${pages}`;
+  document.getElementById('txPrev').disabled=txPage===0;
+  document.getElementById('txNext').disabled=txPage>=pages-1;
+  const catCols=Object.keys(CAT_COLORS);
+  document.getElementById('txTable').innerHTML=slice.map(t=>`
+    <tr>
+      <td style="white-space:nowrap">${t.datum}</td>
+      <td class="td-bold">${(t.tegenpartij||'').slice(0,30)}</td>
+      <td style="color:var(--text3);font-size:12px">${(t.omschrijving||'').slice(0,40)}</td>
+      <td><span class="tag" style="background:${(CAT_COLORS[t.categorie]||'#4d6285')}22;color:${CAT_COLORS[t.categorie]||'#8fa4c8'};font-size:10px">${t.categorie}</span></td>
+      <td><span class="tag tag-${t.soort==='Inkomst'?'green':t.soort==='Aflossing'?'amber':t.soort==='Spaar'?'blue':t.soort==='Intern'?'gray':'red'}" style="font-size:10px">${t.soort}</span></td>
+      <td class="${t.bedrag>0?'td-pos':'td-neg'}" style="white-space:nowrap">${t.bedrag>0?'+':''}${fmt(t.bedrag)}</td>
+      <td style="font-size:12px">${t.status||''}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-xs" onclick="editCat(${t.id})" title="Categorie wijzigen"><i class="ti ti-tag"></i></button>
+          <button class="btn btn-ghost btn-xs" onclick="deleteTx(${t.id})" title="Verwijderen"><i class="ti ti-trash"></i></button>
+        </div>
+      </td>
+    </tr>`).join('')||`<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:2rem">Geen transacties</td></tr>`;
+}
+function editCat(id){
+  const t=S.transacties.find(x=>x.id===id); if(!t) return;
+  const cats=Object.keys(CAT_COLORS);
+  document.getElementById('modalTitle').textContent='Categorie wijzigen';
+  document.getElementById('modalBody').innerHTML=`
+    <div class="form-group"><label class="form-label">Tegenpartij</label><div style="font-size:13px;color:var(--text2);padding:.5rem 0">${t.tegenpartij}</div></div>
+    <div class="form-group"><label class="form-label">Categorie</label>
+      <select class="form-select" id="editCatSel">${cats.map(c=>`<option ${c===t.categorie?'selected':''}>${c}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label class="form-label">Soort</label>
+      <select class="form-select" id="editSoortSel">
+        ${['Inkomst','Uitgave','Aflossing','Spaar','Intern'].map(s=>`<option ${s===t.soort?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:.5rem">
+      <button class="btn btn-primary" onclick="saveCat(${id})">Opslaan</button>
+      <button class="btn btn-ghost" onclick="addAsRule(${id})"><i class="ti ti-plus"></i> Sla op als regel</button>
+    </div>`;
+  openModalDirect();
+}
+function saveCat(id){
+  const t=S.transacties.find(x=>x.id===id); if(!t) return;
+  t.categorie=document.getElementById('editCatSel').value;
+  t.soort=document.getElementById('editSoortSel').value;
+  t.status='✅ OK'; saveAll(); closeModal(); renderTx();
+}
+function addAsRule(id){
+  const t=S.transacties.find(x=>x.id===id); if(!t) return;
+  const kw=prompt('Zoekwoord toevoegen als regel:',t.tegenpartij.toLowerCase());
+  if(!kw) return;
+  S.catRegels.push({id:uid(),zoekwoord:kw.toLowerCase(),cat:document.getElementById('editCatSel').value,soort:document.getElementById('editSoortSel').value,type:'Privé'});
+  saveAll(); notify('Regel toegevoegd','success');
+}
+function deleteTx(id){ if(!confirm('Transactie verwijderen?')) return; S.transacties=S.transacties.filter(t=>t.id!==id); saveAll(); renderTx(); }
+function exportTx(){
+  const per=cPeriod();
+  const rows=S.transacties.filter(t=>t.periode===per);
+  const csv='Datum,Tegenpartij,Omschrijving,Categorie,Soort,Bedrag\n'+rows.map(t=>`${t.datum},"${t.tegenpartij}","${t.omschrijving}",${t.categorie},${t.soort},${t.bedrag}`).join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv,'+encodeURIComponent(csv); a.download=`transacties_${per}.csv`; a.click();
+}
+
+// ══════════════════════════════════════════════════════
+// BEGROTING
+// ══════════════════════════════════════════════════════
+function renderBegroting(){
+  const per=cPeriod();
+  const rows=Object.entries(S.begroting).map(([cat,bud])=>{
+    const werk=S.transacties.filter(t=>t.periode===per&&t.categorie===cat&&t.soort==='Uitgave').reduce((a,b)=>a+Math.abs(b.bedrag),0);
+    const pct=bud>0?Math.round(werk/bud*100):0;
+    const over=Math.max(0,werk-bud);
+    return{cat,bud,werk,pct,over};
+  });
+  document.getElementById('begrotingTable').innerHTML=`
+    <div class="table-wrap"><table>
+      <thead><tr><th>Categorie</th><th>Begroot</th><th>Werkelijk</th><th>Verschil</th><th>%</th><th>Voortgang</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr>
+        <td class="td-bold">${r.cat}</td>
+        <td>${fmt(r.bud)}</td>
+        <td class="${r.over>0?'td-neg':''}">${fmt(r.werk)}</td>
+        <td class="${r.over>0?'td-neg':'td-pos'}">${r.over>0?'+'+fmt(r.over):fmt(r.werk-r.bud)}</td>
+        <td>${r.pct}%</td>
+        <td style="min-width:120px"><div class="prog"><div class="prog-fill" style="width:${Math.min(100,r.pct)}%;background:${r.pct>100?'var(--red)':r.pct>80?'var(--amber)':'var(--green)'}"></div></div></td>
+      </tr>`).join('')}</tbody>
+      <tfoot><tr style="border-top:2px solid var(--border2)">
+        <td class="td-bold">Totaal</td>
+        <td class="td-bold">${fmt(rows.reduce((a,r)=>a+r.bud,0))}</td>
+        <td class="td-bold">${fmt(rows.reduce((a,r)=>a+r.werk,0))}</td>
+        <td class="${rows.reduce((a,r)=>a+r.over,0)>0?'td-neg td-bold':'td-pos td-bold'}">${fmt(rows.reduce((a,r)=>a+r.werk-r.bud,0))}</td>
+        <td colspan="2"></td>
+      </tr></tfoot>
+    </table></div>`;
+
+  // Netto trend
+  const m6=[];const netD=[];
+  for(let i=5;i>=0;i--){const p=offsetPeriod(per,i);m6.push(MONTHS_NL[+p.slice(5,7)-1]);netD.push(sumTx('Inkomst',p)-sumTx('Uitgave',p)-sumTx('Aflossing',p)-sumTx('Spaar',p));}
+  mkChart('nettoTrendChart',{type:'line',data:{labels:m6,datasets:[{label:'Netto',data:netD,borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,.08)',fill:true,tension:.4,pointBackgroundColor:'#6366f1',pointRadius:4,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8fa4c8'},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8fa4c8',callback:v=>'€'+v.toLocaleString('nl')},grid:{color:'rgba(255,255,255,.04)'}}}}});
+
+  const inc=sumTx('Inkomst',per);const uit=sumTx('Uitgave',per);const afl=sumTx('Aflossing',per);const sp=sumTx('Spaar',per);
+  document.getElementById('saldoAnalyse').innerHTML=`
+    <div class="stat-row"><span class="stat-label">Inkomsten</span><span class="stat-val td-pos">${fmt(inc)}</span></div>
+    <div class="stat-row"><span class="stat-label">Uitgaven</span><span class="stat-val td-neg">−${fmt(uit)}</span></div>
+    <div class="stat-row"><span class="stat-label">Aflossingen</span><span class="stat-val td-amber">−${fmt(afl)}</span></div>
+    <div class="stat-row"><span class="stat-label">Sparen</span><span class="stat-val" style="color:var(--accent)">−${fmt(sp)}</span></div>
+    <div class="divider"></div>
+    <div class="stat-row"><span class="stat-label" style="font-weight:600">Netto</span><span class="stat-val ${inc-uit-afl-sp>=0?'td-pos':'td-neg'}" style="font-size:17px;font-weight:700">${fmt(inc-uit-afl-sp)}</span></div>
+  `;
+}
+function openBudgetEdit(){
+  document.getElementById('modalTitle').textContent='Budgetten aanpassen';
+  document.getElementById('modalBody').innerHTML=Object.entries(S.begroting).map(([c,v])=>`
+    <div class="form-group"><label class="form-label">${c}</label><input class="form-input" type="number" id="bud_${c}" value="${v}"></div>`).join('')+`<button class="btn btn-primary btn-full" onclick="saveBudgets()" style="margin-top:.5rem">Opslaan</button>`;
+  openModalDirect();
+}
+function saveBudgets(){ Object.keys(S.begroting).forEach(c=>{const el=document.getElementById('bud_'+c);if(el)S.begroting[c]=+el.value;}); saveAll(); closeModal(); renderBegroting(); notify('Budgetten opgeslagen','success'); }
+
+// ══════════════════════════════════════════════════════
+// SCHULDEN
+// ══════════════════════════════════════════════════════
+function renderSchulden(){
+  const totRestant=S.schulden.reduce((a,s)=>a+(s.oorspr-s.afgelost),0);
+  const totOorspr=S.schulden.reduce((a,s)=>a+s.oorspr,0);
+  const totTermijn=S.schulden.reduce((a,s)=>a+s.termijn,0);
+  const pct=Math.round((1-totRestant/totOorspr)*100);
+  document.getElementById('schuldenKpi').innerHTML=`
+    ${kpi('Totaal restant',fmt(totRestant),'kpi-red','badge-down',pct+'% afgelost','ti-credit-card','')}
+    ${kpi('Maandtermijn',fmt(totTermijn),'kpi-amber','badge-neutral','totaal/mnd','ti-calendar','')}
+    ${kpi('Actieve regelingen',S.schulden.filter(s=>s.status.includes('actief')).length,'kpi-blue','badge-neutral','van '+S.schulden.length+' totaal','ti-clipboard-list','')}
+    ${kpi('Voortgang afbetaling',pct+'%','kpi-teal',pct>50?'badge-up':'badge-neutral',fmt(totOorspr-totRestant)+' afgelost','ti-chart-line','')}
+  `;
+  document.getElementById('schuldenTable').innerHTML=S.schulden.map(s=>{
+    const rest=s.oorspr-s.afgelost;
+    const restMnd=s.termijn>0?Math.ceil(rest/s.termijn):null;
+    const pct=Math.round(s.afgelost/s.oorspr*100);
+    return`<tr>
+      <td class="td-bold">${s.schuldeiser}</td>
+      <td><span class="tag tag-${s.type==='Privé'?'blue':'purple'}">${s.type}</span></td>
+      <td>${fmt(s.oorspr)}</td>
+      <td class="td-pos">${fmt(s.afgelost)} <span style="font-size:10px;color:var(--text3)">(${pct}%)</span></td>
+      <td class="td-neg">${fmt(rest)}</td>
+      <td>${s.termijn>0?fmt(s.termijn):'-'}</td>
+      <td>${restMnd?restMnd+' mnd':'-'}</td>
+      <td>${s.status}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn btn-ghost btn-xs" onclick="editSchulden(${s.id})"><i class="ti ti-edit"></i></button>
+        <button class="btn btn-ghost btn-xs" onclick="removeItem('schulden',${s.id})"><i class="ti ti-trash"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// DOELEN
+// ══════════════════════════════════════════════════════
+function renderDoelen(){
+  const totG=S.doelen.reduce((a,g)=>a+g.doel,0);
+  const totH=S.doelen.reduce((a,g)=>a+g.huidig,0);
+  const per=cPeriod();const vrij=sumTx('Inkomst',per)-sumTx('Uitgave',per)-sumTx('Aflossing',per);
+  document.getElementById('doelenKpi').innerHTML=`
+    ${kpi('Totaal doelbedrag',fmt(totG),'kpi-purple','badge-neutral',S.doelen.length+' doelen','ti-target','')}
+    ${kpi('Totaal gespaard',fmt(totH),'kpi-green','badge-up',Math.round(totH/totG*100)+'% van totaal','ti-piggy-bank','')}
+    ${kpi('Nog nodig',fmt(totG-totH),'kpi-amber','badge-neutral','resterende spaar','ti-coin','')}
+    ${kpi('Spaarcapaciteit',fmt(Math.max(0,vrij)),'kpi-teal','badge-neutral','beschikbaar/mnd','ti-wallet','')}
+  `;
+  const renderGoals=(list,elId)=>{
+    document.getElementById(elId).innerHTML=list.length?list.map(g=>{
+      const pct=Math.min(100,Math.round(g.huidig/g.doel*100));
+      const maanden=vrij>0?Math.ceil((g.doel-g.huidig)/vrij):999;
+      return`<div style="padding:1rem 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div><div style="font-size:14px;font-weight:500;color:var(--text)">${g.naam}</div><div style="font-size:11px;color:var(--text3)">Deadline: ${g.deadline||'–'}</div></div>
+          <div style="text-align:right">
+            <div style="font-size:14px;font-weight:600;color:var(--text)">${fmt(g.huidig)} <span style="color:var(--text3);font-weight:400">/ ${fmt(g.doel)}</span></div>
+            <div style="display:flex;gap:4px;margin-top:4px;justify-content:flex-end">
+              <button class="btn btn-ghost btn-xs" onclick="adjustGoal(${g.id},-100)">−€100</button>
+              <button class="btn btn-ghost btn-xs" onclick="adjustGoal(${g.id},100)">+€100</button>
+              <button class="btn btn-ghost btn-xs" onclick="removeItem('doelen',${g.id})"><i class="ti ti-x"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="prog prog-lg"><div class="prog-fill" style="width:${pct}%;background:${pct>=100?'var(--green)':pct>60?'var(--accent)':'var(--amber)'}"></div></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">${pct}% · nog ${fmt(g.doel-g.huidig)} · ~${maanden===999?'∞':maanden+' mnd'} bij huidig tempo</div>
+      </div>`;
+    }).join(''):`<div class="empty-state"><i class="ti ti-target-off"></i><p>Geen doelen</p></div>`;
+  };
+  renderGoals(S.doelen.filter(g=>g.type==='Privé'),'doelenPrive');
+  renderGoals(S.doelen.filter(g=>g.type==='Zakelijk'),'doelenZakelijk');
+  document.getElementById('activaTable').innerHTML=(S.activa||[]).map(a=>`<tr><td class="td-bold">${a.naam}</td><td>${fmt(a.boekwaarde)}</td><td>${fmt(a.opbrengst)}</td><td><span class="tag tag-amber">${a.status}</span></td><td style="color:var(--text3);font-size:12px">${a.notitie||''}</td></tr>`).join('');
+}
+function adjustGoal(id,d){ const g=S.doelen.find(g=>g.id===id); if(g){g.huidig=Math.max(0,g.huidig+d);saveAll();renderDoelen();} }
+
+// ══════════════════════════════════════════════════════
+// JAAR
+// ══════════════════════════════════════════════════════
+function renderJaar(){
+  const year=+document.getElementById('jaarSel').value;
+  const ms=MONTHS_NL;
+  const inc=[],uit=[],afl=[],sp=[];
+  for(let m=0;m<12;m++){
+    const p=`${year}-${String(m+1).padStart(2,'0')}`;
+    inc.push(sumTx('Inkomst',p)); uit.push(sumTx('Uitgave',p));
+    afl.push(sumTx('Aflossing',p)); sp.push(sumTx('Spaar',p));
+  }
+  const netto=inc.map((v,i)=>v-uit[i]-afl[i]-sp[i]);
+  mkChart('jaarChart',{type:'line',data:{labels:ms,datasets:[
+    {label:'Inkomsten',data:inc,borderColor:'#6366f1',backgroundColor:'transparent',tension:.4,pointRadius:3,borderWidth:2},
+    {label:'Uitgaven',data:uit,borderColor:'#ef4444',backgroundColor:'transparent',tension:.4,pointRadius:3,borderWidth:2},
+    {label:'Aflossingen',data:afl,borderColor:'#f59e0b',backgroundColor:'transparent',tension:.4,pointRadius:3,borderWidth:2,borderDash:[5,3]},
+    {label:'Netto',data:netto,borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,.06)',fill:true,tension:.4,pointRadius:3,borderWidth:2},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8fa4c8',usePointStyle:true,pointStyle:'circle',padding:20}}},scales:{x:{ticks:{color:'#8fa4c8'},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8fa4c8',callback:v=>'€'+v.toLocaleString('nl')},grid:{color:'rgba(255,255,255,.04)'}}}}});
+
+  const totInc=inc.reduce((a,b)=>a+b,0);const totUit=uit.reduce((a,b)=>a+b,0);const totAfl=afl.reduce((a,b)=>a+b,0);const totSp=sp.reduce((a,b)=>a+b,0);
+  document.getElementById('jaarTable').innerHTML=`
+    <table>
+      <thead><tr><th>Rij</th>${ms.map(m=>`<th>${m}</th>`).join('')}<th>Jaar totaal</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold" style="color:var(--green)">Inkomsten</td>${inc.map(v=>`<td class="td-pos">${fmt(v)}</td>`).join('')}<td class="td-pos td-bold">${fmt(totInc)}</td></tr>
+        <tr><td class="td-bold" style="color:var(--red)">Uitgaven</td>${uit.map(v=>`<td class="td-neg">${fmt(v)}</td>`).join('')}<td class="td-neg td-bold">${fmt(totUit)}</td></tr>
+        <tr><td class="td-bold" style="color:var(--amber)">Aflossingen</td>${afl.map(v=>`<td class="td-amber">${fmt(v)}</td>`).join('')}<td class="td-amber td-bold">${fmt(totAfl)}</td></tr>
+        <tr><td class="td-bold" style="color:var(--accent)">Sparen</td>${sp.map(v=>`<td style="color:var(--accent)">${fmt(v)}</td>`).join('')}<td style="color:var(--accent);font-weight:500">${fmt(totSp)}</td></tr>
+        <tr style="border-top:2px solid var(--border2)"><td class="td-bold">Netto</td>${netto.map(v=>`<td class="${v>=0?'td-pos':'td-neg'} td-bold">${fmt(v)}</td>`).join('')}<td class="${totInc-totUit-totAfl-totSp>=0?'td-pos':'td-neg'} td-bold">${fmt(totInc-totUit-totAfl-totSp)}</td></tr>
+      </tbody>
+    </table>`;
+}
+
+// ══════════════════════════════════════════════════════
+// ZAKELIJK
+// ══════════════════════════════════════════════════════
+function renderZakelijk(){
+  const totEx=S.opdrachtgevers.reduce((a,o)=>a+o.bedragExBtw,0);
+  const btw=totEx*0.21;const incBtw=totEx*1.21;
+  const kosten={Lease:850,Boekhouder:150,'Verzekeringen BV':100,Overig:100};
+  const totKosten=Object.values(kosten).reduce((a,b)=>a+b,0);
+  const netto=totEx-totKosten;
+  const btwAfdracht=btw-(totKosten*0.21);
+  document.getElementById('zakelijkKpi').innerHTML=`
+    ${kpi('MRR (ex BTW)',fmt(totEx),'kpi-green','badge-up',S.opdrachtgevers.length+' opdrachtgevers','ti-building','')}
+    ${kpi('BTW te betalen',fmt(btwAfdracht),'kpi-amber','badge-neutral','per kwartaal','ti-receipt-tax','')}
+    ${kpi('Netto winst BV',fmt(netto),'kpi-purple','badge-up','per maand','ti-chart-line','')}
+    ${kpi('MRR (incl BTW)',fmt(incBtw),'kpi-blue','badge-neutral','gefactureerd','ti-file-invoice','')}
+  `;
+  document.getElementById('opdrachtTable').innerHTML=S.opdrachtgevers.map(o=>`<tr>
+    <td class="td-bold">${o.naam}</td>
+    <td class="td-pos">${fmt(o.bedragExBtw)}</td>
+    <td class="td-amber">${fmt(o.bedragExBtw*0.21)}</td>
+    <td>${fmt(o.bedragExBtw*1.21)}</td>
+    <td><button class="btn btn-ghost btn-xs" onclick="removeItem('opdrachtgevers',${o.id})"><i class="ti ti-trash"></i></button></td>
+  </tr>`).join('');
+  document.getElementById('bvKostenList').innerHTML=Object.entries(kosten).map(([k,v])=>`<div class="stat-row"><span class="stat-label">${k}</span><span class="stat-val td-neg">−${fmt(v)}</span></div>`).join('')+`<div class="stat-row" style="border-top:2px solid var(--border2)"><span class="stat-label" style="font-weight:600">Totaal kosten</span><span class="stat-val td-neg" style="font-size:16px">−${fmt(totKosten)}</span></div>`;
+  document.getElementById('zakelijkCalc').innerHTML=`
+    <div class="kpi-card kpi-green"><div class="kpi-label">Ex BTW inkomsten</div><div class="kpi-val">${fmt(totEx)}</div></div>
+    <div class="kpi-card kpi-red"><div class="kpi-label">Kosten BV</div><div class="kpi-val">${fmt(totKosten)}</div></div>
+    <div class="kpi-card kpi-purple"><div class="kpi-label">Netto winst</div><div class="kpi-val">${fmt(netto)}</div><div class="kpi-sub">voor DGA salaris / uitkering</div></div>
+    <div class="kpi-card kpi-amber"><div class="kpi-label">BTW gefactureerd</div><div class="kpi-val">${fmt(btw)}</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">BTW aftrekbaar</div><div class="kpi-val">${fmt(totKosten*0.21)}</div></div>
+    <div class="kpi-card kpi-teal"><div class="kpi-label">BTW afdracht</div><div class="kpi-val">${fmt(btwAfdracht)}</div></div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════
+// GEWOONTES
+// ══════════════════════════════════════════════════════
+function renderGewoontes(){
+  const dagen=['Ma','Di','Wo','Do','Vr','Za','Zo'];
+  document.getElementById('habitTracker').innerHTML=`
+    <div style="display:flex;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border);margin-bottom:.25rem">
+      <div style="flex:1;min-width:160px"></div>
+      ${dagen.map(d=>`<div style="width:28px;text-align:center;font-size:10px;color:var(--text3)">${d}</div>`).join('')}
+      <div style="width:60px;text-align:right;font-size:10px;color:var(--text3)">Streak</div>
+      <div style="width:32px"></div>
+    </div>
+    ${S.habits.map(h=>{
+      const streak=calcStreak(h.dagen);
+      const score=Object.values(h.dagen).filter(v=>v===1).length;
+      return`<div style="display:flex;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1;min-width:160px;display:flex;align-items:center;gap:8px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${h.kleur};flex-shrink:0"></div>
+          <div>
+            <div style="font-size:13.5px;font-weight:500;color:var(--text)">${h.naam}</div>
+            <div style="font-size:11px;color:var(--text3)">${score}/7</div>
+          </div>
+        </div>
+        <div class="habit-dots">
+          ${dagen.map(d=>`<div class="hdot" style="background:${h.dagen[d]===1?h.kleur+'33':h.dagen[d]===2?'var(--red-bg)':'var(--bg4)'};border-color:${h.dagen[d]===1?h.kleur:h.dagen[d]===2?'var(--red)':'var(--border2)'}" title="${d}" onclick="cycleHabit(${h.id},'${d}')">
+            ${h.dagen[d]===1?`<i class="ti ti-check" style="font-size:11px;color:${h.kleur}"></i>`:h.dagen[d]===2?`<i class="ti ti-x" style="font-size:11px;color:var(--red)"></i>`:''}
+          </div>`).join('')}
+        </div>
+        <div style="width:60px;text-align:right;font-size:13px;font-weight:500;color:var(--text)">${streak}<span style="font-size:10px;color:var(--text3)">🔥</span></div>
+        <div style="width:32px;text-align:right"><button class="btn btn-ghost btn-xs" onclick="removeItem('habits',${h.id})"><i class="ti ti-x"></i></button></div>
+      </div>`;
+    }).join('')}
+  `;
+}
+function calcStreak(dagen){ const k=['Zo','Za','Vr','Do','Wo','Di','Ma']; let s=0; for(const d of k){if(dagen[d]===1)s++;else break;} return s; }
+function cycleHabit(id,dag){ const h=S.habits.find(h=>h.id===id); if(h){h.dagen[dag]=(h.dagen[dag]+1)%3;saveAll();renderGewoontes();} }
+
+// ══════════════════════════════════════════════════════
+// VLIEGEN
+// ══════════════════════════════════════════════════════
+function renderVliegen(){
+  const totUren=S.flights.reduce((a,f)=>a+f.uren,0);
+  const totKosten=S.flights.reduce((a,f)=>a+f.kosten,0);
+  const pplTarget=45;const theoryDone=S.theory.filter(t=>t.klaar).length;
+  document.getElementById('vliegenKpi').innerHTML=`
+    ${kpi('Vlieguren',totUren.toFixed(1)+' / '+pplTarget,'kpi-purple',totUren>=pplTarget?'badge-up':'badge-neutral',Math.round(totUren/pplTarget*100)+'% PPL klaar','ti-plane','')}
+    ${kpi('Theorie',theoryDone+' / '+S.theory.length,'kpi-blue','badge-neutral',Math.round(theoryDone/S.theory.length*100)+'% klaar','ti-book','')}
+    ${kpi('Totale kosten',fmt(totKosten),'kpi-red','badge-neutral',S.flights.length+' sessies','ti-coin','')}
+    ${kpi('Budget resterend',fmt(Math.max(0,12000-totKosten)),'kpi-amber','badge-neutral','van €12.000 PPL budget','ti-wallet','')}
+  `;
+  document.getElementById('vluchtTable').innerHTML=S.flights.sort((a,b)=>b.datum.localeCompare(a.datum)).map(f=>`<tr>
+    <td>${f.datum}</td>
+    <td><span class="tag tag-${f.type==='Solo'?'purple':'blue'}">${f.type}</span></td>
+    <td class="td-bold">${f.uren}u</td>
+    <td class="td-neg">−${fmt(f.kosten)}</td>
+    <td style="color:var(--text3);font-size:12px">${f.notitie||''}</td>
+    <td><button class="btn btn-ghost btn-xs" onclick="removeItem('flights',${f.id})"><i class="ti ti-trash"></i></button></td>
+  </tr>`).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:2rem">Nog geen sessies</td></tr>`;
+  document.getElementById('theoryList').innerHTML=S.theory.map((t,i)=>`
+    <div class="stat-row">
+      <div style="display:flex;align-items:center;gap:10px;flex:1">
+        <input type="checkbox" ${t.klaar?'checked':''} onchange="toggleTheory(${i})" style="cursor:pointer;accent-color:var(--accent);width:16px;height:16px">
+        <span style="font-size:13px;color:${t.klaar?'var(--text3)':'var(--text)'}${t.klaar?';text-decoration:line-through':''}">${t.module}</span>
+      </div>
+      <span class="tag ${t.klaar?'tag-green':'tag-amber'}" style="font-size:10px">${t.klaar?'Klaar':'Bezig'}</span>
+    </div>`).join('');
+}
+function toggleTheory(i){ S.theory[i].klaar=!S.theory[i].klaar; saveAll(); renderVliegen(); }
+
+// ══════════════════════════════════════════════════════
+// AI ASSISTENT
+// ══════════════════════════════════════════════════════
+function buildContext(){
+  const per=cPeriod();
+  const inc=sumTx('Inkomst',per);const uit=sumTx('Uitgave',per);const afl=sumTx('Aflossing',per);
+  return`Financiële data van gebruiker (${per}):
+Inkomsten: ${fmt(inc)}, Uitgaven: ${fmt(uit)}, Aflossingen: ${fmt(afl)}, Netto: ${fmt(inc-uit-afl)}
+Totale schulden: ${fmt(S.schulden.reduce((a,s)=>a+(s.oorspr-s.afgelost),0))} (${S.schulden.length} schuldeisers)
+Spaardoelen: ${S.doelen.map(g=>g.naam+' '+Math.round(g.huidig/g.doel*100)+'%').join(', ')}
+BV (Aziz Holding): MRR €${S.opdrachtgevers.reduce((a,o)=>a+o.bedragExBtw,0)} ex BTW
+Vlieguren: ${S.flights.reduce((a,f)=>a+f.uren,0).toFixed(1)}/45 uur PPL
+Antwoord altijd in het Nederlands, beknopt en persoonlijk.`;
+}
+async function sendChat(){
+  const inp=document.getElementById('chatInput');
+  const msg=inp.value.trim(); if(!msg) return;
+  inp.value=''; addChatMsg(msg,'user');
+  const apiKey=ls_load('apiKey','');
+  if(!apiKey){ addChatMsg('Voeg eerst je Claude API sleutel toe in de instellingen rechts.','ai'); return; }
+  addChatMsg('...','ai','thinking');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:buildContext(),messages:[...S.chatHistory,{role:'user',content:msg}]})
+    });
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'Geen antwoord ontvangen.';
+    document.querySelector('.chat-bubble.ai:last-child')?.remove();
+    S.chatHistory.push({role:'user',content:msg},{role:'assistant',content:reply});
+    if(S.chatHistory.length>20) S.chatHistory=S.chatHistory.slice(-20);
+    addChatMsg(reply,'ai');
+  }catch(e){ document.querySelector('.chat-bubble.ai:last-child')?.remove(); addChatMsg('Fout: '+e.message,'ai'); }
+}
+function addChatMsg(txt,role,cls=''){
+  const div=document.createElement('div'); div.className='chat-msg '+role;
+  const av=document.createElement('div'); av.className='chat-avatar'; av.style.background=role==='ai'?'var(--accent-bg)':'rgba(34,197,94,.1)'; av.style.color=role==='ai'?'var(--accent)':'var(--green)'; av.textContent=role==='ai'?'AI':'Jij';
+  const bub=document.createElement('div'); bub.className='chat-bubble '+role+(cls?' '+cls:''); bub.textContent=txt;
+  if(role==='ai'){div.appendChild(av);div.appendChild(bub);}else{div.appendChild(bub);div.appendChild(av);}
+  document.getElementById('chatMessages').appendChild(div);
+  document.getElementById('chatMessages').scrollTop=9999;
+}
+function askAI(q){ document.getElementById('chatInput').value=q; sendChat(); nav('ai'); }
+function saveApiKey(){ ls_save('apiKey',document.getElementById('apiKeyInput').value); notify('API sleutel opgeslagen','success'); }
+
+// ══════════════════════════════════════════════════════
+// IMPORT PAGE
+// ══════════════════════════════════════════════════════
+function renderImport(){
+  document.getElementById('dbStatus').innerHTML=`
+    <div class="stat-row"><span class="stat-label">Transacties opgeslagen</span><span class="stat-val">${S.transacties.length}</span></div>
+    <div class="stat-row"><span class="stat-label">Periodes</span><span class="stat-val">${[...new Set(S.transacties.map(t=>t.periode))].length}</span></div>
+    <div class="stat-row"><span class="stat-label">Ongecategoriseerd</span><span class="stat-val td-amber">${S.transacties.filter(t=>t.categorie==='Ongecategoriseerd').length}</span></div>
+    <div class="stat-row"><span class="stat-label">Opslag</span><span class="stat-val">Lokaal (browser)</span></div>
+    <div style="margin-top:1rem"><button class="btn btn-danger btn-sm" onclick="if(confirm('Alle transacties verwijderen?')){S.transacties=[];saveAll();renderAll();notify('Transacties gewist','success')}">Transacties wissen</button></div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════
+// INSTELLINGEN
+// ══════════════════════════════════════════════════════
+function renderInstellingen(){
+  document.getElementById('regelTable').innerHTML=S.catRegels.map(r=>`<tr>
+    <td class="td-bold">${r.zoekwoord}</td>
+    <td><span class="tag" style="background:${(CAT_COLORS[r.cat]||'#4d6285')}22;color:${CAT_COLORS[r.cat]||'#8fa4c8'};font-size:10px">${r.cat}</span></td>
+    <td><span class="tag tag-${r.soort==='Inkomst'?'green':r.soort==='Aflossing'?'amber':'red'}" style="font-size:10px">${r.soort}</span></td>
+    <td><span class="tag tag-gray" style="font-size:10px">${r.type}</span></td>
+    <td><button class="btn btn-ghost btn-xs" onclick="removeItem('catRegels',${r.id})"><i class="ti ti-trash"></i></button></td>
+  </tr>`).join('');
+  document.getElementById('ibanList').innerHTML=EIGEN_IBANS.map(i=>`<div>🏦 <code style="color:var(--accent);font-size:12px">${i}</code></div>`).join('');
+}
+function saveSupabaseConfig(){
+  const url=document.getElementById('sbUrl').value;const key=document.getElementById('sbKey').value;
+  ls_save('sbConf',{url,key}); notify('Supabase config opgeslagen — herlaad de app om te verbinden','info');
+}
+
+// ══════════════════════════════════════════════════════
+// MODAL SYSTEM
+// ══════════════════════════════════════════════════════
+const CATS=Object.keys(CAT_COLORS);
+function openAddModal(type){
+  const t=type||S.currentPage;
+  const forms={
+    inkomst:`<div class="form-row"><div class="form-group"><label class="form-label">Datum</label><input class="form-input" type="date" id="f_datum" value="${new Date().toISOString().slice(0,10)}"></div><div class="form-group"><label class="form-label">Bedrag (€)</label><input class="form-input" type="number" id="f_bedrag"></div></div><div class="form-group"><label class="form-label">Tegenpartij</label><input class="form-input" type="text" id="f_party" placeholder="bijv. UWV"></div><div class="form-group"><label class="form-label">Omschrijving</label><input class="form-input" type="text" id="f_omschr"></div><div class="form-group"><label class="form-label">Categorie</label><select class="form-select" id="f_cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div>`,
+    uitgave:`<div class="form-row"><div class="form-group"><label class="form-label">Datum</label><input class="form-input" type="date" id="f_datum" value="${new Date().toISOString().slice(0,10)}"></div><div class="form-group"><label class="form-label">Bedrag (€)</label><input class="form-input" type="number" id="f_bedrag"></div></div><div class="form-group"><label class="form-label">Tegenpartij</label><input class="form-input" type="text" id="f_party" placeholder="bijv. Albert Heijn"></div><div class="form-group"><label class="form-label">Categorie</label><select class="form-select" id="f_cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div>`,
+  };
+  const mtype=S.currentPage==='transacties'?'inkomst':S.currentPage;
+  document.getElementById('modalTitle').textContent='Toevoegen';
+  document.getElementById('modalBody').innerHTML=(forms[mtype]||forms.uitgave)+`<button class="btn btn-primary btn-full" onclick="saveTxModal('${mtype}')" style="margin-top:.75rem">Opslaan</button>`;
+  openModalDirect();
+}
+function openModal(type, extra){
+  const forms={
+    schuld:`<div class="form-group"><label class="form-label">Schuldeiser</label><input class="form-input" type="text" id="f_sch"></div><div class="form-row"><div class="form-group"><label class="form-label">Oorspronkelijk (€)</label><input class="form-input" type="number" id="f_oorspr"></div><div class="form-group"><label class="form-label">Afgelost (€)</label><input class="form-input" type="number" id="f_afgelost" value="0"></div></div><div class="form-row"><div class="form-group"><label class="form-label">Termijn/mnd (€)</label><input class="form-input" type="number" id="f_termijn" value="0"></div><div class="form-group"><label class="form-label">Status</label><select class="form-select" id="f_status"><option>🟢 Regeling actief</option><option>🔴 Open/check</option><option>✅ Afbetaald</option><option>Bevroren</option></select></div></div><div class="form-group"><label class="form-label">Notitie</label><input class="form-input" type="text" id="f_notitie"></div><button class="btn btn-primary btn-full" onclick="saveSchulden()" style="margin-top:.75rem">Opslaan</button>`,
+    doel:`<div class="form-group"><label class="form-label">Doelnaam</label><input class="form-input" type="text" id="f_naam"></div><div class="form-row"><div class="form-group"><label class="form-label">Doelbedrag (€)</label><input class="form-input" type="number" id="f_doel"></div><div class="form-group"><label class="form-label">Gespaard (€)</label><input class="form-input" type="number" id="f_huidig" value="0"></div></div><div class="form-row"><div class="form-group"><label class="form-label">Type</label><select class="form-select" id="f_type"><option>Privé</option><option>Zakelijk</option></select></div><div class="form-group"><label class="form-label">Deadline (JJJJ-MM)</label><input class="form-input" type="month" id="f_deadline"></div></div><button class="btn btn-primary btn-full" onclick="saveDoel('${extra||'Privé'}')" style="margin-top:.75rem">Opslaan</button>`,
+    opdracht:`<div class="form-group"><label class="form-label">Opdrachtgever naam</label><input class="form-input" type="text" id="f_naam"></div><div class="form-group"><label class="form-label">Bedrag ex BTW (€/mnd)</label><input class="form-input" type="number" id="f_bedrag"></div><button class="btn btn-primary btn-full" onclick="saveOpdracht()" style="margin-top:.75rem">Opslaan</button>`,
+    habit:`<div class="form-group"><label class="form-label">Gewoonte naam</label><input class="form-input" type="text" id="f_naam" placeholder="bijv. Quran lezen"></div><div class="form-group"><label class="form-label">Kleur</label><select class="form-select" id="f_kleur"><option value="#6366f1">Indigo</option><option value="#22c55e">Groen</option><option value="#3b82f6">Blauw</option><option value="#a855f7">Paars</option><option value="#f59e0b">Amber</option><option value="#ef4444">Rood</option><option value="#14b8a6">Teal</option></select></div><button class="btn btn-primary btn-full" onclick="saveHabit()" style="margin-top:.75rem">Opslaan</button>`,
+    vlucht:`<div class="form-row"><div class="form-group"><label class="form-label">Datum</label><input class="form-input" type="date" id="f_datum" value="${new Date().toISOString().slice(0,10)}"></div><div class="form-group"><label class="form-label">Type</label><select class="form-select" id="f_type"><option>Dual</option><option>Solo</option></select></div></div><div class="form-row"><div class="form-group"><label class="form-label">Uren</label><input class="form-input" type="number" id="f_uren" step="0.5"></div><div class="form-group"><label class="form-label">Kosten (€)</label><input class="form-input" type="number" id="f_kosten"></div></div><div class="form-group"><label class="form-label">Notitie</label><input class="form-input" type="text" id="f_notitie" placeholder="bijv. Circuit Hilversum"></div><button class="btn btn-primary btn-full" onclick="saveVlucht()" style="margin-top:.75rem">Opslaan</button>`,
+    regel:`<div class="form-group"><label class="form-label">Zoekwoord (lowercase)</label><input class="form-input" type="text" id="f_kw" placeholder="bijv. albert heijn"></div><div class="form-row"><div class="form-group"><label class="form-label">Categorie</label><select class="form-select" id="f_cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="form-group"><label class="form-label">Soort</label><select class="form-select" id="f_soort"><option>Uitgave</option><option>Inkomst</option><option>Aflossing</option><option>Spaar</option></select></div></div><div class="form-group"><label class="form-label">Type</label><select class="form-select" id="f_type"><option>Privé</option><option>Zakelijk</option></select></div><button class="btn btn-primary btn-full" onclick="saveRegel()" style="margin-top:.75rem">Opslaan</button>`,
+  };
+  const titles={schuld:'Schuld toevoegen',doel:'Doel toevoegen',opdracht:'Opdrachtgever toevoegen',habit:'Gewoonte toevoegen',vlucht:'Vliegsessie toevoegen',regel:'Categorie-regel toevoegen'};
+  document.getElementById('modalTitle').textContent=titles[type]||'Toevoegen';
+  document.getElementById('modalBody').innerHTML=forms[type]||'';
+  openModalDirect();
+}
+function openModalDirect(){ document.getElementById('modalOv').classList.add('open'); }
+function closeModal(){ document.getElementById('modalOv').classList.remove('open'); }
+const gv=id=>{const el=document.getElementById(id);return el?el.value.trim():'';}
+const gn=id=>{const el=document.getElementById(id);return el?+el.value:0;}
+function saveTxModal(type){
+  const d=new Date(gv('f_datum')||new Date());
+  const t={id:uid(),datum:gv('f_datum'),bedrag:type==='inkomst'?gn('f_bedrag'):-gn('f_bedrag'),tegenpartij:gv('f_party'),omschrijving:gv('f_omschr'),categorie:gv('f_cat'),soort:type==='inkomst'?'Inkomst':'Uitgave',type:'Privé',status:'✅ OK',bron:'Handmatig',periode:gv('f_datum').slice(0,7)};
+  S.transacties.push(t); saveAll(); closeModal(); renderAll(); notify('Transactie toegevoegd','success');
+}
+function saveSchulden(){S.schulden.push({id:uid(),schuldeiser:gv('f_sch'),type:'Privé',oorspr:gn('f_oorspr'),afgelost:gn('f_afgelost'),termijn:gn('f_termijn'),status:gv('f_status'),notitie:gv('f_notitie')});saveAll();closeModal();renderSchulden();notify('Schuld toegevoegd','success');}
+function saveDoel(type){S.doelen.push({id:uid(),naam:gv('f_naam'),type:gv('f_type')||type,doel:gn('f_doel'),huidig:gn('f_huidig'),deadline:gv('f_deadline')});saveAll();closeModal();renderDoelen();notify('Doel toegevoegd','success');}
+function saveOpdracht(){S.opdrachtgevers.push({id:uid(),naam:gv('f_naam'),bedragExBtw:gn('f_bedrag')});saveAll();closeModal();renderZakelijk();notify('Opdrachtgever toegevoegd','success');}
+function saveHabit(){S.habits.push({id:uid(),naam:gv('f_naam'),kleur:gv('f_kleur'),dagen:{Ma:0,Di:0,Wo:0,Do:0,Vr:0,Za:0,Zo:0}});saveAll();closeModal();renderGewoontes();notify('Gewoonte toegevoegd','success');}
+function saveVlucht(){S.flights.push({id:uid(),datum:gv('f_datum'),type:gv('f_type'),uren:+gv('f_uren'),kosten:gn('f_kosten'),notitie:gv('f_notitie')});saveAll();closeModal();renderVliegen();notify('Vliegsessie toegevoegd','success');}
+function saveRegel(){S.catRegels.push({id:uid(),zoekwoord:gv('f_kw').toLowerCase(),cat:gv('f_cat'),soort:gv('f_soort'),type:gv('f_type')});saveAll();closeModal();renderInstellingen();notify('Regel toegevoegd','success');}
+function editSchulden(id){const s=S.schulden.find(x=>x.id===id);if(!s)return;document.getElementById('modalTitle').textContent='Schuld bewerken';document.getElementById('modalBody').innerHTML=`<div class="form-group"><label class="form-label">Schuldeiser</label><input class="form-input" type="text" id="f_sch" value="${s.schuldeiser}"></div><div class="form-row"><div class="form-group"><label class="form-label">Afgelost (€)</label><input class="form-input" type="number" id="f_afgelost" value="${s.afgelost}"></div><div class="form-group"><label class="form-label">Termijn/mnd</label><input class="form-input" type="number" id="f_termijn" value="${s.termijn}"></div></div><div class="form-group"><label class="form-label">Status</label><select class="form-select" id="f_status"><option ${s.status.includes('actief')?'selected':''}>🟢 Regeling actief</option><option ${s.status.includes('Open')?'selected':''}>🔴 Open/check</option><option ${s.status.includes('Afbet')?'selected':''}>✅ Afbetaald</option><option ${s.status==='Bevroren'?'selected':''}>Bevroren</option></select></div><button class="btn btn-primary btn-full" onclick="updateSchulden(${id})" style="margin-top:.75rem">Opslaan</button>`;openModalDirect();}
+function updateSchulden(id){const s=S.schulden.find(x=>x.id===id);if(!s)return;s.schuldeiser=gv('f_sch');s.afgelost=gn('f_afgelost');s.termijn=gn('f_termijn');s.status=gv('f_status');saveAll();closeModal();renderSchulden();notify('Schuld bijgewerkt','success');}
+function removeItem(arr,id){if(!confirm('Verwijderen?'))return;S[arr]=S[arr].filter(i=>i.id!==id);saveAll();renderAll();}
+
+// ══════════════════════════════════════════════════════
+// KPI HELPER
+// ══════════════════════════════════════════════════════
+function kpi(label,val,cls,badge,badgeText,icon,sub){
+  return`<div class="kpi-card ${cls}">
+    <div class="kpi-label"><i class="ti ${icon}"></i>${label}</div>
+    <div class="kpi-val">${val}</div>
+    ${sub?`<div class="kpi-sub">${sub}</div>`:''}
+    <div class="kpi-badge ${badge}">${badgeText}</div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// PERIOD HELPERS
+// ══════════════════════════════════════════════════════
+function prevPeriod(per){ const [y,m]=per.split('-').map(Number); const pm=m-1; return pm<1?`${y-1}-12`:`${y}-${String(pm).padStart(2,'0')}`; }
+function offsetPeriod(per,n){ let [y,m]=per.split('-').map(Number); m-=n; while(m<1){m+=12;y--;} return`${y}-${String(m).padStart(2,'0')}`; }
+
+// ══════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ══════════════════════════════════════════════════════
+function notify(msg,type='info'){ const el=document.getElementById('notif'); el.textContent=''; el.className='notif notif-'+type+' show'; el.innerHTML=`<i class="ti ${type==='success'?'ti-check':type==='error'?'ti-x':'ti-info-circle'}"></i>${msg}`; setTimeout(()=>el.classList.remove('show'),3500); }
+
+// ══════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); if(e.key==='Enter'&&document.getElementById('loginScreen').style.display!=='none') doLogin(); });
+checkSession();
+</script>
+</body>
+</html>
