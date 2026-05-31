@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"><\/script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -948,6 +948,6 @@ function fullDate(ds){ return new Date(ds).toLocaleDateString('nl-NL',{day:'nume
 function showToast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500); }
 window.addEventListener('online',()=>{isOnline=true;setSyncIcon('sync');loadData();});
 window.addEventListener('offline',()=>{isOnline=false;setSyncIcon('offline');});
-<\/script>
+</script>
 </body>
 </html>
