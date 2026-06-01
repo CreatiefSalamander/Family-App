@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  --sidebar: #111827;
+  --content: #F8FAFC;
+  --primary: #0179FE;
+}
+body { font-family: 'Inter', system-ui, sans-serif; background: #F8FAFC; color: #1A1F36; }
+.font-display { font-family: 'IBM Plex Serif', serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+.amount { font-family: 'JetBrains Mono', monospace; }
+.gradient-blue { background: linear-gradient(135deg, #0179FE, #4893FF); }
+.gradient-teal { background: linear-gradient(135deg, #01797A, #489399); }
+.gradient-purple { background: linear-gradient(135deg, #6172F3, #A855F7); }
+.gradient-green { background: linear-gradient(135deg, #059669, #34D399); }
+.card { background: white; border: 1px solid #E5E7EB; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
