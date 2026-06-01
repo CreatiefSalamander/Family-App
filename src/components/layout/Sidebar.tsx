@@ -15,50 +15,63 @@ const NAV = [
   { href: '/zakelijk', icon: Briefcase, label: 'Zakelijk' },
   { href: '/jaaroverzicht', icon: BarChart2, label: 'Jaaroverzicht' },
   { href: '/prijsradar', icon: Search, label: 'Prijsradar' },
+  { href: '/locatie', icon: MapPin, label: 'Locatie' },
   { href: '/instellingen', icon: Settings, label: 'Instellingen' },
 ];
 
 export default function Sidebar({ email, naam }: { email?: string; naam?: string }) {
   const path = usePathname();
   const router = useRouter();
-  const supabase = createClient();
-  const initials = (naam || email || 'AA').slice(0,2).toUpperCase();
+  const sb = createClient();
+  const initials = (naam || email || 'AA').slice(0, 2).toUpperCase();
 
   async function logout() {
-    await supabase.auth.signOut();
+    await sb.auth.signOut();
     router.push('/login');
   }
 
   return (
-    <aside className="w-[250px] flex-shrink-0 bg-[#111827] flex flex-col h-full">
-      <div className="flex items-center gap-2.5 px-5 py-6 border-b border-white/10">
-        <div className="w-8 h-8 rounded-lg gradient-blue flex items-center justify-center">
-          <span className="text-white font-bold text-base">€</span>
+    <aside className="w-[250px] flex-shrink-0 bg-[#111827] flex flex-col h-full overflow-hidden">
+      {/* Logo */}
+      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-white/8">
+        <div className="w-8 h-8 rounded-lg gradient-blue flex items-center justify-center shadow-sm">
+          <span className="text-white font-bold text-sm font-display">€</span>
         </div>
-        <span className="font-display text-xl font-bold text-white">Family-App</span>
+        <span className="font-display text-[19px] font-bold text-white tracking-tight">Family-App</span>
       </div>
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
         {NAV.map(({ href, icon: Icon, label }) => {
-          const active = path === href || (href !== '/' && path.startsWith(href));
+          const active = href === '/' ? path === '/' : path.startsWith(href);
           return (
             <Link key={href} href={href}
-              className={\`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all \${active ? 'bg-[#0179FE]/20 text-white' : 'text-gray-400 hover:bg-white/10 hover:text-white'}\`}>
-              <Icon size={18} className={active ? 'text-[#4893FF]' : ''} />
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${
+                active
+                  ? 'bg-[#0179FE]/20 text-white'
+                  : 'text-gray-400 hover:bg-white/6 hover:text-gray-200'
+              }`}>
+              <Icon size={17} className={active ? 'text-[#60A5FA]' : ''} />
               {label}
             </Link>
           );
         })}
       </nav>
-      <div className="px-3 py-4 border-t border-white/10">
+
+      {/* Footer */}
+      <div className="px-3 py-3 border-t border-white/8">
         <div className="flex items-center gap-3 px-3 py-2 mb-1">
-          <div className="w-9 h-9 rounded-full gradient-blue flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{initials}</div>
+          <div className="w-8 h-8 rounded-full gradient-blue flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            {initials}
+          </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-white truncate">{naam || 'Abdul'}</div>
-            <div className="text-xs text-gray-400 truncate">{email || ''}</div>
+            <p className="text-[13px] font-semibold text-white truncate">{naam || 'Abdul'}</p>
+            <p className="text-[11px] text-gray-400 truncate">{email || ''}</p>
           </div>
         </div>
-        <button onClick={logout} className="flex items-center gap-3 px-3 py-2 w-full text-sm text-gray-400 hover:bg-red-500/10 hover:text-red-400 rounded-lg transition">
-          <LogOut size={16} /> Uitloggen
+        <button onClick={logout}
+          className="flex items-center gap-2.5 px-3 py-2 w-full text-[13px] text-gray-400 hover:bg-red-500/12 hover:text-red-300 rounded-lg transition-colors">
+          <LogOut size={15} /> Uitloggen
         </button>
       </div>
     </aside>
