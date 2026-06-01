@@ -82,6 +82,65 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #F8FAFC; color: 
 .btn-primary:hover { opacity: .92; }
 .btn-primary:active { transform: scale(.98); }
 
+/* Ghost button */
+.btn-ghost {
+  background: transparent;
+  color: #6B7280;
+  font-weight: 500;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  font-family: 'Inter', sans-serif;
+}
+.btn-ghost:hover { background: #F3F4F6; color: #1A1F36; }
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: .01em;
+}
+.badge-blue   { background: #EFF6FF; color: #0179FE; }
+.badge-green  { background: #F0FDF4; color: #16A34A; }
+.badge-red    { background: #FEF2F2; color: #DC2626; }
+.badge-amber  { background: #FFFBEB; color: #D97706; }
+.badge-gray   { background: #F3F4F6; color: #6B7280; }
+
+/* Sidebar items */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #9CA3AF;
+  transition: background .15s, color .15s;
+  text-decoration: none;
+}
+.sidebar-item:hover { background: rgba(255,255,255,.08); color: #E5E7EB; }
+.sidebar-item-active {
+  background: rgba(1,121,254,.18);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* Amount display */
+.amount {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }

@@ -2,11 +2,9 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import RightPanel from '@/components/layout/RightPanel';
-import { fmt, fmtDate, getGreeting } from '@/lib/utils';
+import { fmt, fmtDate } from '@/lib/utils';
 import { Wallet, TrendingUp, TrendingDown, Activity, ArrowUpRight } from 'lucide-react';
 import type { Transactie, Rekening, Budget, Schuld, Doel } from '@/types';
-import { format } from 'date-fns';
-import { nl } from 'date-fns/locale';
 
 const CAT_STYLE: Record<string, { bg: string; color: string; emoji: string }> = {
   Boodschappen: { bg: '#EEF2FF', color: '#6366F1', emoji: '🛒' },
@@ -63,7 +61,6 @@ export default function DashboardPage() {
   const exp = mTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
   const net = inc - exp;
   const bal = tx.reduce((s, t) => s + (t.type === 'income' ? 1 : -1) * t.amount, 0);
-  const today = format(now, "EEEE d MMMM yyyy", { locale: nl });
 
   const kpis = [
     { label: 'Totaal saldo',      value: bal, icon: Wallet,       color: 'text-[#0179FE]', border: 'border-l-[#0179FE]', bg: '#EFF6FF' },
@@ -77,16 +74,6 @@ export default function DashboardPage() {
       {/* Main scroll */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-6 lg:p-8">
-          {/* Topbar */}
-          <div className="hidden md:flex items-center justify-between mb-7">
-            <div>
-              <h1 className="font-display text-2xl font-bold text-gray-900">
-                {getGreeting()}, {naam}
-              </h1>
-              <p className="text-gray-400 text-sm capitalize mt-0.5">{today}</p>
-            </div>
-          </div>
-
           {/* KPI grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
             {kpis.map(({ label, value, icon: Icon, color, border, bg }) => (
