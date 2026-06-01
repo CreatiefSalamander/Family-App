@@ -145,7 +145,7 @@ body {
   color: #6B7280;
 }
 
-/* MOBILE HEADER */
+/* ── Mobile header ──────────────────────────────────────── */
 .mobile-header {
   display: none;
   position: fixed;
@@ -156,11 +156,102 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  z-index: 35;
+  z-index: 50;
 }
+
+/* ── Mobile bottom nav (altijd verborgen behalve op mobiel) ─ */
+.mobile-bottom-nav { display: none !important; }
 @media (max-width: 767px) {
-  .mobile-header { display: flex; }
-  .home-content   { padding: 16px; padding-top: 72px; padding-bottom: 80px; }
+  .mobile-bottom-nav { display: flex !important; }
+}
+
+/* ── Content wrapper (inner div in layout) ───────────────── */
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE (≤ 767px)
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* Sidebar + topbar verborgen */
+  .sidebar { display: none !important; }
+
+  /* Mobile header zichtbaar */
+  .mobile-header { display: flex !important; }
+
+  /* App main: hoogte wordt door content bepaald */
+  .app-main {
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  /* Content wrapper: scrollt als geheel op mobiel */
+  .content-wrapper {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Padding voor fixed header (56px) + bottom nav (64px) */
+  .home-content {
+    padding: 16px !important;
+    padding-top: 72px !important;  /* 56px header + 16px ruimte */
+    padding-bottom: 80px !important; /* 64px nav + 16px ruimte */
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Home flex-row → column op mobiel */
+  .home {
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Right sidebar altijd verborgen op mobiel */
+  .right-sidebar { display: none !important; }
+
+  /* Header box kleiner op mobiel */
+  .header-box-title { font-size: 20px !important; }
+
+  /* KPI cards: altijd 2 kolommen op mobiel */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Transactie tabel: verberg minder belangrijke kolommen */
+  .tx-col-datum   { display: none !important; }
+  .tx-col-bron    { display: none !important; }
+
+  /* Instellingen sidebar: horizontaal scrollen */
+  .settings-nav {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .settings-nav button {
+    flex-shrink: 0 !important;
+    font-size: 12px !important;
+    padding: 8px 10px !important;
+    gap: 6px !important;
+  }
+
+  /* Bank cards: full width */
+  .bank-card { max-width: 100% !important; }
+
+  /* Total balance box: smaller op mobiel */
+  .total-balance {
+    padding: 16px !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+  .total-balance-chart { max-width: 80px !important; }
+
+  /* Knoppen: full width op mobiel */
+  .btn-mobile-full { width: 100% !important; }
 }
 
 /* ══════════════════════════════════════════════════════════

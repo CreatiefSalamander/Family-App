@@ -53,7 +53,7 @@ const translations = {
       no_goals: 'Nog geen doelen aangemaakt',
     },
     business: {
-      title: 'Zakelijk', subtitle: 'Aziz Holding BV — financieel overzicht',
+      title: 'Zakelijk', subtitle: 'Zakelijk financieel overzicht',
       revenue: 'Omzet', vat: 'BTW', profit: 'Netto winst', costs: 'Kosten',
       clients: 'Opdrachtgevers',
     },
@@ -140,7 +140,7 @@ const translations = {
       no_goals: 'No goals created yet',
     },
     business: {
-      title: 'Business', subtitle: 'Aziz Holding BV — financial overview',
+      title: 'Business', subtitle: 'Business financial overview',
       revenue: 'Revenue', vat: 'VAT', profit: 'Net profit', costs: 'Costs',
       clients: 'Clients',
     },
@@ -226,7 +226,7 @@ const translations = {
       no_goals: 'Նպատակ չկա',
     },
     business: {
-      title: 'Բիզնես', subtitle: 'Aziz Holding BV',
+      title: 'Բիզնես', subtitle: 'Բիզնեսի ֆինանսական ակնարկ',
       revenue: 'Եկ.', vat: 'ԱԱՀ', profit: 'Շ. ե.', costs: 'Ծախ.',
       clients: 'Հ.',
     },
@@ -312,7 +312,7 @@ const translations = {
       no_goals: 'لا توجد أهداف',
     },
     business: {
-      title: 'الأعمال', subtitle: 'Aziz Holding BV',
+      title: 'الأعمال', subtitle: 'النظرة المالية للأعمال',
       revenue: 'الإيرادات', vat: 'ضريبة', profit: 'صافي الربح', costs: 'التكاليف',
       clients: 'العملاء',
     },

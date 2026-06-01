@@ -1,4 +1,5 @@
-export const EIGEN_IBANS = ['NL69RABO0366244914', 'NL75INGB0797648585'];
+// Vul hier je eigen IBAN-nummers in — worden gebruikt om interne overboekingen te herkennen
+export const EIGEN_IBANS: string[] = [];
 
 export interface CategorisatieResultaat {
   categorie: string; type: string; soort: string;

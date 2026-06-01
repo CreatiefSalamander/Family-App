@@ -9,13 +9,7 @@ import type { Schuld } from '@/types';
 const fmtEuro = (n:number) => new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(n);
 const fmtDate = (d:string) => d ? new Date(d).toLocaleDateString('nl-NL',{month:'short',year:'numeric'}) : '—';
 
-const DEFAULT_SCHULDEN = [
-  { schuldeiser:'Avres', type:'Huurschuld', oorspronkelijk:26200, afgelost:0, maandtermijn:400, status:'Actief', kleur:'#EF4444', regeling:'Betalingsregeling' },
-  { schuldeiser:'DUO', type:'Studielening', oorspronkelijk:13500, afgelost:0, maandtermijn:200, status:'Actief', kleur:'#F59E0B', regeling:'' },
-  { schuldeiser:'Advocaat', type:'Juridische kosten', oorspronkelijk:5758, afgelost:0, maandtermijn:150, status:'Actief', kleur:'#6172F3', regeling:'' },
-  { schuldeiser:'Belastingdienst', type:'Belastingschuld', oorspronkelijk:4925, afgelost:0, maandtermijn:100, status:'Actief', kleur:'#01797A', regeling:'Betalingsregeling' },
-  { schuldeiser:'ING Lening', type:'Persoonlijke lening', oorspronkelijk:3841, afgelost:0, maandtermijn:115, status:'Actief', kleur:'#0179FE', regeling:'' },
-];
+// Geen voorbeelddata — schulden worden opgehaald uit jouw eigen Supabase account
 
 export default function SchuldenPage() {
   const { t } = useLang();

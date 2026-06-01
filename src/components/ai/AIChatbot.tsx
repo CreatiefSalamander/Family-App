@@ -18,7 +18,7 @@ const SUGGESTIONS = [
   '🎯 Hoe sta ik met mijn doelen?',
 ];
 
-export default function AIChatbot({ naam = 'Abdul' }: { naam?: string }) {
+export default function AIChatbot({ naam = '' }: { naam?: string }) {
   const [open, setOpen]       = useState(false);
   const [msgs, setMsgs]       = useState<ChatMsg[]>([]);
   const [history, setHistory] = useState<ApiMsg[]>([]);
@@ -41,12 +41,12 @@ export default function AIChatbot({ naam = 'Abdul' }: { naam?: string }) {
     (async () => {
       const { data: { user } } = await sb.auth.getUser();
       if (!user) {
-        setMsgs([{ role:'ai', text:`Hoi ${naam}! 👋 Ik ben Family AI. Stel me een vraag over je financiën.`, time:now() }]);
+        setMsgs([{ role:'ai', text:`Hoi${naam ? ` ${naam}` : ''}! 👋 Ik ben Family AI. Stel me een vraag over je financiën.`, time:now() }]);
         return;
       }
       const { data } = await sb.from('ai_gesprekken').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(10);
       if (!data || data.length===0) {
-        setMsgs([{ role:'ai', text:`Hoi ${naam}! 👋 Ik ben Family AI. Ik herinner me al onze gesprekken. Wat wil je weten?`, time:now() }]);
+        setMsgs([{ role:'ai', text:`Hoi${naam ? ` ${naam}` : ''}! 👋 Ik ben Family AI. Ik herinner me al onze gesprekken. Wat wil je weten?`, time:now() }]);
         return;
       }
       const sorted = [...data].reverse();

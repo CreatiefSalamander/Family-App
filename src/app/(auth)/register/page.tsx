@@ -160,13 +160,13 @@ export default function RegisterPage() {
                 <label style={s.label}>Voornaam</label>
                 <input className="input-field" type="text" value={form.voornaam}
                   onChange={e => setField('voornaam', e.target.value)}
-                  placeholder="Abdul" required autoComplete="given-name" />
+                  placeholder="Voornaam" required autoComplete="given-name" />
               </div>
               <div>
                 <label style={s.label}>Achternaam</label>
                 <input className="input-field" type="text" value={form.achternaam}
                   onChange={e => setField('achternaam', e.target.value)}
-                  placeholder="Aziz" required autoComplete="family-name" />
+                  placeholder="Achternaam" required autoComplete="family-name" />
               </div>
             </div>
 

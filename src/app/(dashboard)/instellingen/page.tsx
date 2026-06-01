@@ -113,11 +113,11 @@ export default function InstellingenPage() {
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
                   <div>
                     <label style={{ fontSize:13, fontWeight:600, color:'#374151', display:'block', marginBottom:6 }}>{t.settings.first_name}</label>
-                    <input className="input-field" value={form.voornaam} onChange={e=>setForm(f=>({...f,voornaam:e.target.value}))} placeholder="Abdul"/>
+                    <input className="input-field" value={form.voornaam} onChange={e=>setForm(f=>({...f,voornaam:e.target.value}))} placeholder="Voornaam"/>
                   </div>
                   <div>
                     <label style={{ fontSize:13, fontWeight:600, color:'#374151', display:'block', marginBottom:6 }}>{t.settings.last_name}</label>
-                    <input className="input-field" value={form.achternaam} onChange={e=>setForm(f=>({...f,achternaam:e.target.value}))} placeholder="Aziz"/>
+                    <input className="input-field" value={form.achternaam} onChange={e=>setForm(f=>({...f,achternaam:e.target.value}))} placeholder="Achternaam"/>
                   </div>
                 </div>
                 <div>
@@ -213,7 +213,7 @@ export default function InstellingenPage() {
                 {[
                   { zoek:'AH ', cat:'Boodschappen' }, { zoek:'JUMBO', cat:'Boodschappen' },
                   { zoek:'NS ', cat:'Transport' }, { zoek:'SPOTIFY', cat:'Abonnement' },
-                  { zoek:'SALARIS', cat:'Salaris' }, { zoek:'Leaflink', cat:'Zakelijk' },
+                  { zoek:'SALARIS', cat:'Salaris' }, { zoek:'FREELANCE', cat:'Zakelijk' },
                 ].map((r,i)=>(
                   <div key={i} className="card" style={{ padding:'12px 16px', display:'flex', alignItems:'center', gap:12 }}>
                     <span className="badge badge-gray">als &quot;{r.zoek}&quot;</span>

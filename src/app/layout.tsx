@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Family-App',
-  description: 'Persoonlijke finance manager voor Abdul & gezin',
+  description: 'Persoonlijk financieel dashboard — beheer je geld, schulden en doelen.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

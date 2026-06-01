@@ -8,17 +8,10 @@ import type { Transactie } from '@/types';
 
 const fmtEuro = (n:number) => new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(n);
 
-const OPDRACHTGEVERS = [
-  { naam:'Leaflink', bedrag:2500, type:'Webdevelopment' },
-  { naam:'Netvice',  bedrag:2000, type:'IT Consultancy' },
-  { naam:'Dakprofijt', bedrag:1500, type:'Administratie' },
-];
-const VASTE_KOSTEN = [
-  { naam:'KVK',         bedrag:60  },
-  { naam:'Accountant',  bedrag:150 },
-  { naam:'Software',    bedrag:80  },
-  { naam:'Verzekering', bedrag:120 },
-];
+// Opdrachtgevers en kosten worden geladen uit jouw zakelijke transacties
+// Voeg ze toe via de Transacties pagina met type "Zakelijk"
+const OPDRACHTGEVERS: { naam:string; bedrag:number; type:string }[] = [];
+const VASTE_KOSTEN:   { naam:string; bedrag:number }[]              = [];
 
 export default function ZakelijkPage() {
   const { t } = useLang();

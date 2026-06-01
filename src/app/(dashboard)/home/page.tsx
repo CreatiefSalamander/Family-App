@@ -39,7 +39,7 @@ export default function HomePage() {
   const [bud,   setBud]  = useState<Budget[]>([]);
   const [sch,   setSch]  = useState<Schuld[]>([]);
   const [doel,  setDoel] = useState<Doel[]>([]);
-  const [naam,  setNaam] = useState('Abdul');
+  const [naam,  setNaam] = useState('');
   const [loading, setLoad] = useState(true);
   const sb = createClient();
 
