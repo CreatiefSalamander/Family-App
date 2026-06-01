@@ -1,11 +1,9 @@
 [build]
-  command = "npm run build"
+  command = "npm install --legacy-peer-deps && npm run build"
   publish = ".next"
 
 [build.environment]
-  NEXT_PUBLIC_SUPABASE_URL = "https://lttxjfrtfrjnlazmbcyq.supabase.co"
-  NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_SLofdkgzrdibQzeP5v_bew_bIBDTFAD"
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
