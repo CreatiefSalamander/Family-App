@@ -3,8 +3,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-// LET OP: deze functie is ASYNC — gebruik altijd "await createClient()"
-// Voorbeeld: const supabase = await createClient()
 export async function createClient() {
   const cookieStore = await cookies()
   return createServerClient(
@@ -16,10 +14,19 @@ export async function createClient() {
           return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: Record<string, unknown>) {
-          cookieStore.set({ name, value, ...options } as never)
+          // Mag alleen in Server Actions/Route Handlers, niet in Server Components
+          try {
+            cookieStore.set({ name, value, ...options } as never)
+          } catch {
+            // Genegeerd in read-only contexten (Server Components)
+          }
         },
         remove(name: string, options: Record<string, unknown>) {
-          cookieStore.set({ name, value: '', ...options } as never)
+          try {
+            cookieStore.set({ name, value: '', ...options } as never)
+          } catch {
+            // Genegeerd in read-only contexten (Server Components)
+          }
         },
       },
     }
