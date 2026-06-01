@@ -7,8 +7,10 @@ import { useLang } from '@/lib/lang-context';
 import { getGreeting } from '@/lib/translations';
 import {
   Wallet, TrendingUp, TrendingDown, Activity,
-  ArrowUpRight, PlusCircle, Eye, EyeOff,
+  ArrowUpRight, PlusCircle,
 } from 'lucide-react';
+import TotalBalanceBox from '@/components/ui/TotalBalanceBox';
+import BankCard from '@/components/ui/BankCard';
 import type { Transactie, Rekening, Budget, Schuld, Doel } from '@/types';
 
 /* ─── Helpers ─────────────────────────────────────────── */
@@ -39,7 +41,6 @@ export default function HomePage() {
   const [doel,  setDoel] = useState<Doel[]>([]);
   const [naam,  setNaam] = useState('Abdul');
   const [loading, setLoad] = useState(true);
-  const [hideSaldo, setHideSaldo] = useState(false);
   const sb = createClient();
 
   useEffect(() => {
@@ -112,42 +113,8 @@ export default function HomePage() {
           <p className="header-box-subtext">{t.dashboard.subtitle}</p>
         </div>
 
-        {/* Total balance card */}
-        <div className="total-balance fade-up" style={{ marginBottom: 24 }}>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,.75)', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              {t.dashboard.total_balance}
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <p className="amount" style={{ fontSize: 34, color: '#fff', lineHeight: 1 }}>
-                {loading ? '—' : hideSaldo ? '••••••' : fmtEuro(saldo)}
-              </p>
-              <button
-                onClick={() => setHideSaldo(h => !h)}
-                style={{ background: 'rgba(255,255,255,.2)', border: 'none', borderRadius: 6, padding: '4px 6px', cursor: 'pointer', color: 'white' }}
-              >
-                {hideSaldo ? <Eye size={16} /> : <EyeOff size={16} />}
-              </button>
-            </div>
-            <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 11, background: 'rgba(34,197,94,.25)', color: '#4ADE80', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>
-                  ↑ {loading ? '—' : fmtEuro(inc)}
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 11, background: 'rgba(239,68,68,.25)', color: '#FCA5A5', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>
-                  ↓ {loading ? '—' : fmtEuro(exp)}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,.6)' }}>
-              {todayStr}
-            </p>
-          </div>
-        </div>
+        {/* TotalBalanceBox — exact Horizon stijl met donut chart */}
+        <TotalBalanceBox rekeningen={rek} totaalSaldo={saldo} loading={loading} />
 
         {/* 4 KPI Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 16, marginBottom: 24 }}>
@@ -215,33 +182,51 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ══ Right sidebar ═══════════════════════════════════ */}
+      {/* ══ Right sidebar — exact Horizon stijl ═══════════ */}
       <aside className="right-sidebar no-scrollbar">
 
-        {/* Rekeningen */}
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>{t.dashboard.my_accounts}</h3>
-            <Link href="/rekeningen" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#0179FE', textDecoration: 'none', fontWeight: 600 }}>
-              <PlusCircle size={12} /> {t.dashboard.add_account}
+        {/* Profiel sectie — gradient-mesh banner + avatar */}
+        <section style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
+          <div className="profile-banner" />
+          <div className="profile">
+            <div className="profile-img">
+              <span style={{ fontSize: 32, fontWeight: 700, color: '#0179FE', lineHeight: 1 }}>
+                {naam[0]?.toUpperCase() ?? 'A'}
+              </span>
+            </div>
+            <div className="profile-details">
+              <h1 className="profile-name">{naam}</h1>
+              <p className="profile-email">{/* email via layout */}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Mijn rekeningen — Horizon overlappende bank cards */}
+        <section style={{ paddingTop: 24, paddingBottom: 24, borderTop: '1px solid #F3F4F6' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1A1F36' }}>{t.dashboard.my_accounts}</h2>
+            <Link href="/rekeningen" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 600 }}>
+              <PlusCircle size={14} /> {t.dashboard.add_account}
             </Link>
           </div>
+
           {rek.length === 0 ? (
-            <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', padding: '10px 0' }}>{t.dashboard.no_accounts}</p>
-          ) : rek.slice(0, 3).map(r => (
-            <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid #F3F4F6' }}>
-              <div style={{ width: 4, height: 34, borderRadius: 2, flexShrink: 0, background: BAR_KLEUR[r.color_gradient] || BAR_KLEUR.blue }} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1F36', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
-                <p style={{ fontSize: 11, color: '#9CA3AF' }}>{r.account_number_masked}</p>
+            <p style={{ fontSize: 13, color: '#9CA3AF', textAlign: 'center', padding: '20px 0' }}>{t.dashboard.no_accounts}</p>
+          ) : (
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              {/* Eerste card — voorgrond */}
+              <div style={{ position: 'relative', zIndex: 10, width: '100%' }}>
+                <BankCard rekening={rek[0]} naam={naam} showBalance={false} />
               </div>
-              <p className="amount" style={{ fontSize: 13, color: '#1A1F36', flexShrink: 0 }}>{fmtEuro(r.balance)}</p>
+              {/* Tweede card — gedeeltelijk zichtbaar eronder */}
+              {rek[1] && (
+                <div style={{ position: 'absolute', top: 24, right: 0, zIndex: 0, width: '90%' }}>
+                  <BankCard rekening={rek[1]} naam={naam} showBalance={false} />
+                </div>
+              )}
             </div>
-          ))}
-          <Link href="/rekeningen" style={{ fontSize: 12, color: '#0179FE', textDecoration: 'none', fontWeight: 600, display: 'block', marginTop: 8 }}>
-            {t.dashboard.all_accounts} →
-          </Link>
-        </div>
+          )}
+        </section>
 
         {/* Budgetten */}
         <div style={{ marginBottom: 24 }}>

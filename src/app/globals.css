@@ -327,6 +327,119 @@ select.input-field { appearance: none; cursor: pointer; }
   box-shadow: 0 8px 24px rgba(0,0,0,.2);
 }
 
+/* ══════════════════════════════════════════════════════════
+   HORIZON BANK CARD — exact zoals adrianhajdin/banking
+   ══════════════════════════════════════════════════════════ */
+
+.bank-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 380px;
+  min-height: 190px;
+  border-radius: 20px;
+  padding: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
+  text-decoration: none;
+}
+.bank-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+.bank-card_content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.bank-card_icon {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  margin-top: 12px;
+}
+
+/* TOTAL BALANCE — exact Horizon stijl met gradient bg */
+.total-balance {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 24px;
+  border-radius: 16px;
+  padding: 24px 28px;
+  background: linear-gradient(135deg, #0747b6 0%, #2265d8 50%, #2f91fa 100%);
+  box-shadow: 0 8px 32px rgba(7, 71, 182, 0.35);
+  margin-bottom: 24px;
+}
+
+.total-balance-chart {
+  display: flex;
+  width: 100%;
+  max-width: 120px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* PROFILE BANNER — gradient mesh achtergrond */
+.profile-banner {
+  height: 120px;
+  width: 100%;
+  background-image: url('/icons/gradient-mesh.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 12px 12px 0 0;
+}
+
+.profile {
+  position: relative;
+  display: flex;
+  padding: 0 20px;
+}
+
+.profile-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -40px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #F3F4F6;
+  border: 6px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  padding-top: 52px;
+}
+
+.profile-name {
+  font-family: 'IBM Plex Serif', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1A1F36;
+}
+
+.profile-email {
+  font-size: 14px;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
 /* ANIMATIONS */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(8px); }
