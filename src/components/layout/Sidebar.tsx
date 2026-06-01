@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
 const NAV = [
-  { href: '/', icon: Home, label: 'Overzicht' },
+  { href: '/home', icon: Home, label: 'Overzicht' },
   { href: '/transacties', icon: ArrowLeftRight, label: 'Transacties' },
   { href: '/rekeningen', icon: CreditCard, label: 'Rekeningen' },
   { href: '/begroting', icon: PieChart, label: 'Begroting' },

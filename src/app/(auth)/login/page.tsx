@@ -19,7 +19,7 @@ export default function LoginPage() {
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) throw error;
       const { data: profiel } = await sb.from('profielen').select('onboarding_voltooid').eq('id', data.user.id).single();
-      router.push(profiel?.onboarding_voltooid === false ? '/onboarding' : '/');
+      router.push(profiel?.onboarding_voltooid === false ? '/onboarding' : '/home');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Inloggen mislukt';
       setError(msg.includes('Invalid') || msg.includes('credentials') ? 'E-mail of wachtwoord klopt niet.' : msg);

@@ -14,7 +14,7 @@ export default function OnboardingPage() {
   async function finish() {
     const { data: { user } } = await sb.auth.getUser();
     if (user) await sb.from('profielen').upsert({ id: user.id, ai_persoonlijkheid: persoonlijkheid, onboarding_voltooid: true });
-    router.push('/');
+    router.push('/home');
   }
 
   return (
