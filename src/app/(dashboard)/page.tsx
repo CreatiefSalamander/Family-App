@@ -66,9 +66,9 @@ export default function DashboardPage() {
         {/* KPI Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {KPIS.map(({ label, value, icon: Icon, color, border }) => (
-            <div key={label} className={\`card p-5 border-l-4 \${border} hover:-translate-y-0.5 transition-transform\`}>
-              <div className={\`flex items-center gap-2 text-xs text-gray-500 mb-2\`}><Icon size={14} className={color} />{label}</div>
-              <div className={\`font-mono text-xl font-bold \${color}\`}>{fmt(value)}</div>
+            <div key={label} className={`card p-5 border-l-4 ${border} hover:-translate-y-0.5 transition-transform`}>
+              <div className={`flex items-center gap-2 text-xs text-gray-500 mb-2`}><Icon size={14} className={color} />{label}</div>
+              <div className={`font-mono text-xl font-bold ${color}`}>{fmt(value)}</div>
             </div>
           ))}
         </div>
@@ -95,7 +95,7 @@ export default function DashboardPage() {
                   <div className="text-sm font-semibold truncate">{t.description}</div>
                   <div className="text-xs text-gray-400">{t.category} · {fmtDate(t.date)}</div>
                 </div>
-                <div className={\`font-mono text-sm font-bold \${t.type==='income'?'text-green-600':'text-red-500'}\`}>
+                <div className={`font-mono text-sm font-bold ${t.type==='income'?'text-green-600':'text-red-500'}`}>
                   {t.type==='income'?'+':'-'}{fmt(t.amount)}
                 </div>
               </div>
