@@ -22,6 +22,8 @@ export default function ZakelijkPage() {
   const [formK, setFormK] = useState({ naam:'', bedrag:'', type:'Vast' });
   const sb = createClient();
 
+  const [dbMissing, setDbMissing] = useState(false);
+
   useEffect(() => {
     (async () => {
       const { data: { user } } = await sb.auth.getUser();
@@ -30,6 +32,10 @@ export default function ZakelijkPage() {
         sb.from('opdrachtgevers').select('*').eq('user_id', user.id).order('naam'),
         sb.from('zakelijke_kosten').select('*').eq('user_id', user.id).order('naam'),
       ]);
+      // Tabel bestaat nog niet — toon setup instructie
+      if (o.error?.code === 'PGRST205' || k.error?.code === 'PGRST205') {
+        setDbMissing(true); setLoad(false); return;
+      }
       setOpdr((o.data || []) as Opdrachtgever[]);
       setKost((k.data || []) as ZakelijkeKost[]);
       setLoad(false);
@@ -88,6 +94,34 @@ export default function ZakelijkPage() {
     { label:t.business.profit,  value:fmtEuro(nettoWinst),   color:nettoWinst>=0?'#0179FE':'#EF4444', border:nettoWinst>=0?'#0179FE':'#EF4444', bg:'#EFF6FF' },
     { label:t.business.costs,   value:fmtEuro(totaleKosten), color:'#EF4444', border:'#EF4444', bg:'#FEF2F2' },
   ];
+
+  /* Tabel ontbreekt — toon setup instructie */
+  if (dbMissing) return (
+    <div className="home-content no-scrollbar">
+      <div className="header-box">
+        <h1 className="header-box-title">{t.business.title}</h1>
+        <p className="header-box-subtext">Eenmalige database setup vereist</p>
+      </div>
+      <div className="card" style={{ padding:32, maxWidth:600, background:'#FFFBEB', border:'1px solid #FDE68A' }}>
+        <p style={{ fontSize:18, fontWeight:700, color:'#92400E', marginBottom:8 }}>⚙️ Database tabellen aanmaken</p>
+        <p style={{ fontSize:13, color:'#78350F', marginBottom:20, lineHeight:1.6 }}>
+          De zakelijk pagina heeft 2 nieuwe tabellen nodig. Dit doe je eenmalig in 3 stappen:
+        </p>
+        <div style={{ display:'flex', flexDirection:'column', gap:12, marginBottom:20 }}>
+          {['Ga naar: supabase.com/dashboard/project/lttxjfrtfrjnlazmbcyq/sql/new', 'Plak de SQL die je van je ontwikkelaar hebt gekregen', 'Klik de groene Run knop'].map((stap,i)=>(
+            <div key={i} style={{ display:'flex', alignItems:'flex-start', gap:12 }}>
+              <div style={{ width:24, height:24, borderRadius:'50%', background:'#F59E0B', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:'white', fontSize:12, fontWeight:700 }}>{i+1}</div>
+              <p style={{ fontSize:13, color:'#78350F', paddingTop:2 }}>{stap}</p>
+            </div>
+          ))}
+        </div>
+        <a href="https://supabase.com/dashboard/project/lttxjfrtfrjnlazmbcyq/sql/new" target="_blank"
+          style={{ display:'inline-flex', alignItems:'center', gap:8, background:'#F59E0B', color:'white', padding:'10px 20px', borderRadius:8, textDecoration:'none', fontWeight:600, fontSize:13 }}>
+          → Open SQL Editor
+        </a>
+      </div>
+    </div>
+  );
 
   return (
     <div className="home-content no-scrollbar">
