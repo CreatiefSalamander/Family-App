@@ -1,29 +1,38 @@
 'use client';
+
 import { useState, useRef, useEffect } from 'react';
 import { Bell, ChevronDown, User, Settings, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
-interface Props {
-  naam?: string;
-  email?: string;
-  title?: string;
+interface TopbarProps {
+  title: string;
   subtitle?: string;
+  user: { email: string };
+  profiel: { voornaam?: string; achternaam?: string } | null;
 }
 
-export default function Topbar({ naam, email, title, subtitle }: Props) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const sb = createClient();
-  const initials = (naam || email || 'AA').slice(0, 2).toUpperCase();
+export default function Topbar({ title, subtitle, user, profiel }: TopbarProps) {
+  const [open, setOpen]   = useState(false);
+  const ref               = useRef<HTMLDivElement>(null);
+  const router            = useRouter();
+  const sb                = createClient();
 
+  const voornaam   = profiel?.voornaam   || '';
+  const achternaam = profiel?.achternaam || '';
+  const vollnaam   = [voornaam, achternaam].filter(Boolean).join(' ') || user.email.split('@')[0];
+  const initialen  = (
+    (voornaam[0] || '') + (achternaam[0] || '') ||
+    user.email[0]
+  ).toUpperCase();
+
+  /* sluit dropdown bij klik buiten */
   useEffect(() => {
-    function close(e: MouseEvent) {
+    function onOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+    document.addEventListener('mousedown', onOutside);
+    return () => document.removeEventListener('mousedown', onOutside);
   }, []);
 
   async function logout() {
@@ -33,67 +42,134 @@ export default function Topbar({ naam, email, title, subtitle }: Props) {
   }
 
   return (
-    <header className="h-16 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-7 flex-shrink-0 z-10">
+    <header className="topbar">
+
+      {/* Linker kant — titel */}
       <div>
-        {title ? (
-          <>
-            <h1 className="font-display text-xl font-semibold text-[#1A1F36]">{title}</h1>
-            {subtitle && <p className="text-xs text-[#6B7280] capitalize mt-0.5">{subtitle}</p>}
-          </>
-        ) : (
-          <span className="font-display text-xl font-semibold text-[#1A1F36]">Family-App</span>
+        <h1 style={{
+          fontFamily: "'IBM Plex Serif', serif",
+          fontSize: 20, fontWeight: 700,
+          color: '#1A1F36', lineHeight: 1.2,
+        }}>
+          {title}
+        </h1>
+        {subtitle && (
+          <p style={{ fontSize: 12, color: '#6B7280', marginTop: 1 }}>
+            {subtitle}
+          </p>
         )}
       </div>
 
-      <div className="flex items-center gap-3">
+      {/* Rechter kant — bell + avatar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+
         {/* Notificatie bell */}
-        <button className="relative w-9 h-9 border border-[#E5E7EB] rounded-lg flex items-center justify-center text-[#6B7280] hover:bg-[#F3F4F6] transition-colors">
+        <button style={{
+          position: 'relative', background: 'none',
+          border: '1px solid #E5E7EB', borderRadius: 8,
+          width: 36, height: 36, cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#6B7280',
+        }}>
           <Bell size={17} />
-          <span className="absolute -top-1 -right-1 w-4 h-4 gradient-blue rounded-full text-white text-[9px] font-bold flex items-center justify-center">3</span>
+          <span style={{
+            position: 'absolute', top: -5, right: -5,
+            width: 17, height: 17, borderRadius: '50%',
+            background: 'linear-gradient(135deg, #0179FE, #4893FF)',
+            color: '#fff', fontSize: 9, fontWeight: 700,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            3
+          </span>
         </button>
 
         {/* Avatar dropdown */}
-        <div className="relative" ref={ref}>
+        <div ref={ref} style={{ position: 'relative' }}>
           <button
             onClick={() => setOpen(o => !o)}
-            className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-[#F3F4F6] transition-colors"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: 'none', border: 'none', cursor: 'pointer',
+              padding: '4px 8px', borderRadius: 10,
+              transition: 'background .15s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#F3F4F6')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'none')}
           >
-            <div className="w-8 h-8 rounded-full gradient-blue flex items-center justify-center text-white text-xs font-bold">
-              {initials}
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #0179FE, #4893FF)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#fff', fontSize: 12, fontWeight: 700, flexShrink: 0,
+            }}>
+              {initialen}
             </div>
-            <div className="hidden sm:block text-left">
-              <p className="text-[13px] font-semibold text-[#1A1F36] leading-none">{naam || 'Abdul'}</p>
-              <p className="text-[11px] text-[#6B7280] leading-none mt-0.5 truncate max-w-[120px]">{email || ''}</p>
+            <div style={{ textAlign: 'left', display: 'none' }} className="sm:block">
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1F36', lineHeight: 1 }}>
+                {vollnaam}
+              </p>
+              <p style={{ fontSize: 11, color: '#6B7280', lineHeight: 1, marginTop: 2 }}>
+                {user.email}
+              </p>
             </div>
-            <ChevronDown size={14} className={`text-[#6B7280] transition-transform ${open ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              size={14}
+              color="#6B7280"
+              style={{ transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform .2s' }}
+            />
           </button>
 
+          {/* Dropdown menu */}
           {open && (
-            <div className="absolute right-0 top-12 w-48 bg-white border border-[#E5E7EB] rounded-xl shadow-lg overflow-hidden z-50">
-              <div className="px-4 py-3 border-b border-[#E5E7EB]">
-                <p className="text-[13px] font-semibold text-[#1A1F36]">{naam || 'Abdul'}</p>
-                <p className="text-[11px] text-[#6B7280] truncate">{email || ''}</p>
+            <div style={{
+              position: 'absolute', right: 0, top: 46,
+              width: 200, background: '#fff',
+              border: '1px solid #E5E7EB', borderRadius: 12,
+              boxShadow: '0 8px 30px rgba(0,0,0,.12)',
+              overflow: 'hidden', zIndex: 50,
+            }}>
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid #E5E7EB' }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1F36' }}>{vollnaam}</p>
+                <p style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>{user.email}</p>
               </div>
-              <div className="py-1">
-                <button
-                  onClick={() => { setOpen(false); router.push('/instellingen'); }}
-                  className="flex items-center gap-3 w-full px-4 py-2.5 text-[13px] text-[#1A1F36] hover:bg-[#F3F4F6] transition-colors"
-                >
-                  <User size={14} className="text-[#6B7280]" /> Profiel
-                </button>
-                <button
-                  onClick={() => { setOpen(false); router.push('/instellingen'); }}
-                  className="flex items-center gap-3 w-full px-4 py-2.5 text-[13px] text-[#1A1F36] hover:bg-[#F3F4F6] transition-colors"
-                >
-                  <Settings size={14} className="text-[#6B7280]" /> Instellingen
-                </button>
+              <div style={{ padding: '4px 0' }}>
+                {[
+                  { icon: User,     label: 'Profiel',        href: '/instellingen' },
+                  { icon: Settings, label: 'Instellingen',   href: '/instellingen' },
+                ].map(({ icon: Icon, label, href }) => (
+                  <button
+                    key={label}
+                    onClick={() => { setOpen(false); router.push(href); }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      width: '100%', padding: '10px 16px',
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      fontSize: 13, color: '#1A1F36', fontFamily: 'inherit',
+                      transition: 'background .1s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#F3F4F6')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                  >
+                    <Icon size={14} color="#6B7280" />
+                    {label}
+                  </button>
+                ))}
               </div>
-              <div className="border-t border-[#E5E7EB] py-1">
+              <div style={{ borderTop: '1px solid #E5E7EB', padding: '4px 0' }}>
                 <button
                   onClick={logout}
-                  className="flex items-center gap-3 w-full px-4 py-2.5 text-[13px] text-red-500 hover:bg-red-50 transition-colors"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    width: '100%', padding: '10px 16px',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    fontSize: 13, color: '#EF4444', fontFamily: 'inherit',
+                    transition: 'background .1s',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#FEF2F2')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                 >
-                  <LogOut size={14} /> Uitloggen
+                  <LogOut size={14} />
+                  Uitloggen
                 </button>
               </div>
             </div>

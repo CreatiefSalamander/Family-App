@@ -1,79 +1,148 @@
 'use client';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, ArrowLeftRight, CreditCard, PieChart, TrendingDown, Target, Briefcase, BarChart2, Search, MapPin, Settings, LogOut } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
 
-const NAV = [
-  { href: '/home', icon: Home, label: 'Overzicht' },
-  { href: '/transacties', icon: ArrowLeftRight, label: 'Transacties' },
-  { href: '/rekeningen', icon: CreditCard, label: 'Rekeningen' },
-  { href: '/begroting', icon: PieChart, label: 'Begroting' },
-  { href: '/schulden', icon: TrendingDown, label: 'Schulden' },
-  { href: '/doelen', icon: Target, label: 'Doelen' },
-  { href: '/zakelijk', icon: Briefcase, label: 'Zakelijk' },
-  { href: '/jaaroverzicht', icon: BarChart2, label: 'Jaaroverzicht' },
-  { href: '/prijsradar', icon: Search, label: 'Prijsradar' },
-  { href: '/locatie', icon: MapPin, label: 'Locatie' },
-  { href: '/instellingen', icon: Settings, label: 'Instellingen' },
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import {
+  Home, ArrowLeftRight, CreditCard, PieChart,
+  TrendingDown, Target, Briefcase, BarChart2,
+  Search, MapPin, Settings, LogOut, Euro,
+} from 'lucide-react';
+
+interface SidebarProps {
+  user: { email: string; id?: string };
+  profiel: { voornaam?: string; achternaam?: string } | null;
+}
+
+const NAV_ITEMS = [
+  { label: 'Overzicht',     href: '/home',          icon: Home },
+  { label: 'Transacties',   href: '/transacties',   icon: ArrowLeftRight },
+  { label: 'Rekeningen',    href: '/rekeningen',    icon: CreditCard },
+  { label: 'Begroting',     href: '/begroting',     icon: PieChart },
+  { label: 'Schulden',      href: '/schulden',      icon: TrendingDown },
+  { label: 'Doelen',        href: '/doelen',        icon: Target },
+  { label: 'Zakelijk',      href: '/zakelijk',      icon: Briefcase },
+  { label: 'Jaaroverzicht', href: '/jaaroverzicht', icon: BarChart2 },
+  { label: 'Prijsradar',    href: '/prijsradar',    icon: Search },
+  { label: 'Locatie',       href: '/locatie',       icon: MapPin },
+  { label: 'Instellingen',  href: '/instellingen',  icon: Settings },
 ];
 
-export default function Sidebar({ email, naam }: { email?: string; naam?: string }) {
-  const path = usePathname();
-  const router = useRouter();
-  const sb = createClient();
-  const initials = (naam || email || 'AA').slice(0, 2).toUpperCase();
+export default function Sidebar({ user, profiel }: SidebarProps) {
+  const pathname = usePathname();
+  const router   = useRouter();
+  const sb       = createClient();
 
-  async function logout() {
+  const voornaam  = profiel?.voornaam  || '';
+  const achternaam = profiel?.achternaam || '';
+  const vollnaam  = [voornaam, achternaam].filter(Boolean).join(' ') || user.email.split('@')[0];
+  const initialen = (
+    (voornaam[0] || '') + (achternaam[0] || '') ||
+    user.email[0]
+  ).toUpperCase();
+
+  async function handleLogout() {
     await sb.auth.signOut();
     router.push('/login');
   }
 
   return (
-    <aside className="w-[250px] flex-shrink-0 bg-[#111827] flex flex-col h-full overflow-hidden">
-      {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-white/8">
-        <div className="w-8 h-8 rounded-lg gradient-blue flex items-center justify-center shadow-sm">
-          <span className="text-white font-bold text-sm font-display">€</span>
-        </div>
-        <span className="font-display text-[19px] font-bold text-white tracking-tight">Family-App</span>
-      </div>
+    <aside className="sidebar">
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
-        {NAV.map(({ href, icon: Icon, label }) => {
-          const active = href === '/' ? path === '/' : path.startsWith(href);
+      {/* ── Logo ───────────────────────────────────────── */}
+      <Link
+        href="/home"
+        style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          marginBottom: 28, textDecoration: 'none',
+        }}
+      >
+        <div style={{
+          width: 34, height: 34,
+          background: 'linear-gradient(135deg, #0179FE, #4893FF)',
+          borderRadius: 9, display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          <Euro size={18} color="#ffffff" />
+        </div>
+        <span style={{
+          fontFamily: "'IBM Plex Serif', serif",
+          fontSize: 19, fontWeight: 700, color: '#ffffff',
+          letterSpacing: '-0.3px',
+        }}>
+          Family-App
+        </span>
+      </Link>
+
+      {/* ── Nav label ──────────────────────────────────── */}
+      <p style={{
+        fontSize: 10, color: '#4B5563', fontWeight: 700,
+        letterSpacing: '0.1em', textTransform: 'uppercase',
+        marginBottom: 6, paddingLeft: 12,
+      }}>
+        MENU
+      </p>
+
+      {/* ── Navigation ─────────────────────────────────── */}
+      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+          const isActive = pathname === href || pathname.startsWith(href + '/');
           return (
-            <Link key={href} href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${
-                active
-                  ? 'bg-[#0179FE]/20 text-white'
-                  : 'text-gray-400 hover:bg-white/6 hover:text-gray-200'
-              }`}>
-              <Icon size={17} className={active ? 'text-[#60A5FA]' : ''} />
-              {label}
+            <Link
+              key={href}
+              href={href}
+              className={`nav-item ${isActive ? 'nav-item-active' : ''}`}
+            >
+              <Icon size={18} />
+              <span>{label}</span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="px-3 py-3 border-t border-white/8">
-        <div className="flex items-center gap-3 px-3 py-2 mb-1">
-          <div className="w-8 h-8 rounded-full gradient-blue flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            {initials}
+      {/* ── Footer ─────────────────────────────────────── */}
+      <div style={{
+        borderTop: '1px solid rgba(255,255,255,.08)',
+        paddingTop: 14, marginTop: 16,
+      }}>
+        {/* User info */}
+        <div style={{
+          display: 'flex', alignItems: 'center',
+          gap: 10, padding: '6px 12px', marginBottom: 4,
+        }}>
+          <div style={{
+            width: 34, height: 34, borderRadius: '50%',
+            background: 'linear-gradient(135deg, #0179FE, #4893FF)',
+            display: 'flex', alignItems: 'center',
+            justifyContent: 'center', flexShrink: 0,
+            color: '#ffffff', fontSize: 13, fontWeight: 700,
+          }}>
+            {initialen}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-white truncate">{naam || 'Abdul'}</p>
-            <p className="text-[11px] text-gray-400 truncate">{email || ''}</p>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{
+              color: '#ffffff', fontSize: 13, fontWeight: 600,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {vollnaam}
+            </p>
+            <p style={{
+              color: '#6B7280', fontSize: 11,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {user.email}
+            </p>
           </div>
         </div>
-        <button onClick={logout}
-          className="flex items-center gap-2.5 px-3 py-2 w-full text-[13px] text-gray-400 hover:bg-red-500/12 hover:text-red-300 rounded-lg transition-colors">
-          <LogOut size={15} /> Uitloggen
+
+        {/* Logout */}
+        <button onClick={handleLogout} className="nav-item" style={{ marginTop: 2 }}>
+          <LogOut size={16} />
+          <span>Uitloggen</span>
         </button>
       </div>
+
     </aside>
   );
 }
