@@ -1,9 +1,11 @@
 import { redirect }       from 'next/navigation';
 import { createClient }  from '@/lib/supabase/server';
+import { LangProvider }  from '@/lib/lang-context';
 import Sidebar           from '@/components/layout/Sidebar';
-import Topbar            from '@/components/layout/Topbar';
 import MobileNav         from '@/components/layout/MobileNav';
 import AIChatbot         from '@/components/ai/AIChatbot';
+import type { Lang }     from '@/lib/translations';
+import { Euro }          from 'lucide-react';
 
 export default async function DashboardLayout({
   children,
@@ -11,48 +13,57 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   /* ── Auth check ──────────────────────────────────────── */
-  const supabase = await createClient();  // ALTIJD AWAIT
+  const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
-
   if (error || !user) redirect('/login');
 
-  /* ── Profiel ophalen ─────────────────────────────────── */
+  /* ── Profiel + taal ophalen ──────────────────────────── */
   const { data: profiel } = await supabase
     .from('profielen')
-    .select('voornaam, achternaam, ai_persoonlijkheid')
+    .select('voornaam, achternaam, ai_persoonlijkheid, taal')
     .eq('id', user.id)
     .single();
 
-  /* ── Groet berekenen ─────────────────────────────────── */
-  const email    = user.email ?? '';
-  const voornaam = profiel?.voornaam || email.split('@')[0] || 'Abdul';
-  const hour     = new Date().getHours();
-  const groet    = hour < 12 ? 'Goedemorgen' : hour < 18 ? 'Goedemiddag' : 'Goedenavond';
-  const greeting = `${groet}, ${voornaam}`;
-
-  const today = new Date().toLocaleDateString('nl-NL', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-  });
+  const lang      = (profiel?.taal || 'nl') as Lang;
+  const voornaam  = profiel?.voornaam || user.email?.split('@')[0] || 'Abdul';
+  const email     = user.email ?? '';
 
   return (
-    <>
-      {/* ── Desktop: sidebar (position fixed) ──────────── */}
-      <Sidebar user={{ ...user, email }} profiel={profiel} />
+    <LangProvider lang={lang}>
+      {/*
+       * HORIZON LAYOUT:
+       * <main flex h-screen>
+       *   <Sidebar sticky />
+       *   <div flex-1 flex-col overflow-hidden>
+       *     {children}  ← each page provides its own scrollable content
+       *   </div>
+       * </main>
+       */}
+      <main style={{
+        display: 'flex',
+        height: '100vh',
+        width: '100%',
+        overflow: 'hidden',
+        backgroundColor: '#F8FAFC',
+      }}>
 
-      {/* ── Desktop: main content (margin-left 250px) ──── */}
-      <div className="main-content">
-        <Topbar
-          title={greeting}
-          subtitle={today}
-          user={{ email }}
-          profiel={profiel}
-        />
-        <main style={{ flex: 1, overflowY: 'auto' }}>
+        {/* Desktop sidebar */}
+        <Sidebar user={{ email }} profiel={profiel} />
+
+        {/* Content area */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          minWidth: 0,
+        }}>
           {children}
-        </main>
-      </div>
+        </div>
 
-      {/* ── Mobile: header bovenaan (CSS: display:none → flex op <768px) ── */}
+      </main>
+
+      {/* Mobile fixed header */}
       <header className="mobile-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{
@@ -60,16 +71,17 @@ export default async function DashboardLayout({
             background: 'linear-gradient(135deg,#0179FE,#4893FF)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 14, fontFamily: "'IBM Plex Serif',serif" }}>
-              €
-            </span>
+            <Euro size={15} color="#fff" />
           </div>
-          <span style={{ fontFamily: "'IBM Plex Serif',serif", fontWeight: 700, color: '#1A1F36', fontSize: 16 }}>
+          <span style={{
+            fontFamily: "'IBM Plex Serif',serif",
+            fontWeight: 700, color: '#fff', fontSize: 16,
+          }}>
             Family-App
           </span>
         </div>
         <div style={{
-          width: 32, height: 32, borderRadius: '50%',
+          width: 30, height: 30, borderRadius: '50%',
           background: 'linear-gradient(135deg,#0179FE,#4893FF)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: '#fff', fontSize: 12, fontWeight: 700,
@@ -78,11 +90,11 @@ export default async function DashboardLayout({
         </div>
       </header>
 
-      {/* ── Mobile: bottom navigation ────────────────────── */}
+      {/* Mobile bottom nav */}
       <MobileNav />
 
-      {/* ── AI Chatbot — zweeft op elke pagina ───────────── */}
+      {/* AI chatbot zweeft op elke pagina */}
       <AIChatbot naam={voornaam} />
-    </>
+    </LangProvider>
   );
 }

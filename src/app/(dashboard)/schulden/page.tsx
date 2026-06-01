@@ -1,157 +1,153 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { fmt } from '@/lib/utils';
-import { Plus, X, TrendingDown } from 'lucide-react';
+import { useLang } from '@/lib/lang-context';
+import { Plus, TrendingDown } from 'lucide-react';
 import type { Schuld } from '@/types';
 
-const INIT_SCHULDEN = [
-  { schuldeiser: 'Avres', type: 'Betalingsregeling', oorspronkelijk: 26200, afgelost: 0, maandtermijn: 200, status: 'Open' as const, kleur: '#EF4444' },
-  { schuldeiser: 'DUO Hoofdsom', type: 'Studieschuld', oorspronkelijk: 13500, afgelost: 0, maandtermijn: 150, status: 'Actief' as const, kleur: '#F59E0B' },
-  { schuldeiser: 'Advocaat schuld', type: 'Rekening', oorspronkelijk: 5758, afgelost: 0, maandtermijn: 100, status: 'Open' as const, kleur: '#EF4444' },
-  { schuldeiser: 'Belastingdienst', type: 'Belastingschuld', oorspronkelijk: 4925, afgelost: 0, maandtermijn: 91, status: 'Open' as const, kleur: '#F97316' },
-  { schuldeiser: 'ING Lening', type: 'Persoonlijke lening', oorspronkelijk: 3841, afgelost: 0, maandtermijn: 150, status: 'Actief' as const, kleur: '#F59E0B' },
+const fmtEuro = (n:number) => new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(n);
+const fmtDate = (d:string) => d ? new Date(d).toLocaleDateString('nl-NL',{month:'short',year:'numeric'}) : '—';
+
+const DEFAULT_SCHULDEN = [
+  { schuldeiser:'Avres', type:'Huurschuld', oorspronkelijk:26200, afgelost:0, maandtermijn:400, status:'Actief', kleur:'#EF4444', regeling:'Betalingsregeling' },
+  { schuldeiser:'DUO', type:'Studielening', oorspronkelijk:13500, afgelost:0, maandtermijn:200, status:'Actief', kleur:'#F59E0B', regeling:'' },
+  { schuldeiser:'Advocaat', type:'Juridische kosten', oorspronkelijk:5758, afgelost:0, maandtermijn:150, status:'Actief', kleur:'#6172F3', regeling:'' },
+  { schuldeiser:'Belastingdienst', type:'Belastingschuld', oorspronkelijk:4925, afgelost:0, maandtermijn:100, status:'Actief', kleur:'#01797A', regeling:'Betalingsregeling' },
+  { schuldeiser:'ING Lening', type:'Persoonlijke lening', oorspronkelijk:3841, afgelost:0, maandtermijn:115, status:'Actief', kleur:'#0179FE', regeling:'' },
 ];
 
 export default function SchuldenPage() {
-  const [schulden, setSchuld] = useState<Schuld[]>([]);
-  const [showAdd, setShowAdd] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [form, setForm] = useState({ schuldeiser: '', type: '', oorspronkelijk: '', afgelost: '0', maandtermijn: '', kleur: '#EF4444' });
+  const { t } = useLang();
+  const [sch, setSch] = useState<Schuld[]>([]);
+  const [load, setLoad] = useState(true);
+  const [show, setShow] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ schuldeiser:'', type:'', oorspronkelijk:'', maandtermijn:'', kleur:'#EF4444' });
   const sb = createClient();
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return;
+      const { data } = await sb.from('schulden').select('*').eq('user_id', user.id).order('oorspronkelijk', { ascending:false });
+      setSch((data||[]) as unknown as Schuld[]);
+      setLoad(false);
+    })();
+  }, []);
 
-  async function load() {
+  const totaalRest    = sch.reduce((s,d)=>s+(d.oorspronkelijk-d.afgelost),0);
+  const totaalMaand   = sch.reduce((s,d)=>s+d.maandtermijn,0);
+  const actief        = sch.filter(d=>d.status==='Actief').length;
+
+  async function addSch() {
+    setSaving(true);
     const { data: { user } } = await sb.auth.getUser();
-    if (!user) return;
-    const { data } = await sb.from('schulden').select('*').eq('user_id', user.id).order('oorspronkelijk', { ascending: false });
-    if (data && data.length === 0) {
-      // Eerste gebruik: voorvullen
-      const inserts = INIT_SCHULDEN.map(s => ({ ...s, user_id: user.id }));
-      const { data: inserted } = await sb.from('schulden').insert(inserts).select();
-      setSchuld((inserted || []) as unknown as Schuld[]);
-    } else {
-      setSchuld((data || []) as unknown as Schuld[]);
-    }
-    setLoaded(true);
+    if (!user) { setSaving(false); return; }
+    const { data } = await sb.from('schulden').insert({
+      user_id:user.id, schuldeiser:form.schuldeiser, type:form.type,
+      oorspronkelijk:parseFloat(form.oorspronkelijk)||0, afgelost:0,
+      maandtermijn:parseFloat(form.maandtermijn)||0, kleur:form.kleur,
+      status:'Actief',
+    }).select().single();
+    if (data) setSch(prev=>[...prev, data as unknown as Schuld]);
+    setShow(false); setSaving(false);
+    setForm({ schuldeiser:'', type:'', oorspronkelijk:'', maandtermijn:'', kleur:'#EF4444' });
   }
-
-  async function saveSchuld() {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user || !form.schuldeiser) return;
-    const s = { user_id: user.id, schuldeiser: form.schuldeiser, type: form.type, oorspronkelijk: parseFloat(form.oorspronkelijk) || 0, afgelost: parseFloat(form.afgelost) || 0, maandtermijn: parseFloat(form.maandtermijn) || 0, kleur: form.kleur, status: 'Open' as const };
-    const { data } = await sb.from('schulden').insert(s).select().single();
-    if (data) { setSchuld(prev => [...prev, data as unknown as Schuld]); setShowAdd(false); setForm({ schuldeiser: '', type: '', oorspronkelijk: '', afgelost: '0', maandtermijn: '', kleur: '#EF4444' }); }
-  }
-
-  const totaalRestant = schulden.reduce((s, d) => s + (d.oorspronkelijk - d.afgelost), 0);
-  const totaalTermijn = schulden.reduce((s, d) => s + (d.maandtermijn || 0), 0);
-  const totaalAfgelost = schulden.reduce((s, d) => s + (d.afgelost || 0), 0);
-  const actief = schulden.filter(s => s.status === 'Actief').length;
 
   return (
-    <div className="px-6 lg:px-8 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center"><TrendingDown size={20} className="text-red-500" /></div>
-          <div><h1 className="font-display text-2xl font-bold">Schulden</h1><p className="text-sm text-gray-400">Overzicht en aflossingsplanning</p></div>
+    <div className="home-content no-scrollbar">
+      <div className="header-box">
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+          <div>
+            <h1 className="header-box-title">{t.debts.title}</h1>
+            <p className="header-box-subtext">{t.debts.subtitle}</p>
+          </div>
+          <button className="btn-primary" style={{ fontSize:13 }} onClick={()=>setShow(true)}><Plus size={15}/> {t.debts.add}</button>
         </div>
-        <button onClick={() => setShowAdd(true)} className="btn-primary flex items-center gap-2 px-4 py-2 text-sm"><Plus size={15} />Toevoegen</button>
       </div>
 
       {/* KPI cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16, marginBottom:24 }}>
         {[
-          { label: 'Totaal restant', value: fmt(totaalRestant), color: 'text-red-500', border: 'border-l-red-400' },
-          { label: 'Maandtermijn', value: fmt(totaalTermijn), color: 'text-amber-500', border: 'border-l-amber-400' },
-          { label: 'Actieve regelingen', value: String(actief), color: 'text-[#0179FE]', border: 'border-l-[#0179FE]' },
-          { label: 'Totaal afgelost', value: fmt(totaalAfgelost), color: 'text-green-600', border: 'border-l-green-500' },
-        ].map(k => (
-          <div key={k.label} className={`card p-5 border-l-4 ${k.border}`}>
-            <p className="text-xs text-gray-400 mb-2 font-medium">{k.label}</p>
-            <p className={`font-mono text-xl font-bold ${k.color}`}>{k.value}</p>
+          { label:t.debts.total,   value:fmtEuro(totaalRest),  color:'#EF4444', border:'#EF4444', bg:'#FEF2F2' },
+          { label:t.debts.monthly, value:fmtEuro(totaalMaand), color:'#F59E0B', border:'#F59E0B', bg:'#FFFBEB' },
+          { label:t.debts.active,  value:actief+' regelingen', color:'#6172F3', border:'#6172F3', bg:'#F5F3FF' },
+        ].map(k=>(
+          <div key={k.label} className="kpi-card" style={{ borderLeftColor:k.border, background:k.bg }}>
+            <p style={{ fontSize:10, color:'#6B7280', fontWeight:700, textTransform:'uppercase', letterSpacing:'.07em', marginBottom:8 }}>{k.label}</p>
+            <p className="amount" style={{ fontSize:22, color:k.color }}>{k.value}</p>
           </div>
         ))}
       </div>
 
-      {/* Schulden table */}
-      <div className="card overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="font-semibold text-base">Schuldenlijst</h2>
+      {/* Schulden lijst */}
+      {load ? (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          {[...Array(5)].map((_,i)=><div key={i} className="skeleton" style={{ height:80, borderRadius:12 }}/>)}
         </div>
-        {!loaded ? (
-          <div className="space-y-3 p-6">{[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />)}</div>
-        ) : (
-          schulden.map((s) => {
-            const rest = s.oorspronkelijk - (s.afgelost || 0);
-            const pct = s.oorspronkelijk > 0 ? Math.round(((s.afgelost || 0) / s.oorspronkelijk) * 100) : 0;
-            const mndOver = s.maandtermijn > 0 ? Math.ceil(rest / s.maandtermijn) : null;
+      ) : (
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+          {(sch.length>0 ? sch : []).map((s,i) => {
+            const rest = s.oorspronkelijk - s.afgelost;
+            const pct  = s.oorspronkelijk>0 ? (s.afgelost/s.oorspronkelijk)*100 : 0;
             return (
-              <div key={s.id} className="px-6 py-4 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-10 rounded-full flex-shrink-0" style={{ background: s.kleur || '#EF4444' }} />
-                    <div>
-                      <p className="font-semibold text-sm">{s.schuldeiser}</p>
-                      <p className="text-xs text-gray-400">{s.type}</p>
-                    </div>
+              <div key={s.id||i} className="card card-hover" style={{ padding:20 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+                  <div style={{ width:44, height:44, borderRadius:'50%', background:s.kleur||'#EF4444', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <TrendingDown size={20} color="white"/>
                   </div>
-                  <div className="flex items-center gap-4 text-right">
-                    <div>
-                      <p className="text-xs text-gray-400">Oorspronkelijk</p>
-                      <p className="font-mono text-sm font-semibold">{fmt(s.oorspronkelijk)}</p>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4 }}>
+                      <div>
+                        <p style={{ fontSize:14, fontWeight:700, color:'#1A1F36' }}>{s.schuldeiser}</p>
+                        <p style={{ fontSize:12, color:'#6B7280' }}>{s.type} {s.regeling?'· '+s.regeling:''}</p>
+                      </div>
+                      <div style={{ textAlign:'right' }}>
+                        <p className="amount" style={{ fontSize:18, color:'#EF4444' }}>-{fmtEuro(rest)}</p>
+                        <p style={{ fontSize:11, color:'#9CA3AF' }}>{fmtEuro(s.maandtermijn)}{t.common.per_month}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-400">Restant</p>
-                      <p className="font-mono text-sm font-bold text-red-500">-{fmt(rest)}</p>
+                    <div className="progress-track" style={{ background:'#FEE2E2' }}>
+                      <div className="progress-fill" style={{ width:pct+'%', background:'#22C55E' }}/>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-400">Termijn/mnd</p>
-                      <p className="font-mono text-sm font-semibold">{s.maandtermijn > 0 ? fmt(s.maandtermijn) : '—'}</p>
+                    <div style={{ display:'flex', justifyContent:'space-between', marginTop:4 }}>
+                      <p style={{ fontSize:10, color:'#9CA3AF' }}>Afgelost: {fmtEuro(s.afgelost)}</p>
+                      <p style={{ fontSize:10, color:'#9CA3AF' }}>Origineel: {fmtEuro(s.oorspronkelijk)}</p>
                     </div>
-                    <div>
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${s.status === 'Actief' ? 'bg-blue-50 text-blue-600' : s.status === 'Afbetaald' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
-                        {s.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="ml-6">
-                  <div className="flex justify-between text-xs text-gray-400 mb-1">
-                    <span>{pct}% afgelost</span>
-                    {mndOver && <span>~{mndOver} maanden resterend</span>}
-                  </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: pct + '%' }} />
                   </div>
                 </div>
               </div>
             );
-          })
-        )}
-      </div>
-
-      {/* Add modal */}
-      {showAdd && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowAdd(false)}>
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5"><h2 className="font-display font-bold text-lg">Schuld toevoegen</h2><button onClick={() => setShowAdd(false)}><X size={20} /></button></div>
-            <div className="space-y-4">
-              {[['schuldeiser', 'Schuldeiser', 'Bijv. DUO, Belastingdienst'], ['type', 'Type', 'Lening, Betalingsregeling...']].map(([k, l, p]) => (
-                <div key={k}><label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">{l}</label>
-                  <input type="text" placeholder={p} value={(form as Record<string, string>)[k]} onChange={e => setForm(f => ({ ...f, [k]: e.target.value }))} className="input-field" /></div>
-              ))}
-              <div className="grid grid-cols-3 gap-3">
-                {[['oorspronkelijk', 'Bedrag (€)'], ['afgelost', 'Afgelost (€)'], ['maandtermijn', 'Termijn/mnd (€)']].map(([k, l]) => (
-                  <div key={k}><label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">{l}</label>
-                    <input type="number" value={(form as Record<string, string>)[k]} onChange={e => setForm(f => ({ ...f, [k]: e.target.value }))} className="input-field" /></div>
-                ))}
-              </div>
+          })}
+          {sch.length===0 && (
+            <div className="card" style={{ padding:48, textAlign:'center' }}>
+              <p style={{ fontSize:36, marginBottom:8 }}>✅</p>
+              <p style={{ fontWeight:600, color:'#4B5563' }}>Geen schulden gevonden</p>
+              <p style={{ fontSize:13, color:'#9CA3AF', marginTop:4 }}>Voeg je schulden toe om ze bij te houden</p>
             </div>
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowAdd(false)} className="flex-1 border border-gray-200 rounded-xl py-2.5 text-sm font-semibold hover:bg-gray-50">Annuleren</button>
-              <button onClick={saveSchuld} className="flex-1 btn-primary rounded-xl py-2.5">Opslaan</button>
+          )}
+        </div>
+      )}
+
+      {show&&(
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.4)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100 }}
+          onClick={e=>e.target===e.currentTarget&&setShow(false)}>
+          <div className="card" style={{ width:440, padding:28 }}>
+            <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, marginBottom:20 }}>{t.debts.add}</h3>
+            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+                <input className="input-field" placeholder="Schuldeiser" value={form.schuldeiser} onChange={e=>setForm(f=>({...f,schuldeiser:e.target.value}))}/>
+                <input className="input-field" placeholder="Type (bijv. Lening)" value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))}/>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+                <input className="input-field" type="number" placeholder="Totaalbedrag (€)" value={form.oorspronkelijk} onChange={e=>setForm(f=>({...f,oorspronkelijk:e.target.value}))}/>
+                <input className="input-field" type="number" placeholder="Maandtermijn (€)" value={form.maandtermijn} onChange={e=>setForm(f=>({...f,maandtermijn:e.target.value}))}/>
+              </div>
+              <div style={{ display:'flex', gap:10 }}>
+                <button className="btn-ghost" style={{ flex:1 }} onClick={()=>setShow(false)}>{t.common.cancel}</button>
+                <button className="btn-primary" style={{ flex:1 }} onClick={addSch} disabled={saving}>{saving?t.common.loading:t.common.add}</button>
+              </div>
             </div>
           </div>
         </div>

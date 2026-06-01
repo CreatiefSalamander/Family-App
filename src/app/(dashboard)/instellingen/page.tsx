@@ -1,204 +1,230 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { User, Bot, Database } from 'lucide-react';
+import { useLang } from '@/lib/lang-context';
+import { LANG_LABELS, type Lang } from '@/lib/translations';
+import { User, Globe, Bot, Database, Tag, CheckCircle } from 'lucide-react';
 
-const TABS = [
-  { id: 'profiel', label: 'Profiel', icon: User },
-  { id: 'ai', label: 'Claude AI', icon: Bot },
-  { id: 'supabase', label: 'Supabase', icon: Database },
-];
+type Tab = 'profiel' | 'taal' | 'ai' | 'supabase' | 'regels';
 
 export default function InstellingenPage() {
-  const [tab, setTab] = useState('profiel');
-  const [naam, setNaam] = useState('');
-  const [email, setEmail] = useState('');
-  const [claudeKey, setClaudeKey] = useState('');
-  const [supaStatus, setSupaStatus] = useState('');
-  const [claudeStatus, setClaudeStatus] = useState('');
+  const { t, lang } = useLang();
+  const [tab, setTab]       = useState<Tab>('profiel');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved]   = useState(false);
+  const [form, setForm]     = useState({ voornaam:'', achternaam:'', email:'' });
+  const [apiKey, setApiKey] = useState('');
+  const [selectedLang, setSelectedLang] = useState<Lang>(lang);
   const sb = createClient();
 
-  useEffect(() => {
-    async function load() {
+  useEffect(()=>{
+    (async()=>{
       const { data: { user } } = await sb.auth.getUser();
       if (!user) return;
-      setEmail(user.email || '');
-      const { data } = await sb.from('profielen').select('voornaam').eq('id', user.id).single();
-      if (data) setNaam((data as { voornaam?: string }).voornaam || '');
+      setForm(f=>({...f, email:user.email||''}));
+      const { data:p } = await sb.from('profielen').select('*').eq('id',user.id).single();
+      if (p) { setForm(f=>({...f, voornaam:p.voornaam||'', achternaam:p.achternaam||''})); setSelectedLang((p.taal||'nl') as Lang); }
       const k = localStorage.getItem('claude_api_key');
-      if (k) setClaudeKey('••••••••••••••••');
-    }
-    load();
-  }, []);
+      if (k) setApiKey(k);
+    })();
+  },[]);
 
-  async function testSupabase() {
-    setSupaStatus('Testen...');
-    try {
-      const { error } = await sb.from('transactions').select('id').limit(1);
-      setSupaStatus(error ? '✗ ' + error.message : '✓ Verbinding geslaagd');
-    } catch {
-      setSupaStatus('✗ Verbindingsfout');
-    }
+  async function saveProfiel() {
+    setSaving(true);
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+    await sb.from('profielen').upsert({ id:user.id, voornaam:form.voornaam, achternaam:form.achternaam });
+    setSaving(false); setSaved(true);
+    setTimeout(()=>setSaved(false), 2500);
   }
 
-  async function testClaude() {
-    const k = localStorage.getItem('claude_api_key');
-    if (!k) { setClaudeStatus('Geen API key'); return; }
-    setClaudeStatus('Testen...');
-    try {
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': k,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 10, messages: [{ role: 'user', content: 'Hi' }] }),
-      });
-      const d = await r.json();
-      setClaudeStatus(d.error ? '✗ ' + d.error.message : '✓ Verbinding geslaagd');
-    } catch {
-      setClaudeStatus('✗ Fout');
-    }
+  async function saveLang() {
+    setSaving(true);
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+    await sb.from('profielen').upsert({ id:user.id, taal:selectedLang });
+    setSaving(false); setSaved(true);
+    setTimeout(()=>{ setSaved(false); window.location.reload(); }, 1000);
   }
 
-  function saveClaudeKey() {
-    if (claudeKey && claudeKey !== '••••••••••••••••') {
-      localStorage.setItem('claude_api_key', claudeKey);
-      setClaudeKey('••••••••••••••••');
-      alert('API key opgeslagen');
-    }
+  function saveApiKey() {
+    localStorage.setItem('claude_api_key', apiKey);
+    setSaved(true); setTimeout(()=>setSaved(false), 2500);
   }
+
+  const TABS: { id:Tab; icon:typeof User; label:string }[] = [
+    { id:'profiel',   icon:User,     label:t.settings.profile },
+    { id:'taal',      icon:Globe,    label:t.settings.language },
+    { id:'ai',        icon:Bot,      label:t.settings.ai },
+    { id:'supabase',  icon:Database, label:t.settings.supabase },
+    { id:'regels',    icon:Tag,      label:t.settings.rules },
+  ];
 
   return (
-    <div className="px-7 py-6">
-      <h1 className="font-display text-2xl font-bold mb-6">Instellingen</h1>
-      <div className="flex gap-6">
-        <div className="w-48 flex-shrink-0">
-          {TABS.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium mb-1 transition ${
-                tab === t.id ? 'bg-blue-50 text-[#0179FE]' : 'text-gray-500 hover:bg-gray-100'
-              }`}
-            >
-              <t.icon size={16} />
-              {t.label}
+    <div className="home-content no-scrollbar">
+      <div className="header-box">
+        <h1 className="header-box-title">{t.settings.title}</h1>
+        <p className="header-box-subtext">{t.settings.subtitle}</p>
+      </div>
+
+      <div style={{ display:'flex', gap:20, alignItems:'flex-start' }}>
+        {/* Zijnavigatie */}
+        <div className="card" style={{ padding:8, width:200, flexShrink:0 }}>
+          {TABS.map(tb=>(
+            <button key={tb.id} onClick={()=>setTab(tb.id)} style={{
+              display:'flex', alignItems:'center', gap:10, width:'100%',
+              padding:'10px 14px', borderRadius:8, border:'none', cursor:'pointer',
+              fontSize:13, fontWeight:500, fontFamily:'inherit', transition:'background .15s',
+              background:tab===tb.id?'#EFF6FF':'transparent',
+              color:tab===tb.id?'#0179FE':'#4B5563',
+            }}>
+              <tb.icon size={16}/> {tb.label}
             </button>
           ))}
         </div>
 
-        <div className="flex-1">
-          {tab === 'profiel' && (
-            <div className="card p-6">
-              <h2 className="font-bold text-base mb-5">Profiel</h2>
-              <div className="flex items-center gap-5 mb-6">
-                <div className="w-16 h-16 rounded-full gradient-blue flex items-center justify-center text-white text-xl font-bold">
-                  {naam.slice(0, 2).toUpperCase() || 'AA'}
-                </div>
-                <div>
-                  <p className="font-semibold text-lg">{naam || 'Abdul Aziz'}</p>
-                  <p className="text-sm text-gray-400">{email}</p>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium block mb-1">Voornaam</label>
-                  <input
-                    type="text"
-                    value={naam}
-                    onChange={e => setNaam(e.target.value)}
-                    className="w-full max-w-sm border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium block mb-1">E-mail</label>
-                  <input
-                    type="email"
-                    value={email}
-                    readOnly
-                    className="w-full max-w-sm border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 text-gray-500"
-                  />
-                </div>
-              </div>
+        {/* Content */}
+        <div className="card" style={{ flex:1, padding:28 }}>
+
+          {/* Succes banner */}
+          {saved && (
+            <div style={{ display:'flex', alignItems:'center', gap:10, background:'#F0FDF4', border:'1px solid #86EFAC', borderRadius:10, padding:'10px 16px', marginBottom:20 }}>
+              <CheckCircle size={18} color="#22C55E"/>
+              <p style={{ fontSize:13, fontWeight:600, color:'#16A34A' }}>{t.settings.saved}</p>
             </div>
           )}
 
-          {tab === 'ai' && (
-            <div className="card p-6">
-              <h2 className="font-bold text-base mb-5">Claude AI</h2>
-              <div className="space-y-4 max-w-md">
-                <div>
-                  <label className="text-sm font-medium block mb-1">Claude API Key</label>
-                  <input
-                    type="password"
-                    value={claudeKey}
-                    onChange={e => setClaudeKey(e.target.value)}
-                    placeholder="sk-ant-..."
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400"
-                  />
+          {/* PROFIEL TAB */}
+          {tab==='profiel' && (
+            <div>
+              <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:20 }}>{t.settings.profile}</h3>
+              {/* Avatar */}
+              <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:24 }}>
+                <div style={{ width:72, height:72, borderRadius:'50%', background:'linear-gradient(135deg,#0179FE,#4893FF)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:26, fontWeight:700, color:'white' }}>
+                  {(form.voornaam[0]||'A')+(form.achternaam[0]||'A')}
                 </div>
                 <div>
-                  <label className="text-sm font-medium block mb-1">Model</label>
-                  <input
-                    type="text"
-                    value="claude-sonnet-4-5"
-                    readOnly
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 text-gray-500"
-                  />
+                  <p style={{ fontSize:16, fontWeight:700, color:'#1A1F36' }}>{form.voornaam} {form.achternaam}</p>
+                  <p style={{ fontSize:13, color:'#6B7280' }}>{form.email}</p>
                 </div>
-                <div className="flex gap-3">
-                  <button onClick={saveClaudeKey} className="gradient-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90">
-                    Opslaan
-                  </button>
-                  <button onClick={testClaude} className="border border-gray-200 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50">
-                    Verbinding testen
-                  </button>
-                </div>
-                {claudeStatus && (
-                  <p className={`text-sm ${claudeStatus.startsWith('✓') ? 'text-green-600' : 'text-red-500'}`}>
-                    {claudeStatus}
-                  </p>
-                )}
               </div>
-            </div>
-          )}
-
-          {tab === 'supabase' && (
-            <div className="card p-6">
-              <h2 className="font-bold text-base mb-5">Supabase</h2>
-              <div className="space-y-4 max-w-md">
-                <div>
-                  <label className="text-sm font-medium block mb-1">Project URL</label>
-                  <input
-                    type="text"
-                    value="https://lttxjfrtfrjnlazmbcyq.supabase.co"
-                    readOnly
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 text-gray-500"
-                  />
+              <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
+                  <div>
+                    <label style={{ fontSize:13, fontWeight:600, color:'#374151', display:'block', marginBottom:6 }}>{t.settings.first_name}</label>
+                    <input className="input-field" value={form.voornaam} onChange={e=>setForm(f=>({...f,voornaam:e.target.value}))} placeholder="Abdul"/>
+                  </div>
+                  <div>
+                    <label style={{ fontSize:13, fontWeight:600, color:'#374151', display:'block', marginBottom:6 }}>{t.settings.last_name}</label>
+                    <input className="input-field" value={form.achternaam} onChange={e=>setForm(f=>({...f,achternaam:e.target.value}))} placeholder="Aziz"/>
+                  </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium block mb-1">Anon Key</label>
-                  <input
-                    type="text"
-                    value="sb_publishable_SLofdkgzrdibQzeP5v_bew_bIBDTFAD"
-                    readOnly
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-xs bg-gray-50 text-gray-500"
-                  />
+                  <label style={{ fontSize:13, fontWeight:600, color:'#374151', display:'block', marginBottom:6 }}>{t.settings.email}</label>
+                  <input className="input-field" value={form.email} disabled style={{ opacity:.6, cursor:'not-allowed' }}/>
                 </div>
-                <button onClick={testSupabase} className="border border-gray-200 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50">
-                  Verbinding testen
+                <button className="btn-primary" style={{ width:'auto', alignSelf:'flex-start' }} onClick={saveProfiel} disabled={saving}>
+                  {saving ? t.common.loading : t.settings.save}
                 </button>
-                {supaStatus && (
-                  <p className={`text-sm ${supaStatus.startsWith('✓') ? 'text-green-600' : 'text-red-500'}`}>
-                    {supaStatus}
-                  </p>
-                )}
               </div>
             </div>
           )}
+
+          {/* TAAL TAB */}
+          {tab==='taal' && (
+            <div>
+              <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:8 }}>{t.settings.language}</h3>
+              <p style={{ fontSize:13, color:'#6B7280', marginBottom:24 }}>{t.settings.choose_lang}</p>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:24 }}>
+                {(Object.entries(LANG_LABELS) as [Lang, typeof LANG_LABELS.nl][]).map(([k, v])=>(
+                  <button key={k} onClick={()=>setSelectedLang(k)} style={{
+                    display:'flex', alignItems:'center', gap:14, padding:18, borderRadius:12,
+                    border: selectedLang===k?'2px solid #0179FE':'2px solid #E5E7EB',
+                    background: selectedLang===k?'#EFF6FF':'white',
+                    cursor:'pointer', transition:'all .15s', textAlign:'left',
+                  }}>
+                    <span style={{ fontSize:32 }}>{v.flag}</span>
+                    <div>
+                      <p style={{ fontSize:15, fontWeight:700, color: selectedLang===k?'#0179FE':'#1A1F36' }}>{v.label}</p>
+                      <p style={{ fontSize:12, color:'#9CA3AF' }}>{v.dir==='rtl'?'RTL — rechts naar links':'LTR — links naar rechts'}</p>
+                    </div>
+                    {selectedLang===k && <CheckCircle size={20} color="#0179FE" style={{ marginLeft:'auto' }}/>}
+                  </button>
+                ))}
+              </div>
+              <button className="btn-primary" style={{ width:'auto' }} onClick={saveLang} disabled={saving}>
+                {saving ? t.common.loading : t.settings.save}
+              </button>
+            </div>
+          )}
+
+          {/* AI TAB */}
+          {tab==='ai' && (
+            <div>
+              <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:8 }}>{t.settings.ai}</h3>
+              <p style={{ fontSize:13, color:'#6B7280', marginBottom:20 }}>{t.settings.api_help}</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+                <div>
+                  <label style={{ fontSize:13, fontWeight:600, color:'#374151', display:'block', marginBottom:6 }}>{t.settings.api_key}</label>
+                  <input className="input-field" type="password" value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder={t.settings.api_key_ph}/>
+                </div>
+                {apiKey && (
+                  <div style={{ padding:12, background:'#F0FDF4', borderRadius:8, border:'1px solid #86EFAC' }}>
+                    <p style={{ fontSize:12, color:'#16A34A', fontWeight:600 }}>✓ API key ingesteld</p>
+                    <p style={{ fontSize:11, color:'#22C55E', marginTop:2 }}>sk-ant-...{apiKey.slice(-4)}</p>
+                  </div>
+                )}
+                <button className="btn-primary" style={{ width:'auto', alignSelf:'flex-start' }} onClick={saveApiKey}>
+                  {t.settings.save}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* SUPABASE TAB */}
+          {tab==='supabase' && (
+            <div>
+              <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:20 }}>{t.settings.supabase}</h3>
+              <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+                {[
+                  { label:'Project URL', value:'lttxjfrtfrjnlazmbcyq.supabase.co', ok:true },
+                  { label:'Verbinding',  value:'Actief', ok:true },
+                  { label:'Tabellen',    value:'transactions, accounts, budgets, schulden, goals, profielen', ok:true },
+                ].map(r=>(
+                  <div key={r.label} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:12 }}>
+                    <div style={{ width:10, height:10, borderRadius:'50%', background:r.ok?'#22C55E':'#EF4444', flexShrink:0 }}/>
+                    <div>
+                      <p style={{ fontSize:12, color:'#6B7280', fontWeight:600 }}>{r.label}</p>
+                      <p style={{ fontSize:13, color:'#1A1F36', fontFamily:"'JetBrains Mono',monospace" }}>{r.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* REGELS TAB */}
+          {tab==='regels' && (
+            <div>
+              <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:8 }}>{t.settings.rules}</h3>
+              <p style={{ fontSize:13, color:'#6B7280', marginBottom:20 }}>Automatische categorisatie op basis van omschrijving.</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                {[
+                  { zoek:'AH ', cat:'Boodschappen' }, { zoek:'JUMBO', cat:'Boodschappen' },
+                  { zoek:'NS ', cat:'Transport' }, { zoek:'SPOTIFY', cat:'Abonnement' },
+                  { zoek:'SALARIS', cat:'Salaris' }, { zoek:'Leaflink', cat:'Zakelijk' },
+                ].map((r,i)=>(
+                  <div key={i} className="card" style={{ padding:'12px 16px', display:'flex', alignItems:'center', gap:12 }}>
+                    <span className="badge badge-gray">als &quot;{r.zoek}&quot;</span>
+                    <span style={{ fontSize:13, color:'#9CA3AF' }}>→</span>
+                    <span className="badge badge-blue">{r.cat}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </div>

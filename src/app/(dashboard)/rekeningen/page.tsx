@@ -1,171 +1,158 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { fmt, fmtDate } from '@/lib/utils';
-import { Plus, X } from 'lucide-react';
-import type { Rekening, Transactie } from '@/types';
+import { useLang } from '@/lib/lang-context';
+import { Plus, CreditCard, Eye, EyeOff } from 'lucide-react';
+import type { Rekening } from '@/types';
 
-const GRADS: Record<string, string> = {
-  blue: 'linear-gradient(135deg,#0179FE,#4893FF)',
-  teal: 'linear-gradient(135deg,#01797A,#489399)',
-  purple: 'linear-gradient(135deg,#6172F3,#A855F7)',
-  green: 'linear-gradient(135deg,#059669,#34D399)',
+const fmtEuro = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
+
+const GRADIENTS: Record<string, string> = {
+  blue:   'linear-gradient(135deg, #0179FE 0%, #4893FF 100%)',
+  teal:   'linear-gradient(135deg, #01797A 0%, #489399 100%)',
+  purple: 'linear-gradient(135deg, #6172F3 0%, #A855F7 100%)',
+  green:  'linear-gradient(135deg, #059669 0%, #34D399 100%)',
 };
+const GRAD_KEYS = Object.keys(GRADIENTS);
 
 export default function RekeningenPage() {
-  const [rekeningen, setRekeningen] = useState<Rekening[]>([]);
-  const [transacties, setTransacties] = useState<Transactie[]>([]);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({
-    name: '',
-    bank_name: '',
-    account_number_masked: '',
-    balance: '',
-    color_gradient: 'blue',
-  });
+  const { t } = useLang();
+  const [rek, setRek] = useState<Rekening[]>([]);
+  const [loading, setLoad] = useState(true);
+  const [hide, setHide] = useState(false);
+  const [show, setShow] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ name:'', bank_name:'', account_number_masked:'', balance:'', color_gradient:'blue' });
   const sb = createClient();
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return;
+      const { data } = await sb.from('accounts').select('*').eq('user_id', user.id).order('name');
+      setRek((data||[]) as unknown as Rekening[]);
+      setLoad(false);
+    })();
+  }, []);
 
-  async function load() {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) return;
-    const [{ data: rek }, { data: tx }] = await Promise.all([
-      sb.from('accounts').select('*').eq('user_id', user.id),
-      sb.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(50),
-    ]);
-    setRekeningen((rek || []) as unknown as Rekening[]);
-    setTransacties((tx || []) as unknown as Transactie[]);
-  }
+  const totaal = rek.reduce((s, r) => s + r.balance, 0);
 
-  async function addRekening() {
+  async function addRek() {
+    setSaving(true);
     const { data: { user } } = await sb.auth.getUser();
-    if (!user || !form.name) return;
-    const r = {
-      user_id: user.id,
-      name: form.name,
-      bank_name: form.bank_name,
+    if (!user) { setSaving(false); return; }
+    const { data } = await sb.from('accounts').insert({
+      user_id: user.id, name: form.name, bank_name: form.bank_name,
       account_number_masked: form.account_number_masked,
-      balance: parseFloat(form.balance) || 0,
-      color_gradient: form.color_gradient,
-    };
-    const { data } = await sb.from('accounts').insert(r).select().single();
-    if (data) { setRekeningen(prev => [...prev, data as unknown as Rekening]); setShowAdd(false); }
+      balance: parseFloat(form.balance)||0, color_gradient: form.color_gradient,
+    }).select().single();
+    if (data) setRek(prev => [...prev, data as unknown as Rekening]);
+    setShow(false); setSaving(false);
+    setForm({ name:'', bank_name:'', account_number_masked:'', balance:'', color_gradient:'blue' });
   }
-
-  const selTx = selected ? transacties.filter(t => t.account_id === selected) : transacties;
 
   return (
-    <div className="px-7 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl font-bold">Rekeningen</h1>
-        <button
-          onClick={() => setShowAdd(true)}
-          className="flex items-center gap-2 gradient-blue text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90"
-        >
-          <Plus size={16} /> Toevoegen
+    <div className="home-content no-scrollbar">
+      <div className="header-box">
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+          <div>
+            <h1 className="header-box-title">{t.accounts.title}</h1>
+            <p className="header-box-subtext">{t.accounts.subtitle}</p>
+          </div>
+          <button className="btn-primary" style={{ fontSize:13 }} onClick={()=>setShow(true)}><Plus size={15}/> {t.accounts.add}</button>
+        </div>
+      </div>
+
+      {/* Totaal saldo */}
+      <div className="total-balance fade-up" style={{ marginBottom:28 }}>
+        <div>
+          <p style={{ fontSize:12, color:'rgba(255,255,255,.75)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', marginBottom:4 }}>
+            Totaal vermogen
+          </p>
+          <p className="amount" style={{ fontSize:34, color:'#fff' }}>
+            {hide ? '••••••' : fmtEuro(totaal)}
+          </p>
+          <p style={{ fontSize:12, color:'rgba(255,255,255,.6)', marginTop:4 }}>{rek.length} rekening{rek.length !== 1 ? 'en' : ''}</p>
+        </div>
+        <button onClick={()=>setHide(h=>!h)} style={{ background:'rgba(255,255,255,.2)', border:'none', borderRadius:8, padding:'8px 12px', cursor:'pointer', color:'white', display:'flex', alignItems:'center', gap:6, fontSize:13 }}>
+          {hide ? <Eye size={16}/> : <EyeOff size={16}/>} {hide ? 'Toon' : 'Verberg'}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-        {rekeningen.map(r => (
-          <div
-            key={r.id}
-            onClick={() => setSelected(selected === r.id ? null : r.id)}
-            className="relative rounded-2xl p-6 h-48 flex flex-col justify-between cursor-pointer overflow-hidden hover:-translate-y-1 transition-transform"
-            style={{ background: GRADS[r.color_gradient] || GRADS.blue }}
-          >
-            <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/10" />
-            <div className="absolute -bottom-12 -left-4 w-48 h-48 rounded-full bg-white/5" />
-            <div className="relative z-10 flex items-center justify-between">
-              <span className="text-white/80 text-sm font-semibold">{r.bank_name}</span>
-              <div className="w-8 h-6 rounded bg-gradient-to-br from-yellow-300 to-yellow-500" />
-            </div>
-            <div className="relative z-10">
-              <div className="font-mono text-white/90 text-base tracking-widest mb-3">
-                {r.account_number_masked || '•••• •••• •••• 0000'}
+      {/* Bank cards grid */}
+      {loading ? (
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:20 }}>
+          {[...Array(3)].map((_,i) => <div key={i} className="skeleton" style={{ height:180, borderRadius:16 }}/>)}
+        </div>
+      ) : rek.length===0 ? (
+        <div className="card" style={{ padding:48, textAlign:'center' }}>
+          <CreditCard size={48} color="#E5E7EB" style={{ margin:'0 auto 16px' }}/>
+          <p style={{ fontWeight:600, color:'#4B5563', marginBottom:4 }}>{t.accounts.no_accounts}</p>
+          <button className="btn-primary" style={{ marginTop:16, width:'auto' }} onClick={()=>setShow(true)}>{t.accounts.add}</button>
+        </div>
+      ) : (
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))', gap:20 }}>
+          {rek.map(r => (
+            <div key={r.id} className="bank-card fade-up" style={{ background: GRADIENTS[r.color_gradient]||GRADIENTS.blue }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+                <div>
+                  <p style={{ fontSize:13, color:'rgba(255,255,255,.75)', fontWeight:600 }}>{r.bank_name}</p>
+                  <p style={{ fontSize:17, fontWeight:700, color:'#fff', marginTop:4 }}>{r.name}</p>
+                </div>
+                <div style={{ width:36, height:36, borderRadius:8, background:'rgba(255,255,255,.2)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <CreditCard size={20} color="white"/>
+                </div>
               </div>
-              <div className="flex items-end justify-between">
-                <span className="text-white/70 text-xs uppercase tracking-wide">{r.name}</span>
-                <span className="font-mono text-2xl font-bold text-white">{fmt(r.balance)}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-        {!rekeningen.length && (
-          <div className="col-span-2 card p-12 text-center text-gray-400">
-            <p className="text-3xl mb-2">🏦</p>
-            <p>Voeg je eerste rekening toe</p>
-          </div>
-        )}
-      </div>
-
-      <div className="card p-6">
-        <h2 className="text-base font-bold mb-4">
-          {selected ? 'Transacties — ' + rekeningen.find(r => r.id === selected)?.name : 'Alle transacties'}
-        </h2>
-        {selTx.slice(0, 20).map(t => (
-          <div key={t.id} className="flex items-center gap-4 py-3 border-b border-gray-50 last:border-0">
-            <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center text-base">
-              {t.type === 'income' ? '💰' : '🧾'}
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold">{t.description}</p>
-              <p className="text-xs text-gray-400">{fmtDate(t.date)}</p>
-            </div>
-            <p className={`font-mono text-sm font-bold ${t.type === 'income' ? 'text-green-600' : 'text-red-500'}`}>
-              {t.type === 'income' ? '+' : '-'}{fmt(t.amount)}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {showAdd && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setShowAdd(false)}>
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold">Rekening toevoegen</h2>
-              <button onClick={() => setShowAdd(false)}><X size={20} /></button>
-            </div>
-            <div className="space-y-3">
-              {(['name', 'bank_name', 'account_number_masked', 'balance'] as const).map(k => {
-                const labels: Record<string, string> = { name: 'Naam', bank_name: 'Bank', account_number_masked: 'Rekeningnummer', balance: 'Beginsaldo' };
-                const placeholders: Record<string, string> = { name: 'Betaalrekening', bank_name: 'ING, Rabobank...', account_number_masked: '**** 1234', balance: '0.00' };
-                return (
-                  <div key={k}>
-                    <label className="text-sm font-medium text-gray-700 block mb-1">{labels[k]}</label>
-                    <input
-                      type={k === 'balance' ? 'number' : 'text'}
-                      placeholder={placeholders[k]}
-                      value={form[k]}
-                      onChange={e => setForm(f => ({ ...f, [k]: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400"
-                    />
-                  </div>
-                );
-              })}
               <div>
-                <label className="text-sm font-medium text-gray-700 block mb-2">Kleur</label>
-                <div className="flex gap-2">
-                  {(['blue', 'teal', 'purple', 'green'] as const).map(g => (
-                    <button
-                      key={g}
-                      onClick={() => setForm(f => ({ ...f, color_gradient: g }))}
-                      className={`flex-1 h-8 rounded-lg transition ${form.color_gradient === g ? 'ring-2 ring-offset-1 ring-gray-400' : ''}`}
-                      style={{ background: GRADS[g] }}
-                    />
-                  ))}
+                <p style={{ fontSize:11, color:'rgba(255,255,255,.65)', marginBottom:4, fontWeight:600 }}>REKENINGNUMMER</p>
+                <p style={{ fontSize:14, color:'rgba(255,255,255,.9)', letterSpacing:'2px', fontFamily:"'JetBrains Mono',monospace" }}>
+                  {hide ? '•••• •••• ••••' : r.account_number_masked}
+                </p>
+              </div>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <div>
+                  <p style={{ fontSize:11, color:'rgba(255,255,255,.65)', marginBottom:4, fontWeight:600 }}>SALDO</p>
+                  <p className="amount" style={{ fontSize:22, color:'#fff' }}>
+                    {hide ? '••••' : fmtEuro(r.balance)}
+                  </p>
+                </div>
+                <div className="glassmorphism" style={{ padding:'4px 10px', borderRadius:20 }}>
+                  <p style={{ fontSize:12, color:'rgba(255,255,255,.9)', fontWeight:600 }}>
+                    {r.is_zakelijk ? '💼 Zakelijk' : '🏠 Privé'}
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="flex gap-3 mt-5">
-              <button onClick={() => setShowAdd(false)} className="flex-1 border border-gray-200 rounded-lg py-2.5 text-sm font-semibold hover:bg-gray-50">
-                Annuleren
-              </button>
-              <button onClick={addRekening} className="flex-1 gradient-blue text-white rounded-lg py-2.5 text-sm font-semibold">
-                Opslaan
-              </button>
+          ))}
+        </div>
+      )}
+
+      {/* Modal */}
+      {show&&(
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.4)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100 }}
+          onClick={e=>e.target===e.currentTarget&&setShow(false)}>
+          <div className="card" style={{ width:440, padding:28 }}>
+            <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, marginBottom:20 }}>{t.accounts.add}</h3>
+            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+                <input className="input-field" placeholder="Naam rekening" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/>
+                <input className="input-field" placeholder="Bank (bijv. Rabobank)" value={form.bank_name} onChange={e=>setForm(f=>({...f,bank_name:e.target.value}))}/>
+              </div>
+              <input className="input-field" placeholder="Rekeningnummer (bijv. NL69 RABO 0366)" value={form.account_number_masked} onChange={e=>setForm(f=>({...f,account_number_masked:e.target.value}))}/>
+              <input className="input-field" type="number" placeholder="Huidig saldo (€)" value={form.balance} onChange={e=>setForm(f=>({...f,balance:e.target.value}))}/>
+              <div>
+                <p style={{ fontSize:13, fontWeight:600, color:'#374151', marginBottom:8 }}>Kleur</p>
+                <div style={{ display:'flex', gap:10 }}>
+                  {GRAD_KEYS.map(k => (
+                    <button key={k} onClick={()=>setForm(f=>({...f,color_gradient:k}))} style={{ width:40, height:40, borderRadius:'50%', background:GRADIENTS[k], border: form.color_gradient===k?'3px solid #1A1F36':'3px solid transparent', cursor:'pointer' }}/>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display:'flex', gap:10, marginTop:6 }}>
+                <button className="btn-ghost" style={{ flex:1 }} onClick={()=>setShow(false)}>{t.common.cancel}</button>
+                <button className="btn-primary" style={{ flex:1 }} onClick={addRek} disabled={saving}>{saving?t.common.loading:t.common.add}</button>
+              </div>
             </div>
           </div>
         </div>

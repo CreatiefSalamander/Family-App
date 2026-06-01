@@ -1,96 +1,109 @@
 'use client';
+
 import { useState, useEffect } from 'react';
-import { MapPin, Navigation } from 'lucide-react';
+import { useLang } from '@/lib/lang-context';
+import { MapPin, Navigation, Store, Coffee, Fuel, Building2 } from 'lucide-react';
+
+interface Place { naam: string; type: string; afstand: string; icoon: typeof Store; kleur: string; }
+
+const MOCK_PLACES: Place[] = [
+  { naam:'Albert Heijn Osdorp', type:'Supermarkt', afstand:'0.4 km', icoon:Store, kleur:'#22C55E' },
+  { naam:'ING Bank',            type:'Bank',       afstand:'0.7 km', icoon:Building2, kleur:'#F59E0B' },
+  { naam:'Shell Tankstation',   type:'Benzine',    afstand:'1.2 km', icoon:Fuel, kleur:'#EF4444' },
+  { naam:'Starbucks',           type:'Koffie',     afstand:'1.5 km', icoon:Coffee, kleur:'#92400E' },
+  { naam:'Lidl',                type:'Supermarkt', afstand:'1.8 km', icoon:Store, kleur:'#0179FE' },
+];
 
 export default function LocatiePage() {
-  const [pos, setPos] = useState<{ lat: number; lng: number } | null>(null);
-  const [error, setError] = useState('');
-  const [asked, setAsked] = useState(false);
+  const { t } = useLang();
+  const [status, setStatus] = useState<'idle'|'loading'|'granted'|'denied'>('idle');
+  const [coords, setCoords] = useState<{lat:number;lng:number}|null>(null);
 
   function requestLocation() {
-    setAsked(true);
-    if (!navigator.geolocation) { setError('Locatie niet beschikbaar in deze browser.'); return; }
-    navigator.geolocation.getCurrentPosition(
-      p => setPos({ lat: p.coords.latitude, lng: p.coords.longitude }),
-      () => setError('Locatie toegang geweigerd. Sta toe in je browser.'),
-      { timeout: 10000 }
+    setStatus('loading');
+    navigator.geolocation?.getCurrentPosition(
+      pos => { setCoords({ lat:pos.coords.latitude, lng:pos.coords.longitude }); setStatus('granted'); },
+      ()   => setStatus('denied'),
     );
   }
 
-  const mapsUrl = pos
-    ? `https://www.google.com/maps/embed/v1/search?key=&q=supermarkt+tankstation&center=${pos.lat},${pos.lng}&zoom=14`
-    : '';
-
   return (
-    <div className="px-6 lg:px-8 py-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl gradient-blue flex items-center justify-center">
-          <MapPin size={20} className="text-white" />
-        </div>
-        <div>
-          <h1 className="font-display text-2xl font-bold">Locatie</h1>
-          <p className="text-sm text-gray-400">Dichtstbijzijnde supermarkten en tankstations</p>
-        </div>
+    <div className="home-content no-scrollbar">
+      <div className="header-box">
+        <h1 className="header-box-title">{t.location.title}</h1>
+        <p className="header-box-subtext">{t.location.subtitle}</p>
       </div>
 
-      {!asked ? (
-        <div className="card p-12 text-center max-w-md mx-auto">
-          <div className="w-16 h-16 rounded-2xl gradient-blue flex items-center justify-center mx-auto mb-5">
-            <Navigation size={28} className="text-white" />
+      {status === 'idle' && (
+        <div className="card" style={{ padding:48, textAlign:'center', marginBottom:24 }}>
+          <div style={{ width:80, height:80, borderRadius:'50%', background:'#EFF6FF', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px' }}>
+            <MapPin size={36} color="#0179FE"/>
           </div>
-          <h2 className="font-display font-bold text-xl mb-2">Locatie gebruiken</h2>
-          <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-            Family-App gebruikt je locatie om dichtstbijzijnde supermarkten, tankstations
-            en geldautomaten te tonen.
+          <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:20, fontWeight:700, color:'#1A1F36', marginBottom:8 }}>
+            Locatietoegang nodig
+          </h3>
+          <p style={{ fontSize:14, color:'#6B7280', marginBottom:24 }}>
+            Geef toegang tot je locatie om winkels en diensten in de buurt te zien.
           </p>
-          <button onClick={requestLocation} className="btn-primary px-8 py-3">
-            Locatie toestaan
+          <button className="btn-primary" style={{ width:'auto' }} onClick={requestLocation}>
+            <Navigation size={16}/> {t.location.allow}
           </button>
         </div>
-      ) : error ? (
-        <div className="card p-8 text-center max-w-md mx-auto">
-          <p className="text-red-500 font-medium mb-4">{error}</p>
-          <button onClick={requestLocation} className="btn-primary px-6 py-2.5 text-sm">Opnieuw proberen</button>
+      )}
+
+      {status === 'loading' && (
+        <div className="card" style={{ padding:48, textAlign:'center' }}>
+          <p style={{ fontSize:36, marginBottom:12 }}>📍</p>
+          <p style={{ color:'#6B7280' }}>Locatie ophalen...</p>
         </div>
-      ) : !pos ? (
-        <div className="card p-12 text-center">
-          <div className="w-10 h-10 border-4 border-[#0179FE] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Locatie ophalen...</p>
+      )}
+
+      {status === 'denied' && (
+        <div className="card" style={{ padding:24, background:'#FEF2F2', border:'none' }}>
+          <p style={{ fontWeight:600, color:'#DC2626' }}>Locatietoegang geweigerd</p>
+          <p style={{ fontSize:13, color:'#EF4444', marginTop:4 }}>Geef locatietoegang via je browserinstellingen.</p>
         </div>
-      ) : (
-        <div className="space-y-5">
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              { label: 'Supermarkten', emoji: '🛒', desc: 'AH, Jumbo, Lidl' },
-              { label: 'Tankstations', emoji: '⛽', desc: 'Shell, BP, Tango' },
-              { label: 'Geldautomaten', emoji: '💳', desc: 'ING, Rabobank, ABN' },
-            ].map(item => (
-              <div key={item.label} className="card p-5 text-center hover:border-[#0179FE] cursor-pointer transition-colors card-hover">
-                <div className="text-3xl mb-2">{item.emoji}</div>
-                <p className="font-semibold text-sm">{item.label}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{item.desc}</p>
+      )}
+
+      {status === 'granted' && coords && (
+        <>
+          <div className="card" style={{ padding:16, marginBottom:20, display:'flex', alignItems:'center', gap:12 }}>
+            <div style={{ width:40, height:40, borderRadius:'50%', background:'#F0FDF4', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <Navigation size={20} color="#22C55E"/>
+            </div>
+            <div>
+              <p style={{ fontSize:13, fontWeight:600, color:'#1A1F36' }}>Locatie gevonden</p>
+              <p style={{ fontSize:11, color:'#9CA3AF' }}>{coords.lat.toFixed(4)}, {coords.lng.toFixed(4)}</p>
+            </div>
+            <span className="badge badge-green" style={{ marginLeft:'auto' }}>Live</span>
+          </div>
+
+          {/* Map placeholder */}
+          <div className="card" style={{ height:280, marginBottom:24, overflow:'hidden', position:'relative' }}>
+            <iframe
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=${coords.lng-0.01},${coords.lat-0.01},${coords.lng+0.01},${coords.lat+0.01}&layer=mapnik&marker=${coords.lat},${coords.lng}`}
+              style={{ width:'100%', height:'100%', border:'none' }}
+              title="Kaart"
+            />
+          </div>
+
+          {/* Dichtsbijzijnde plekken */}
+          <h3 style={{ fontSize:14, fontWeight:700, color:'#1A1F36', marginBottom:12 }}>{t.location.nearby}</h3>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {MOCK_PLACES.map((p,i)=>(
+              <div key={i} className="card card-hover" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
+                <div style={{ width:40, height:40, borderRadius:10, background:p.kleur+'20', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                  <p.icoon size={20} color={p.kleur}/>
+                </div>
+                <div style={{ flex:1 }}>
+                  <p style={{ fontSize:13, fontWeight:600, color:'#1A1F36' }}>{p.naam}</p>
+                  <p style={{ fontSize:11, color:'#9CA3AF' }}>{p.type}</p>
+                </div>
+                <span className="badge badge-gray">{p.afstand}</span>
               </div>
             ))}
           </div>
-          <div className="card overflow-hidden">
-            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="font-semibold text-sm">Kaart in de buurt</h3>
-              <p className="text-xs text-gray-400">{pos.lat.toFixed(4)}, {pos.lng.toFixed(4)}</p>
-            </div>
-            <div className="bg-gray-100 h-72 flex items-center justify-center">
-              <div className="text-center">
-                <MapPin size={32} className="text-[#0179FE] mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-600">Locatie gevonden</p>
-                <p className="text-xs text-gray-400 mt-1">Verbind een Google Maps API key voor de kaart</p>
-                <a href={`https://maps.google.com/?q=supermarkt&near=${pos.lat},${pos.lng}`}
-                  target="_blank" rel="noreferrer"
-                  className="mt-3 inline-block text-xs text-[#0179FE] hover:underline font-medium">
-                  Open in Google Maps →
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );
