@@ -1,11 +1,12 @@
-import { redirect }       from 'next/navigation';
-import { createClient }  from '@/lib/supabase/server';
-import { LangProvider }  from '@/lib/lang-context';
-import Sidebar           from '@/components/layout/Sidebar';
-import MobileNav         from '@/components/layout/MobileNav';
-import AIChatbot         from '@/components/ai/AIChatbot';
-import type { Lang }     from '@/lib/translations';
-import { Euro }          from 'lucide-react';
+import { redirect }                  from 'next/navigation';
+import { createClient }             from '@/lib/supabase/server';
+import { LangProvider }             from '@/lib/lang-context';
+import { setupNieuweGebruiker }     from '@/lib/setup-user';
+import Sidebar                      from '@/components/layout/Sidebar';
+import MobileNav                    from '@/components/layout/MobileNav';
+import AIChatbot                    from '@/components/ai/AIChatbot';
+import type { Lang }                from '@/lib/translations';
+import { Euro }                     from 'lucide-react';
 
 export default async function DashboardLayout({
   children,
@@ -18,7 +19,7 @@ export default async function DashboardLayout({
 
   const { data: profiel } = await supabase
     .from('profielen')
-    .select('voornaam, achternaam, ai_persoonlijkheid, taal')
+    .select('voornaam, achternaam, ai_persoonlijkheid, taal, onboarding_voltooid')
     .eq('id', user.id)
     .single();
 
@@ -26,6 +27,11 @@ export default async function DashboardLayout({
   const voornaam = profiel?.voornaam || user.email?.split('@')[0] || '';
   const email    = user.email ?? '';
   const initialen = voornaam ? voornaam.slice(0, 2).toUpperCase() : email.slice(0, 2).toUpperCase();
+
+  /* ── Eerste login: vul standaard data in ──────────────── */
+  if (!profiel?.onboarding_voltooid) {
+    setupNieuweGebruiker(supabase, user.id).catch(() => {});
+  }
 
   return (
     <LangProvider lang={lang}>

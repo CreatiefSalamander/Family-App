@@ -7,7 +7,7 @@ import { useLang } from '@/lib/lang-context';
 import {
   Home, ArrowLeftRight, CreditCard, PieChart,
   TrendingDown, Target, Briefcase, BarChart2,
-  Search, MapPin, Settings, LogOut, Euro,
+  Search, MapPin, Settings, LogOut, Euro, Upload,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -35,6 +35,7 @@ export default function Sidebar({ user, profiel }: SidebarProps) {
     { label: t.nav.goals,         href: '/doelen',        icon: Target },
     { label: t.nav.business,      href: '/zakelijk',      icon: Briefcase },
     { label: t.nav.annual,        href: '/jaaroverzicht', icon: BarChart2 },
+    { label: 'Importeer',         href: '/import',        icon: Upload },
     { label: t.nav.prices,        href: '/prijsradar',    icon: Search },
     { label: t.nav.location,      href: '/locatie',       icon: MapPin },
     { label: t.nav.settings,      href: '/instellingen',  icon: Settings },
