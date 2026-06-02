@@ -4,9 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # NEXT_PUBLIC_ vars zijn PUBLIEK by design en mogen in de bundle staan
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# Next.js API routes worden automatisch als serverless functions gedeployd
-# door @netlify/plugin-nextjs — geen aparte [functions] sectie nodig
