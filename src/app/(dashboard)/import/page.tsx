@@ -94,66 +94,48 @@ export default function ImportPage() {
     }
   }
 
-  /* ─── PDF/Word verwerken via Claude API ─────────────── */
+  /* ─── PDF/Word verwerken via server-side API route ──── */
   async function verwerkDocument(bestand: File) {
     setNaam(bestand.name); setError(''); setResult(null); setPreview([]);
-    const apiKey = localStorage.getItem('claude_api_key');
-    if (!apiKey) {
-      setError('Stel eerst een Claude API key in via Instellingen → Claude AI.');
-      return;
-    }
     try {
-      let tekst = '';
+      let body: Record<string, unknown>;
+
       if (bestand.name.endsWith('.docx')) {
-        const mammoth  = await import('mammoth');
-        const buffer   = await bestand.arrayBuffer();
-        const result   = await mammoth.extractRawText({ arrayBuffer: buffer });
-        tekst          = result.value;
+        /* Word: extraheer tekst client-side, stuur tekst naar server */
+        const mammoth = await import('mammoth');
+        const buffer  = await bestand.arrayBuffer();
+        const result  = await mammoth.extractRawText({ arrayBuffer: buffer });
+        body = { tekst: result.value };
       } else if (bestand.name.endsWith('.pdf')) {
-        // Voor PDF: stuur als base64 naar Claude API
+        /* PDF: stuur base64 naar server-side analyze-document route */
         const buffer = await bestand.arrayBuffer();
         const b64    = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-        const resp   = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true',
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-5',
-            max_tokens: 4096,
-            messages: [{
-              role: 'user',
-              content: [{
-                type: 'document',
-                source: { type: 'base64', media_type: 'application/pdf', data: b64 },
-              }, {
-                type: 'text',
-                text: 'Extraheer alle financiële transacties uit dit document. Geef terug als JSON array: [{"datum":"YYYY-MM-DD","omschrijving":"...","bedrag":0.00,"categorie":"..."}]. Bedrag positief = inkomst, negatief = uitgave. Geef ALLEEN de JSON, geen uitleg.',
-              }],
-            }],
-          }),
-        });
-        const data = await resp.json();
-        tekst      = data.content?.[0]?.text ?? '';
-      }
-
-      // Parse JSON uit Claude response
-      const jsonMatch = tekst.match(/\[[\s\S]*\]/);
-      if (!jsonMatch) {
-        setError('Kon geen transacties vinden in het document.');
+        body = { base64: b64, mediaType: 'application/pdf' };
+      } else {
+        setError('Niet ondersteund bestandstype voor AI analyse.');
         return;
       }
-      const parsed = JSON.parse(jsonMatch[0]) as Array<{datum:string; omschrijving:string; bedrag:number; categorie?:string}>;
+
+      const resp = await fetch('/api/analyze-document', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(body),
+      });
+      const data = await resp.json();
+
+      if (data.error) {
+        setError('Claude kon het document niet lezen: ' + data.error);
+        return;
+      }
+
+      const parsed = (data.transacties ?? []) as Array<{datum:string; omschrijving:string; bedrag:number; categorie?:string}>;
       setPreview(parsed.slice(0, 100).map(p => ({
-        datum:       p.datum,
+        datum:        p.datum,
         omschrijving: p.omschrijving,
-        tegenpartij: '',
-        bedrag:      p.bedrag,
-        categorie:   p.categorie || detecteerCategorie(p.omschrijving, ''),
-        selected:    true,
+        tegenpartij:  '',
+        bedrag:       p.bedrag,
+        categorie:    p.categorie || detecteerCategorie(p.omschrijving, ''),
+        selected:     true,
       })));
     } catch (e) {
       setError('Fout bij verwerken: ' + (e instanceof Error ? e.message : 'Onbekende fout'));

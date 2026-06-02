@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { callClaude, AI_TOOLS } from '@/lib/ai/claude';
+import { AI_TOOLS } from '@/lib/ai/claude';
 import { buildSystemPrompt, AI_PERSONALITIES } from '@/lib/ai/personalities';
 import { fmt } from '@/lib/utils';
-import { Bot, X, Send, Sparkles, ChevronDown } from 'lucide-react';
+import { Bot, X, Send, ChevronDown } from 'lucide-react';
 import type { AIPersonality } from '@/types';
 
 interface ChatMsg  { role:'user'|'ai'; text:string; time:string; }
@@ -95,32 +95,50 @@ export default function AIChatbot({ naam = '' }: { naam?: string }) {
     return { error:'Onbekende tool: '+name };
   }
 
-  async function processAI(apiMsgs:ApiMsg[]) {
-    const k=localStorage.getItem('claude_api_key');
-    if (!k) { addMsg('ai','Stel eerst een Claude API key in via ⚙️ Instellingen → Claude AI.'); return; }
-    const ctx={ totaalSaldo:0, inkomsten:0, uitgaven:0, schulden:0, netto:0 };
-    const sys=buildSystemPrompt(naam,persoonlijkheid,ctx);
-    let resp=await callClaude(k,sys,apiMsgs as Parameters<typeof callClaude>[2],AI_TOOLS);
-    let msgs2=[...apiMsgs];
+  /* ── Server-side API call (ANTHROPIC_API_KEY staat in Netlify env) ── */
+  async function callServer(messages: ApiMsg[], system: string): Promise<Record<string,unknown>> {
+    const resp = await fetch('/api/ai-chat', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ messages, tools: AI_TOOLS, system }),
+    });
+    if (!resp.ok) throw new Error(`AI API fout: ${resp.status}`);
+    return resp.json();
+  }
 
-    while(resp?.stop_reason==='tool_use') {
-      const tu=resp.content?.find((c:Record<string,unknown>)=>c.type==='tool_use') as Record<string,unknown>;
+  async function processAI(apiMsgs:ApiMsg[]) {
+    const ctx = { totaalSaldo:0, inkomsten:0, uitgaven:0, schulden:0, netto:0 };
+    const sys = buildSystemPrompt(naam, persoonlijkheid, ctx);
+
+    let resp = await callServer(apiMsgs, sys);
+    let msgs2 = [...apiMsgs];
+
+    /* Tool-use loop */
+    while(resp?.stop_reason === 'tool_use') {
+      const tu = (resp.content as Record<string,unknown>[])
+        ?.find((c) => c.type === 'tool_use') as Record<string,unknown>;
       if (!tu) break;
-      const result=await runTool(tu.name as string, tu.input as Record<string,unknown>);
-      msgs2=[...msgs2,{role:'assistant',content:resp.content},{role:'user',content:[{type:'tool_result',tool_use_id:tu.id,content:JSON.stringify(result)}]}];
+      const result = await runTool(tu.name as string, tu.input as Record<string,unknown>);
+      msgs2 = [
+        ...msgs2,
+        { role:'assistant', content: resp.content },
+        { role:'user', content: [{ type:'tool_result', tool_use_id: tu.id, content: JSON.stringify(result) }] },
+      ];
       setHistory(msgs2);
-      resp=await callClaude(k,sys,msgs2 as Parameters<typeof callClaude>[2],AI_TOOLS);
+      resp = await callServer(msgs2, sys);
     }
 
-    const text=resp?.content?.find((c:Record<string,unknown>)=>c.type==='text')?.text as string||'Geen antwoord ontvangen.';
-    setHistory(h=>[...h,{role:'assistant',content:text}]);
-    addMsg('ai',text);
+    const textItem = (resp.content as Record<string,unknown>[])?.find(c => c.type === 'text');
+    const text = (textItem?.text as string) || 'Geen antwoord ontvangen.';
+    setHistory(h => [...h, { role:'assistant', content: text }]);
+    addMsg('ai', text);
 
+    /* Sla gesprek op in Supabase */
     const { data: { user } } = await sb.auth.getUser();
     if (user) {
       await sb.from('ai_gesprekken').insert([
-        {user_id:user.id, rol:'user', bericht:apiMsgs[apiMsgs.length-1].content as string, pagina:window.location.pathname},
-        {user_id:user.id, rol:'assistant', bericht:text, pagina:window.location.pathname},
+        { user_id:user.id, rol:'user',      bericht: apiMsgs[apiMsgs.length-1].content as string, pagina: window.location.pathname },
+        { user_id:user.id, rol:'assistant', bericht: text, pagina: window.location.pathname },
       ]);
     }
   }

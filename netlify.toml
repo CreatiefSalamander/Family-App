@@ -7,3 +7,6 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Next.js API routes worden automatisch als serverless functions gedeployd
+# door @netlify/plugin-nextjs — geen aparte [functions] sectie nodig

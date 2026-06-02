@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import TotalBalanceBox from '@/components/ui/TotalBalanceBox';
 import BankCard from '@/components/ui/BankCard';
+import MerchantLogo from '@/components/finance/MerchantLogo';
 import type { Transactie, Rekening, Budget, Schuld, Doel } from '@/types';
 
 /* ─── Helpers ─────────────────────────────────────────── */
@@ -159,9 +160,7 @@ export default function HomePage() {
           ) : (
             tx.slice(0, 8).map(t => (
               <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: '1px solid #F3F4F6' }}>
-                <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#F3F4F6', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>
-                  {CAT_ICON[t.category] || '📄'}
-                </div>
+                <MerchantLogo naam={t.tegenpartij || t.description} size={38} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1F36', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {t.description}
