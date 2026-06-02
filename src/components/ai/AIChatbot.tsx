@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { AI_TOOLS } from '@/lib/ai/claude';
 import { buildSystemPrompt, AI_PERSONALITIES } from '@/lib/ai/personalities';
@@ -14,8 +15,35 @@ type ApiMsg = { role:string; content:unknown };
 const SUGGESTIONS = [
   '💰 Hoeveel gaf ik uit deze maand?',
   '📊 Geef me een financieel overzicht',
-  '➕ Voeg €50 boodschappen toe',
-  '🎯 Hoe sta ik met mijn doelen?',
+  '✈️ Zoek vlucht naar Yerevan',
+  '🌤️ Wat is het weer in Amsterdam?',
+  '🛒 Zoek goedkoopste olijfolie prijs',
+  '₿ Hoe staat mijn crypto portfolio?',
+  '📊 Ga naar schulden pagina',
+];
+
+/* Extra tools voor navigatie en nieuwe API's */
+const EXTRA_TOOLS = [
+  {
+    name:'navigate_to', description:'Navigeer naar een pagina in de app',
+    input_schema:{ type:'object', properties:{ pagina:{ type:'string', enum:['home','transacties','rekeningen','begroting','schulden','doelen','zakelijk','jaaroverzicht','import','crypto','reizen','prijsradar','locatie','instellingen'] }, reden:{ type:'string' } }, required:['pagina'] },
+  },
+  {
+    name:'zoek_product', description:'Zoek de beste prijs voor een product via Google Shopping',
+    input_schema:{ type:'object', properties:{ product:{ type:'string' } }, required:['product'] },
+  },
+  {
+    name:'get_weer', description:'Haal het weer op voor een stad',
+    input_schema:{ type:'object', properties:{ stad:{ type:'string' } }, required:['stad'] },
+  },
+  {
+    name:'zoek_vlucht', description:'Zoek vluchten van A naar B en geef links',
+    input_schema:{ type:'object', properties:{ van:{ type:'string' }, naar:{ type:'string' }, datum:{ type:'string' } }, required:['van','naar'] },
+  },
+  {
+    name:'get_crypto', description:'Haal mijn Bitvavo crypto portfolio op',
+    input_schema:{ type:'object', properties:{} },
+  },
 ];
 
 export default function AIChatbot({ naam = '' }: { naam?: string }) {
@@ -29,6 +57,7 @@ export default function AIChatbot({ naam = '' }: { naam?: string }) {
   const endRef    = useRef<HTMLDivElement>(null);
   const inputRef  = useRef<HTMLTextAreaElement>(null);
   const sb        = createClient();
+  const router    = useRouter();
   const personality = AI_PERSONALITIES[persoonlijkheid];
 
   /* scroll naar beneden */
@@ -92,15 +121,44 @@ export default function AIChatbot({ naam = '' }: { naam?: string }) {
       mTx.filter((t:Record<string,unknown>)=>t.type==='expense').forEach((t:Record<string,unknown>)=>{ const cat=t.category as string; byCat[cat]=(byCat[cat]||0)+(t.amount as number); });
       return { maand:n.toLocaleString('nl-NL',{month:'long',year:'numeric'}), inkomsten:fmt(inc), uitgaven:fmt(exp), netto:fmt(inc-exp), per_categorie:byCat, aantal:mTx.length };
     }
+    /* ── Nieuwe tools ─────────────────────────── */
+    if (name==='navigate_to') {
+      const pagina = input.pagina as string;
+      setTimeout(()=>{ router.push('/'+pagina); setOpen(false); }, 800);
+      return { success:true, actie:`Navigeren naar /${pagina}` };
+    }
+    if (name==='zoek_product') {
+      const resp = await fetch('/api/zoek-prijs', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ product: input.product }) });
+      const data = await resp.json();
+      return data.error ? { error:data.error } : { resultaten: data.resultaten?.slice(0,3) };
+    }
+    if (name==='get_weer') {
+      const resp = await fetch('/api/weer', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ stad: input.stad }) });
+      const data = await resp.json();
+      return data.error ? { error:data.error } : { stad:data.stad, temp:data.temp, beschrijving:data.beschrijving };
+    }
+    if (name==='zoek_vlucht') {
+      const { van, naar, datum } = input as { van:string; naar:string; datum?:string };
+      const d = datum ?? new Date(Date.now()+7*864e5).toISOString().split('T')[0];
+      const googleUrl = `https://www.google.com/flights?hl=nl#flt=${encodeURIComponent(van)}.${encodeURIComponent(naar)}.${d};c:EUR;e:1;sd:1;t:f`;
+      const kiwiUrl   = `https://www.kiwi.com/nl/search/results/${encodeURIComponent(van)}/${encodeURIComponent(naar)}/${d}/no-return`;
+      return { google_flights:googleUrl, kiwi:kiwiUrl, boodschap:`Vluchten van ${van} naar ${naar} op ${d}` };
+    }
+    if (name==='get_crypto') {
+      const resp = await fetch('/api/bitvavo');
+      const data = await resp.json();
+      return data.error ? { error:data.error } : { totaal:data.totaal, top3:data.coins?.slice(0,3) };
+    }
     return { error:'Onbekende tool: '+name };
   }
 
   /* ── Server-side API call (ANTHROPIC_API_KEY staat in Netlify env) ── */
   async function callServer(messages: ApiMsg[], system: string): Promise<Record<string,unknown>> {
+    const allTools = [...AI_TOOLS, ...EXTRA_TOOLS];
     const resp = await fetch('/api/ai-chat', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ messages, tools: AI_TOOLS, system }),
+      body:    JSON.stringify({ messages, tools: allTools, system }),
     });
     if (!resp.ok) throw new Error(`AI API fout: ${resp.status}`);
     return resp.json();

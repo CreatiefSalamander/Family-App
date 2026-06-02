@@ -117,6 +117,41 @@ export default function HomePage() {
         {/* TotalBalanceBox — exact Horizon stijl met donut chart */}
         <TotalBalanceBox rekeningen={rek} totaalSaldo={saldo} loading={loading} />
 
+        {/* Financiële gezondheidscore */}
+        {!loading && (() => {
+          const budgetScore = bud.length > 0
+            ? Math.round((budMet.filter(b => b.werkelijk <= b.monthly_limit).length / bud.length) * 30)
+            : 15;
+          const spaarpct   = inc > 0 ? Math.min(25, Math.round((netto / inc) * 25)) : 0;
+          const nettoScore = netto > 0 ? 20 : 0;
+          const schuldScore= sch.length > 0
+            ? Math.round(Math.min(25, (sch.reduce((s,d)=>s+d.afgelost,0)/Math.max(1,sch.reduce((s,d)=>s+d.oorspronkelijk,0)))*25))
+            : 25;
+          const score = Math.max(0, Math.min(100, budgetScore + spaarpct + nettoScore + schuldScore));
+          const [kleur, label] = score >= 71 ? ['#22C55E','Goed'] : score >= 41 ? ['#F59E0B','Matig'] : ['#EF4444','Kritiek'];
+          const dashArray = 2 * Math.PI * 28;
+          return (
+            <div className="card" style={{ padding:20, marginBottom:24, display:'flex', alignItems:'center', gap:20 }}>
+              <svg width="72" height="72" viewBox="0 0 72 72" style={{ flexShrink:0 }}>
+                <circle cx="36" cy="36" r="28" fill="none" stroke="#F3F4F6" strokeWidth="8"/>
+                <circle cx="36" cy="36" r="28" fill="none" stroke={kleur} strokeWidth="8"
+                  strokeDasharray={`${dashArray}`}
+                  strokeDashoffset={`${dashArray*(1-score/100)}`}
+                  strokeLinecap="round" transform="rotate(-90 36 36)"
+                  style={{ transition:'stroke-dashoffset 1s ease' }}/>
+                <text x="36" y="40" textAnchor="middle" fill={kleur} fontSize="15" fontWeight="700">{score}</text>
+              </svg>
+              <div>
+                <p style={{ fontSize:11, color:'#6B7280', fontWeight:700, textTransform:'uppercase', letterSpacing:'.07em' }}>Financiële gezondheid</p>
+                <p style={{ fontSize:18, fontWeight:700, color:kleur, marginTop:2 }}>{label}</p>
+                <p style={{ fontSize:12, color:'#9CA3AF', marginTop:2 }}>
+                  Budget {budgetScore}/30 · Sparen {spaarpct}/25 · Schulden {schuldScore}/25 · Netto {nettoScore}/20
+                </p>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* 4 KPI Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 16, marginBottom: 24 }}>
           {kpis.map(({ label, value, icon: Icon, color, border, bg }) => (

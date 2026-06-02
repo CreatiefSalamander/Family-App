@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useLang } from '@/lib/lang-context';
-import { Search, Plus, Upload } from 'lucide-react';
+import { Search, Plus, Upload, Camera } from 'lucide-react';
 import type { Transactie } from '@/types';
+import BonScanner from '@/components/finance/BonScanner';
 
 const fmtEuro = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
 const fmtDate = (d: string) => new Date(d).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -24,6 +25,7 @@ export default function TransactiesPage() {
   const [typ, setTyp]       = useState('all');
   const [cat, setCat]       = useState('');
   const [pg, setPg]         = useState(1);
+  const [bonOpen, setBonOpen] = useState(false);
   const [show, setShow]     = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm]     = useState({ description:'', amount:'', type:'expense', category:'Overig', date: new Date().toISOString().split('T')[0] });
@@ -78,6 +80,7 @@ export default function TransactiesPage() {
           </div>
           <div style={{ display:'flex', gap:10 }}>
             <button className="btn-ghost" style={{ fontSize:13 }}><Upload size={15}/> {t.transactions.import}</button>
+            <button className="btn-ghost" style={{ fontSize:13 }} onClick={()=>setBonOpen(true)}><Camera size={15}/> 📸 Bon</button>
             <button className="btn-primary" style={{ fontSize:13 }} onClick={() => setShow(true)}><Plus size={15}/> {t.transactions.add}</button>
           </div>
         </div>
@@ -198,6 +201,24 @@ export default function TransactiesPage() {
       <button className="btn-primary" onClick={()=>setShow(true)} style={{ position:'fixed', bottom:88, right:24, width:52, height:52, borderRadius:'50%', padding:0, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 16px rgba(1,121,254,.4)', zIndex:40 }}>
         <Plus size={22}/>
       </button>
+
+      {/* Bon Scanner */}
+      {bonOpen && (
+        <BonScanner
+          onSluiten={() => setBonOpen(false)}
+          onToevoegen={async (bon) => {
+            const { data: { user } } = await sb.auth.getUser();
+            if (!user) return;
+            const { data } = await sb.from('transactions').insert({
+              user_id: user.id, amount: bon.bedrag, type:'expense',
+              description: bon.winkel, category: bon.categorie,
+              date: bon.datum, source:'Bon scanner', status:'OK',
+              is_zakelijk:false, type_soort:'Uitgave',
+            }).select().single();
+            if (data) setTx(prev => [data as unknown as Transactie, ...prev]);
+          }}
+        />
+      )}
     </div>
   );
 }

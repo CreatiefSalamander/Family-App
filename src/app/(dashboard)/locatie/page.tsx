@@ -1,110 +1,274 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useLang } from '@/lib/lang-context';
-import { MapPin, Navigation, Store, Coffee, Fuel, Building2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { MapPin, Navigation, Store, Coffee, Fuel, Building2, Heart, RefreshCw, Loader2, ExternalLink, Search } from 'lucide-react';
 
-interface Place { naam: string; type: string; afstand: string; icoon: typeof Store; kleur: string; }
-
-const MOCK_PLACES: Place[] = [
-  { naam:'Albert Heijn Osdorp', type:'Supermarkt', afstand:'0.4 km', icoon:Store, kleur:'#22C55E' },
-  { naam:'ING Bank',            type:'Bank',       afstand:'0.7 km', icoon:Building2, kleur:'#F59E0B' },
-  { naam:'Shell Tankstation',   type:'Benzine',    afstand:'1.2 km', icoon:Fuel, kleur:'#EF4444' },
-  { naam:'Starbucks',           type:'Koffie',     afstand:'1.5 km', icoon:Coffee, kleur:'#92400E' },
-  { naam:'Lidl',                type:'Supermarkt', afstand:'1.8 km', icoon:Store, kleur:'#0179FE' },
+const CATEGORIEEN = [
+  { key:'supermarkt',  label:'🛒 Supermarkten', icon:Store },
+  { key:'tankstation', label:'⛽ Benzine',       icon:Fuel },
+  { key:'restaurant',  label:'🍽️ Restaurants',   icon:Coffee },
+  { key:'apotheek',    label:'💊 Apotheek',       icon:Heart },
+  { key:'bank',        label:'🏦 Bank/ATM',       icon:Building2 },
 ];
 
+const VLAGGEN: Record<string, string> = {
+  USD:'🇺🇸', GBP:'🇬🇧', TRY:'🇹🇷', AMD:'🇦🇲', AED:'🇦🇪', JPY:'🇯🇵', CHF:'🇨🇭', SEK:'🇸🇪', PLN:'🇵🇱', HUF:'🇭🇺',
+};
+
+interface Place { naam:string; adres:string; rating:number|null; open:boolean|null; lat:number; lng:number; }
+interface Koers  { [code:string]: number }
+interface WeerData { stad:string; temp:number; feelsLike:number; beschrijving:string; icoon:string; luchtvochtigheid:number; windsnelheid:number; forecast:{tijd:string;temp:number;beschrijving:string;icoon:string}[] }
+
 export default function LocatiePage() {
-  const { t } = useLang();
-  const [status, setStatus] = useState<'idle'|'loading'|'granted'|'denied'>('idle');
-  const [coords, setCoords] = useState<{lat:number;lng:number}|null>(null);
+  const [coords,    setCoords]   = useState<{lat:number;lng:number}|null>(null);
+  const [geoStatus, setGeoStatus]= useState<'idle'|'loading'|'ok'|'denied'>('idle');
+  const [actieve,   setActieve]  = useState('supermarkt');
+  const [plaatsen,  setPlaatsen] = useState<Place[]>([]);
+  const [plaatsenLoad, setPlaatsenLoad] = useState(false);
+  const [weer,      setWeer]     = useState<WeerData|null>(null);
+  const [weerLoad,  setWeerLoad] = useState(false);
+  const [koersen,   setKoersen]  = useState<Koers>({});
+  const [koersenLoad,setKoersenLoad]=useState(false);
+  const [weerStad,  setWeerStad] = useState('');
+  const [vlucht,    setVlucht]   = useState('');
+  const [vluchtData,setVluchtData]=useState<{vluchtnummer:string;status:string;maatschappij:string;vertrek:{luchthaven:string;gepland:string};aankomst:{luchthaven:string;gepland:string};vertraging:number}|null>(null);
+  const [vluchtLoad,setVluchtLoad]=useState(false);
+  const [vluchtErr, setVluchtErr]= useState('');
+
+  const haalPlaatsen = useCallback(async (lat:number, lng:number, type:string) => {
+    setPlaatsenLoad(true);
+    const resp = await fetch('/api/google-places', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ lat, lng, type, radius:2000 }) });
+    const data = await resp.json();
+    setPlaatsen(data.error ? [] : (data.resultaten??[]));
+    setPlaatsenLoad(false);
+  }, []);
+
+  const haalWeer = useCallback(async (lat:number, lng:number) => {
+    setWeerLoad(true);
+    const resp = await fetch('/api/weer', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ lat, lng }) });
+    const data = await resp.json();
+    if (!data.error) setWeer(data);
+    setWeerLoad(false);
+  }, []);
+
+  const haalKoersen = useCallback(async () => {
+    setKoersenLoad(true);
+    const resp = await fetch('/api/wisselkoers', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ van:'EUR' }) });
+    const data = await resp.json();
+    if (!data.error) setKoersen(data.koersen??{});
+    setKoersenLoad(false);
+  }, []);
 
   function requestLocation() {
-    setStatus('loading');
+    setGeoStatus('loading');
     navigator.geolocation?.getCurrentPosition(
-      pos => { setCoords({ lat:pos.coords.latitude, lng:pos.coords.longitude }); setStatus('granted'); },
-      ()   => setStatus('denied'),
+      pos => {
+        const { latitude:lat, longitude:lng } = pos.coords;
+        setCoords({ lat, lng }); setGeoStatus('ok');
+        haalPlaatsen(lat, lng, actieve);
+        haalWeer(lat, lng);
+      },
+      () => setGeoStatus('denied'),
     );
+  }
+
+  useEffect(() => { haalKoersen(); const t = setInterval(haalKoersen, 5*60*1000); return () => clearInterval(t); }, [haalKoersen]);
+
+  useEffect(() => {
+    if (coords) haalPlaatsen(coords.lat, coords.lng, actieve);
+  }, [actieve, coords, haalPlaatsen]);
+
+  async function zoekVlucht() {
+    if (!vlucht.trim()) return;
+    setVluchtLoad(true); setVluchtErr(''); setVluchtData(null);
+    const resp = await fetch('/api/vlucht-tracker', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ vluchtnummer: vlucht }) });
+    const data = await resp.json();
+    if (data.error) setVluchtErr(data.error); else setVluchtData(data);
+    setVluchtLoad(false);
+  }
+
+  async function zoekWeerStad() {
+    if (!weerStad.trim()) return;
+    setWeerLoad(true);
+    const resp = await fetch('/api/weer', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ stad:weerStad }) });
+    const data = await resp.json();
+    if (!data.error) setWeer(data);
+    setWeerLoad(false);
+  }
+
+  function googleMapsUrl(lat:number, lng:number, naam:string) {
+    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${encodeURIComponent(naam)}`;
   }
 
   return (
     <div className="home-content no-scrollbar">
       <div className="header-box">
-        <h1 className="header-box-title">{t.location.title}</h1>
-        <p className="header-box-subtext">{t.location.subtitle}</p>
+        <h1 className="header-box-title">📍 Locatie</h1>
+        <p className="header-box-subtext">Winkels in de buurt, wisselkoersen en vluchten</p>
       </div>
 
-      {status === 'idle' && (
-        <div className="card" style={{ padding:48, textAlign:'center', marginBottom:24 }}>
-          <div style={{ width:80, height:80, borderRadius:'50%', background:'#EFF6FF', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px' }}>
-            <MapPin size={36} color="#0179FE"/>
+      {/* Sectie 1: Weer */}
+      <div className="card" style={{ padding:24, marginBottom:20 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+          <h3 style={{ fontSize:14, fontWeight:700, color:'#1A1F36' }}>🌤️ Weer</h3>
+          <div style={{ display:'flex', gap:8 }}>
+            <input className="input-field" placeholder="Stad zoeken..." value={weerStad} onChange={e=>setWeerStad(e.target.value)} onKeyDown={e=>e.key==='Enter'&&zoekWeerStad()} style={{ width:180 }}/>
+            <button className="btn-ghost" style={{ fontSize:12 }} onClick={zoekWeerStad} disabled={weerLoad}><Search size={14}/></button>
           </div>
-          <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:20, fontWeight:700, color:'#1A1F36', marginBottom:8 }}>
-            Locatietoegang nodig
-          </h3>
-          <p style={{ fontSize:14, color:'#6B7280', marginBottom:24 }}>
-            Geef toegang tot je locatie om winkels en diensten in de buurt te zien.
-          </p>
-          <button className="btn-primary" style={{ width:'auto' }} onClick={requestLocation}>
-            <Navigation size={16}/> {t.location.allow}
+        </div>
+        {weerLoad ? (
+          <div style={{ display:'flex', alignItems:'center', gap:8, padding:'12px 0', color:'#6B7280' }}><Loader2 size={18} style={{ animation:'spin 1s linear infinite', color:'#0179FE' }}/><p style={{ fontSize:13 }}>Weer laden...</p></div>
+        ) : weer ? (
+          <>
+            <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`https://openweathermap.org/img/wn/${weer.icoon}@2x.png`} alt={weer.beschrijving} style={{ width:72, height:72 }}/>
+              <div>
+                <p style={{ fontSize:32, fontWeight:700, color:'#1A1F36', lineHeight:1 }}>{weer.temp}°C</p>
+                <p style={{ fontSize:13, color:'#6B7280', textTransform:'capitalize', marginTop:2 }}>{weer.beschrijving} · {weer.stad}</p>
+                <p style={{ fontSize:12, color:'#9CA3AF', marginTop:2 }}>Voelt als {weer.feelsLike}°C · 💧 {weer.luchtvochtigheid}% · 🌬️ {weer.windsnelheid} m/s</p>
+              </div>
+            </div>
+            {weer.forecast?.length > 0 && (
+              <div style={{ display:'flex', gap:10, overflowX:'auto', marginTop:16, paddingBottom:4 }}>
+                {weer.forecast.map((f,i)=>(
+                  <div key={i} style={{ flexShrink:0, textAlign:'center', padding:'8px 12px', background:'#F9FAFB', borderRadius:10, minWidth:72 }}>
+                    <p style={{ fontSize:10, color:'#9CA3AF' }}>{new Date(f.tijd).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`https://openweathermap.org/img/wn/${f.icoon}.png`} alt="" style={{ width:32, height:32 }}/>
+                    <p style={{ fontSize:13, fontWeight:700, color:'#1A1F36' }}>{f.temp}°</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <div style={{ display:'flex', gap:10 }}>
+            {geoStatus==='ok' && coords
+              ? <button className="btn-ghost" style={{ fontSize:13 }} onClick={()=>haalWeer(coords.lat,coords.lng)}><RefreshCw size={14}/> Huidige locatie</button>
+              : <p style={{ fontSize:13, color:'#9CA3AF' }}>Sta locatie toe of zoek op stad</p>
+            }
+          </div>
+        )}
+      </div>
+
+      {/* Sectie 2: Winkels in de buurt */}
+      <div className="card" style={{ padding:24, marginBottom:20 }}>
+        <h3 style={{ fontSize:14, fontWeight:700, color:'#1A1F36', marginBottom:12 }}>🏪 In de buurt</h3>
+
+        {geoStatus === 'idle' && (
+          <div style={{ textAlign:'center', padding:'24px 0' }}>
+            <MapPin size={40} color="#0179FE" style={{ margin:'0 auto 12px' }}/>
+            <p style={{ fontSize:14, fontWeight:600, color:'#4B5563', marginBottom:4 }}>Locatietoegang nodig</p>
+            <button className="btn-primary" style={{ width:'auto', margin:'8px auto 0' }} onClick={requestLocation}>
+              <Navigation size={16}/> Locatie toestaan
+            </button>
+          </div>
+        )}
+
+        {geoStatus === 'loading' && (
+          <div style={{ display:'flex', alignItems:'center', gap:8, padding:'16px 0', color:'#6B7280' }}>
+            <Loader2 size={18} style={{ animation:'spin 1s linear infinite', color:'#0179FE' }}/><p style={{ fontSize:13 }}>Locatie ophalen...</p>
+          </div>
+        )}
+
+        {geoStatus === 'denied' && (
+          <div style={{ background:'#FEF2F2', borderRadius:8, padding:'12px 16px' }}>
+            <p style={{ fontSize:13, color:'#DC2626' }}>Locatietoegang geweigerd. Geef toegang via browserinstellingen.</p>
+          </div>
+        )}
+
+        {geoStatus === 'ok' && (
+          <>
+            <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:16 }}>
+              {CATEGORIEEN.map(c => (
+                <button key={c.key} onClick={()=>setActieve(c.key)}
+                  style={{ padding:'7px 14px', borderRadius:20, border:'none', cursor:'pointer', fontSize:12, fontWeight:600, fontFamily:'inherit', transition:'all .15s', background:actieve===c.key?'linear-gradient(90deg,#0179FE,#4893FF)':'#F3F4F6', color:actieve===c.key?'#fff':'#4B5563' }}>
+                  {c.label}
+                </button>
+              ))}
+            </div>
+
+            {plaatsenLoad ? (
+              <div style={{ display:'flex', alignItems:'center', gap:8, padding:'12px 0', color:'#6B7280' }}>
+                <Loader2 size={16} style={{ animation:'spin 1s linear infinite', color:'#0179FE' }}/><p style={{ fontSize:13 }}>Zoeken...</p>
+              </div>
+            ) : plaatsen.length===0 ? (
+              <p style={{ fontSize:13, color:'#9CA3AF', textAlign:'center', padding:'16px 0' }}>Geen resultaten gevonden</p>
+            ) : (
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                {plaatsen.map((p,i)=>(
+                  <div key={i} style={{ display:'flex', alignItems:'center', gap:14, padding:'12px', background:'#F9FAFB', borderRadius:10 }}>
+                    <div style={{ width:40, height:40, borderRadius:10, background:'#EFF6FF', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <MapPin size={18} color="#0179FE"/>
+                    </div>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <p style={{ fontSize:13, fontWeight:600, color:'#1A1F36', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.naam}</p>
+                      <p style={{ fontSize:11, color:'#9CA3AF' }}>{p.adres}</p>
+                      <div style={{ display:'flex', gap:10, marginTop:2 }}>
+                        {p.rating && <span style={{ fontSize:11, color:'#F59E0B' }}>⭐ {p.rating}</span>}
+                        {p.open!==null && <span style={{ fontSize:11, color:p.open?'#22C55E':'#EF4444', fontWeight:600 }}>{p.open?'Open':'Gesloten'}</span>}
+                      </div>
+                    </div>
+                    <a href={googleMapsUrl(p.lat, p.lng, p.naam)} target="_blank" rel="noopener noreferrer"
+                      style={{ display:'flex', alignItems:'center', gap:4, padding:'6px 12px', background:'white', border:'1px solid #E5E7EB', borderRadius:8, textDecoration:'none', color:'#0179FE', fontSize:12, fontWeight:600, flexShrink:0 }}>
+                      <Navigation size={12}/> Route
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Sectie 3: Wisselkoersen */}
+      <div className="card" style={{ padding:24, marginBottom:20 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+          <h3 style={{ fontSize:14, fontWeight:700, color:'#1A1F36' }}>💱 Wisselkoersen (EUR →)</h3>
+          <button className="btn-ghost" style={{ fontSize:12 }} onClick={haalKoersen} disabled={koersenLoad}>
+            <RefreshCw size={13} style={{ animation:koersenLoad?'spin 1s linear infinite':'none' }}/> Ververs
           </button>
         </div>
-      )}
-
-      {status === 'loading' && (
-        <div className="card" style={{ padding:48, textAlign:'center' }}>
-          <p style={{ fontSize:36, marginBottom:12 }}>📍</p>
-          <p style={{ color:'#6B7280' }}>Locatie ophalen...</p>
-        </div>
-      )}
-
-      {status === 'denied' && (
-        <div className="card" style={{ padding:24, background:'#FEF2F2', border:'none' }}>
-          <p style={{ fontWeight:600, color:'#DC2626' }}>Locatietoegang geweigerd</p>
-          <p style={{ fontSize:13, color:'#EF4444', marginTop:4 }}>Geef locatietoegang via je browserinstellingen.</p>
-        </div>
-      )}
-
-      {status === 'granted' && coords && (
-        <>
-          <div className="card" style={{ padding:16, marginBottom:20, display:'flex', alignItems:'center', gap:12 }}>
-            <div style={{ width:40, height:40, borderRadius:'50%', background:'#F0FDF4', display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <Navigation size={20} color="#22C55E"/>
-            </div>
-            <div>
-              <p style={{ fontSize:13, fontWeight:600, color:'#1A1F36' }}>Locatie gevonden</p>
-              <p style={{ fontSize:11, color:'#9CA3AF' }}>{coords.lat.toFixed(4)}, {coords.lng.toFixed(4)}</p>
-            </div>
-            <span className="badge badge-green" style={{ marginLeft:'auto' }}>Live</span>
-          </div>
-
-          {/* Map placeholder */}
-          <div className="card" style={{ height:280, marginBottom:24, overflow:'hidden', position:'relative' }}>
-            <iframe
-              src={`https://www.openstreetmap.org/export/embed.html?bbox=${coords.lng-0.01},${coords.lat-0.01},${coords.lng+0.01},${coords.lat+0.01}&layer=mapnik&marker=${coords.lat},${coords.lng}`}
-              style={{ width:'100%', height:'100%', border:'none' }}
-              title="Kaart"
-            />
-          </div>
-
-          {/* Dichtsbijzijnde plekken */}
-          <h3 style={{ fontSize:14, fontWeight:700, color:'#1A1F36', marginBottom:12 }}>{t.location.nearby}</h3>
-          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-            {MOCK_PLACES.map((p,i)=>(
-              <div key={i} className="card card-hover" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
-                <div style={{ width:40, height:40, borderRadius:10, background:p.kleur+'20', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                  <p.icoon size={20} color={p.kleur}/>
+        {koersenLoad && Object.keys(koersen).length===0 ? (
+          <p style={{ fontSize:13, color:'#9CA3AF' }}>Laden...</p>
+        ) : (
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))', gap:10 }}>
+            {Object.entries(koersen).map(([code, rate])=>(
+              <div key={code} style={{ background:'#F9FAFB', borderRadius:10, padding:'12px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <div>
+                  <p style={{ fontSize:12, color:'#6B7280' }}>{VLAGGEN[code]||'💱'} {code}</p>
+                  <p className="amount" style={{ fontSize:16, color:'#1A1F36' }}>{rate.toFixed(code==='JPY'?2:4)}</p>
                 </div>
-                <div style={{ flex:1 }}>
-                  <p style={{ fontSize:13, fontWeight:600, color:'#1A1F36' }}>{p.naam}</p>
-                  <p style={{ fontSize:11, color:'#9CA3AF' }}>{p.type}</p>
-                </div>
-                <span className="badge badge-gray">{p.afstand}</span>
               </div>
             ))}
           </div>
-        </>
-      )}
+        )}
+      </div>
+
+      {/* Sectie 4: Vlucht tracker */}
+      <div className="card" style={{ padding:24 }}>
+        <h3 style={{ fontSize:14, fontWeight:700, color:'#1A1F36', marginBottom:12 }}>✈️ Vlucht tracker</h3>
+        <div style={{ display:'flex', gap:10, marginBottom:12 }}>
+          <input className="input-field" placeholder="Vluchtnummer (bijv. KL1234)" value={vlucht} onChange={e=>setVlucht(e.target.value.toUpperCase())} onKeyDown={e=>e.key==='Enter'&&zoekVlucht()} style={{ flex:1 }}/>
+          <button className="btn-primary" style={{ fontSize:13 }} onClick={zoekVlucht} disabled={vluchtLoad}>
+            {vluchtLoad ? <Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/> : <Search size={15}/>}
+          </button>
+        </div>
+        {vluchtErr && <p style={{ fontSize:13, color:'#EF4444' }}>⚠️ {vluchtErr}</p>}
+        {vluchtData && (
+          <div style={{ background:'#F9FAFB', borderRadius:10, padding:14 }}>
+            <p style={{ fontSize:14, fontWeight:700, marginBottom:8 }}>{vluchtData.vluchtnummer} · {vluchtData.maatschappij} · <span style={{ color:vluchtData.status==='active'?'#0179FE':vluchtData.status==='landed'?'#22C55E':'#F59E0B' }}>{vluchtData.status}</span></p>
+            <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+              <div><p style={{ fontSize:15, fontWeight:700 }}>{vluchtData.vertrek.luchthaven}</p><p style={{ fontSize:12, color:'#6B7280' }}>{vluchtData.vertrek.gepland?new Date(vluchtData.vertrek.gepland).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}):''}</p></div>
+              <ExternalLink size={18} color="#0179FE" style={{ transform:'rotate(45deg)' }}/>
+              <div><p style={{ fontSize:15, fontWeight:700 }}>{vluchtData.aankomst.luchthaven}</p><p style={{ fontSize:12, color:'#6B7280' }}>{vluchtData.aankomst.gepland?new Date(vluchtData.aankomst.gepland).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}):''}</p></div>
+            </div>
+            {vluchtData.vertraging>0 && <p style={{ fontSize:12, color:'#F59E0B', marginTop:8, fontWeight:600 }}>⚠️ {vluchtData.vertraging} min vertraging</p>}
+          </div>
+        )}
+      </div>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 }
