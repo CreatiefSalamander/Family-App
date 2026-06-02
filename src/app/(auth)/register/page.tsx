@@ -134,7 +134,7 @@ export default function RegisterPage() {
           <div style={s.logoIcon}>
             <span style={{ color:'#fff', fontWeight:700, fontSize:18, fontFamily:"'IBM Plex Serif',serif" }}>€</span>
           </div>
-          <span style={s.logoText}>Family-App</span>
+          <span style={s.logoText}>Household</span>
         </div>
 
         <h1 style={s.heading}>Account aanmaken</h1>
@@ -250,7 +250,7 @@ export default function RegisterPage() {
         <div style={s.blob2} />
         <div style={s.rightContent}>
           <h2 style={s.rightH}>Jouw financiën,<br />veilig en privé</h2>
-          <p style={s.rightSub}>Family-App slaat alleen op wat nodig is</p>
+          <p style={s.rightSub}>Household slaat alleen op wat nodig is</p>
           {bullets.map((text, i) => (
             <div key={i} style={s.bullet}>
               <div style={s.bulletIcon}>

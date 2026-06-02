@@ -69,7 +69,7 @@ export default async function DashboardLayout({
             <Euro size={16} color="#fff" />
           </div>
           <span style={{ fontFamily:"'IBM Plex Serif',serif", fontWeight:700, color:'#fff', fontSize:17 }}>
-            Family-App
+            Household
           </span>
         </div>
         {/* Avatar rechts */}

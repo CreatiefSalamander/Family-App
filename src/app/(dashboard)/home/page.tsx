@@ -40,28 +40,35 @@ export default function HomePage() {
   const [bud,   setBud]  = useState<Budget[]>([]);
   const [sch,   setSch]  = useState<Schuld[]>([]);
   const [doel,  setDoel] = useState<Doel[]>([]);
-  const [naam,  setNaam] = useState('');
-  const [loading, setLoad] = useState(true);
+  const [naam,      setNaam]     = useState('');
+  const [vollnaam,  setVollnaam] = useState('');
+  const [email,     setEmail]    = useState('');
+  const [loading,   setLoad]     = useState(true);
   const sb = createClient();
 
   useEffect(() => {
     (async () => {
       const { data: { user } } = await sb.auth.getUser();
       if (!user) return;
+      setEmail(user.email ?? '');
       const [a, b, c, d, e, f] = await Promise.all([
         sb.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(100),
         sb.from('accounts').select('*').eq('user_id', user.id),
         sb.from('budgets').select('*').eq('user_id', user.id),
         sb.from('schulden').select('*').eq('user_id', user.id),
         sb.from('goals').select('*').eq('user_id', user.id),
-        sb.from('profielen').select('voornaam').eq('id', user.id).single(),
+        sb.from('profielen').select('voornaam, achternaam').eq('id', user.id).single(),
       ]);
       setTx(  (a.data || []) as unknown as Transactie[]);
       setRek( (b.data || []) as unknown as Rekening[]);
       setBud( (c.data || []) as unknown as Budget[]);
       setSch( (d.data || []) as unknown as Schuld[]);
       setDoel((e.data || []) as unknown as Doel[]);
-      if (f.data?.voornaam) setNaam(f.data.voornaam);
+      if (f.data?.voornaam) {
+        setNaam(f.data.voornaam);
+        const vn = [f.data.voornaam, f.data.achternaam].filter(Boolean).join(' ');
+        setVollnaam(vn);
+      }
       setLoad(false);
     })();
   }, []);
@@ -219,18 +226,18 @@ export default function HomePage() {
       {/* ══ Right sidebar — exact Horizon stijl ═══════════ */}
       <aside className="right-sidebar no-scrollbar">
 
-        {/* Profiel sectie — gradient-mesh banner + avatar */}
+        {/* Profiel sectie — gradient-mesh banner + avatar (zoals Horizon) */}
         <section style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
           <div className="profile-banner" />
           <div className="profile">
             <div className="profile-img">
               <span style={{ fontSize: 32, fontWeight: 700, color: '#0179FE', lineHeight: 1 }}>
-                {naam[0]?.toUpperCase() ?? 'A'}
+                {naam[0]?.toUpperCase() ?? '?'}
               </span>
             </div>
             <div className="profile-details">
-              <h1 className="profile-name">{naam}</h1>
-              <p className="profile-email">{/* email via layout */}</p>
+              <h1 className="profile-name">{vollnaam || naam}</h1>
+              <p className="profile-email">{email}</p>
             </div>
           </div>
         </section>

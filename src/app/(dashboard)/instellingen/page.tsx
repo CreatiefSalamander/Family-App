@@ -131,54 +131,89 @@ export default function InstellingenPage() {
             </div>
           )}
 
-          {/* TAAL TAB */}
+          {/* TAAL TAB — elegante compacte taal kiezer */}
           {tab==='taal' && (
             <div>
               <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:8 }}>{t.settings.language}</h3>
-              <p style={{ fontSize:13, color:'#6B7280', marginBottom:24 }}>{t.settings.choose_lang}</p>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:24 }}>
+              <p style={{ fontSize:13, color:'#6B7280', marginBottom:20 }}>{t.settings.choose_lang}</p>
+
+              {/* Compacte horizontale kiezer */}
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:24 }}>
                 {(Object.entries(LANG_LABELS) as [Lang, typeof LANG_LABELS.nl][]).map(([k, v])=>(
                   <button key={k} onClick={()=>setSelectedLang(k)} style={{
-                    display:'flex', alignItems:'center', gap:14, padding:18, borderRadius:12,
-                    border: selectedLang===k?'2px solid #0179FE':'2px solid #E5E7EB',
-                    background: selectedLang===k?'#EFF6FF':'white',
-                    cursor:'pointer', transition:'all .15s', textAlign:'left',
+                    display:'flex', alignItems:'center', gap:8, padding:'10px 16px', borderRadius:10,
+                    border: selectedLang===k?'2px solid #0179FE':'1.5px solid #E5E7EB',
+                    background: selectedLang===k?'linear-gradient(135deg,#EFF6FF,#DBEAFE)':'white',
+                    cursor:'pointer', transition:'all .15s',
+                    boxShadow: selectedLang===k?'0 2px 8px rgba(1,121,254,.15)':'none',
                   }}>
-                    <span style={{ fontSize:32 }}>{v.flag}</span>
-                    <div>
-                      <p style={{ fontSize:15, fontWeight:700, color: selectedLang===k?'#0179FE':'#1A1F36' }}>{v.label}</p>
-                      <p style={{ fontSize:12, color:'#9CA3AF' }}>{v.dir==='rtl'?'RTL — rechts naar links':'LTR — links naar rechts'}</p>
-                    </div>
-                    {selectedLang===k && <CheckCircle size={20} color="#0179FE" style={{ marginLeft:'auto' }}/>}
+                    <span style={{ fontSize:20 }}>{v.flag}</span>
+                    <span style={{ fontSize:13, fontWeight:selectedLang===k?700:500, color:selectedLang===k?'#0179FE':'#374151' }}>{v.label}</span>
+                    {selectedLang===k && <CheckCircle size={14} color="#0179FE"/>}
                   </button>
                 ))}
               </div>
+
+              {selectedLang==='ar' && (
+                <div style={{ background:'#FFFBEB', borderRadius:8, padding:'10px 14px', marginBottom:16, border:'1px solid #FDE68A' }}>
+                  <p style={{ fontSize:12, color:'#92400E' }}>✏️ Arabisch activeert RTL (rechts-naar-links) tekstrichting in de app.</p>
+                </div>
+              )}
+
               <button className="btn-primary" style={{ width:'auto' }} onClick={saveLang} disabled={saving}>
                 {saving ? t.common.loading : t.settings.save}
               </button>
             </div>
           )}
 
-          {/* AI TAB */}
+          {/* AI TAB — server-side AI, geen key nodig */}
           {tab==='ai' && (
             <div>
-              <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:8 }}>{t.settings.ai}</h3>
-              <p style={{ fontSize:13, color:'#6B7280', marginBottom:20 }}>{t.settings.api_help}</p>
-              <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-                <div>
-                  <label style={{ fontSize:13, fontWeight:600, color:'#374151', display:'block', marginBottom:6 }}>{t.settings.api_key}</label>
-                  <input className="input-field" type="password" value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder={t.settings.api_key_ph}/>
-                </div>
-                {apiKey && (
-                  <div style={{ padding:12, background:'#F0FDF4', borderRadius:8, border:'1px solid #86EFAC' }}>
-                    <p style={{ fontSize:12, color:'#16A34A', fontWeight:600 }}>✓ API key ingesteld</p>
-                    <p style={{ fontSize:11, color:'#22C55E', marginTop:2 }}>sk-ant-...{apiKey.slice(-4)}</p>
+              <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:8 }}>AI & Koppelingen</h3>
+              <p style={{ fontSize:13, color:'#6B7280', marginBottom:20 }}>
+                Household gebruikt meerdere AI en externe API koppelingen. Deze zijn server-side geconfigureerd en werken automatisch.
+              </p>
+
+              {/* API koppelingen overzicht */}
+              <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:24 }}>
+                {[
+                  { naam:'Claude AI (Anthropic)',    beschrijving:'AI chatbot, bon scanner, document analyse, maandrapport', icoon:'🤖', actief:true },
+                  { naam:'SerpAPI',                  beschrijving:'Prijsradar — Google Shopping resultaten', icoon:'🔍', actief:true },
+                  { naam:'Brandfetch',               beschrijving:'Winkellogi\'s bij transacties', icoon:'🏪', actief:true },
+                  { naam:'OpenWeatherMap',           beschrijving:'Weer widget op locatie pagina', icoon:'🌤️', actief:true },
+                  { naam:'AviationStack',            beschrijving:'Vlucht tracker (status & tijden)', icoon:'✈️', actief:true },
+                  { naam:'Bitvavo',                  beschrijving:'Crypto portfolio (read-only)', icoon:'₿', actief:true },
+                  { naam:'Exchange Rate API',        beschrijving:'Live wisselkoersen (geen key nodig)', icoon:'💱', actief:true },
+                  { naam:'Google Places',            beschrijving:'Winkels in de buurt', icoon:'📍', actief:true },
+                  { naam:'Supabase',                 beschrijving:'Database — al jouw persoonlijke data', icoon:'🗄️', actief:true },
+                ].map(api=>(
+                  <div key={api.naam} style={{ display:'flex', alignItems:'center', gap:14, padding:'12px 16px', background:'#F9FAFB', borderRadius:10, border:'1px solid #F3F4F6' }}>
+                    <span style={{ fontSize:20, flexShrink:0 }}>{api.icoon}</span>
+                    <div style={{ flex:1 }}>
+                      <p style={{ fontSize:13, fontWeight:600, color:'#1A1F36' }}>{api.naam}</p>
+                      <p style={{ fontSize:11, color:'#9CA3AF' }}>{api.beschrijving}</p>
+                    </div>
+                    <span style={{ display:'flex', alignItems:'center', gap:4, fontSize:11, fontWeight:600, color:'#22C55E' }}>
+                      <span style={{ width:6, height:6, borderRadius:'50%', background:'#22C55E', display:'inline-block' }}/>
+                      Actief
+                    </span>
                   </div>
-                )}
-                <button className="btn-primary" style={{ width:'auto', alignSelf:'flex-start' }} onClick={saveApiKey}>
-                  {t.settings.save}
-                </button>
+                ))}
               </div>
+
+              {/* Behoud optie voor optionele persoonlijke AI key */}
+              <details style={{ marginTop:8 }}>
+                <summary style={{ fontSize:12, color:'#9CA3AF', cursor:'pointer', padding:'4px 0' }}>
+                  Optioneel: eigen Claude API key voor extra gebruik
+                </summary>
+                <div style={{ marginTop:12, display:'flex', flexDirection:'column', gap:10 }}>
+                  <p style={{ fontSize:12, color:'#6B7280' }}>
+                    Niet nodig — de app heeft al een gedeelde Claude API key. Voeg alleen toe als je meer capaciteit wil.
+                  </p>
+                  <input className="input-field" type="password" value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder="sk-ant-..."/>
+                  <button className="btn-ghost" style={{ width:'auto', fontSize:12 }} onClick={saveApiKey}>Opslaan</button>
+                </div>
+              </details>
             </div>
           )}
 

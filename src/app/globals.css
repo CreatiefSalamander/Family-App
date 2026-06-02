@@ -47,7 +47,30 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 40;
+  transition: width 0.25s ease;
 }
+
+/* SIDEBAR COLLAPSED STATE */
+.sidebar.collapsed {
+  width: 72px;
+}
+.sidebar.collapsed .sidebar-label-text,
+.sidebar.collapsed .sidebar-logo,
+.sidebar.collapsed .sidebar-user-info,
+.sidebar.collapsed .sidebar-section-label {
+  display: none;
+}
+.sidebar.collapsed .sidebar-link {
+  justify-content: center;
+  padding: 10px 0;
+}
+.sidebar.collapsed .sidebar-footer-user {
+  justify-content: center;
+  padding: 6px 0;
+}
+
+/* content-wrapper adjusts when sidebar collapses */
+body[data-sidebar="collapsed"] .content-wrapper { margin-left: 0; }
 
 @media (max-width: 767px) {
   .sidebar { display: none !important; }
@@ -144,6 +167,77 @@ body {
   font-size: 13px;
   color: #6B7280;
 }
+
+/* ══════════════════════════════════════════════════════════
+   TOOLTIPS — hover 1s delay, simpel en klein
+   ══════════════════════════════════════════════════════════ */
+[data-tip] { position: relative; }
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(17, 24, 39, 0.95);
+  color: #E5E7EB;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  transition: opacity .15s ease;
+  transition-delay: 0s;
+}
+[data-tip]:hover::after {
+  opacity: 1;
+  transition-delay: 1s;
+}
+/* Tooltip naar rechts voor sidebar */
+.sidebar [data-tip]::after {
+  left: calc(100% + 10px);
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.sidebar.collapsed [data-tip]::after {
+  opacity: 0;
+  transition-delay: 0.5s;
+}
+.sidebar.collapsed [data-tip]:hover::after { opacity: 1; }
+
+/* ══════════════════════════════════════════════════════════
+   CURRENCY TICKER — auto-scroll links naar rechts
+   ══════════════════════════════════════════════════════════ */
+.ticker-track {
+  overflow: hidden;
+  white-space: nowrap;
+  mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+}
+.ticker-content {
+  display: inline-flex;
+  gap: 0;
+  animation: tickerScroll 40s linear infinite;
+}
+.ticker-content:hover { animation-play-state: paused; }
+@keyframes tickerScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  cursor: pointer;
+  transition: background .15s;
+  border-radius: 8px;
+}
+.ticker-item:hover { background: rgba(1,121,254,.08); }
 
 /* ── Mobile header ──────────────────────────────────────── */
 .mobile-header {

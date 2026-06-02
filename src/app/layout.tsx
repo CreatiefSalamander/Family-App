@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Family-App',
+  title: 'Household',
   description: 'Persoonlijk financieel dashboard — beheer je geld, schulden en doelen.',
 };
 

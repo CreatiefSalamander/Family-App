@@ -96,8 +96,9 @@ export default function LocatiePage() {
     setWeerLoad(false);
   }
 
+  /* Opent Google Maps navigatie (werkt op mobiel én desktop) */
   function googleMapsUrl(lat:number, lng:number, naam:string) {
-    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${encodeURIComponent(naam)}`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${encodeURIComponent(naam)}&travelmode=walking`;
   }
 
   return (
@@ -222,27 +223,45 @@ export default function LocatiePage() {
         )}
       </div>
 
-      {/* Sectie 3: Wisselkoersen */}
-      <div className="card" style={{ padding:24, marginBottom:20 }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-          <h3 style={{ fontSize:14, fontWeight:700, color:'#1A1F36' }}>💱 Wisselkoersen (EUR →)</h3>
-          <button className="btn-ghost" style={{ fontSize:12 }} onClick={haalKoersen} disabled={koersenLoad}>
-            <RefreshCw size={13} style={{ animation:koersenLoad?'spin 1s linear infinite':'none' }}/> Ververs
+      {/* Sectie 3: Wisselkoersen — scrollende ticker */}
+      <div className="card" style={{ padding:'16px 0', marginBottom:20, overflow:'hidden' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'0 20px 12px' }}>
+          <h3 style={{ fontSize:14, fontWeight:700, color:'#1A1F36' }}>💱 Live wisselkoersen EUR →</h3>
+          <button className="btn-ghost" style={{ fontSize:11, padding:'4px 10px' }} onClick={haalKoersen} disabled={koersenLoad}>
+            <RefreshCw size={12} style={{ animation:koersenLoad?'spin 1s linear infinite':'none' }}/>
           </button>
         </div>
-        {koersenLoad && Object.keys(koersen).length===0 ? (
-          <p style={{ fontSize:13, color:'#9CA3AF' }}>Laden...</p>
-        ) : (
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))', gap:10 }}>
-            {Object.entries(koersen).map(([code, rate])=>(
-              <div key={code} style={{ background:'#F9FAFB', borderRadius:10, padding:'12px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                <div>
-                  <p style={{ fontSize:12, color:'#6B7280' }}>{VLAGGEN[code]||'💱'} {code}</p>
-                  <p className="amount" style={{ fontSize:16, color:'#1A1F36' }}>{rate.toFixed(code==='JPY'?2:4)}</p>
-                </div>
-              </div>
-            ))}
+
+        {/* Auto-scrollende ticker */}
+        {Object.keys(koersen).length > 0 && (
+          <div className="ticker-track" style={{ padding:'4px 0' }}>
+            <div className="ticker-content">
+              {/* Dubbele inhoud voor naadloze loop */}
+              {[...Object.entries(koersen), ...Object.entries(koersen)].map(([code, rate], i) => (
+                <a
+                  key={i}
+                  href={`https://finance.yahoo.com/quote/EUR${code}=X/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ticker-item"
+                  data-tip={`1 EUR = ${rate.toFixed(4)} ${code} — klik voor meer details`}
+                  style={{ textDecoration:'none', padding:'8px 20px', borderRadius:8, display:'inline-flex', alignItems:'center', gap:8 }}
+                >
+                  <span style={{ fontSize:18 }}>{VLAGGEN[code]||'💱'}</span>
+                  <div>
+                    <p style={{ fontSize:11, color:'#9CA3AF', fontWeight:600, lineHeight:1 }}>{code}</p>
+                    <p className="amount" style={{ fontSize:14, color:'#1A1F36', lineHeight:1.2 }}>
+                      {rate.toFixed(code==='JPY'?2:4)}
+                    </p>
+                  </div>
+                </a>
+              ))}
+            </div>
           </div>
+        )}
+
+        {koersenLoad && Object.keys(koersen).length===0 && (
+          <p style={{ fontSize:13, color:'#9CA3AF', padding:'8px 20px' }}>Koersen laden...</p>
         )}
       </div>
 

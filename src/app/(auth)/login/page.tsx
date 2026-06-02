@@ -6,9 +6,10 @@ import { createClient } from '@/lib/supabase/client';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPw, setShowPw] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [showPw,    setShowPw]    = useState(false);
+  const [error,     setError]     = useState('');
+  const [loading,   setLoading]   = useState(false);
+  const [onthoudMe, setOnthoudMe] = useState(true);
   const router = useRouter();
   const sb = createClient();
 
@@ -69,7 +70,7 @@ export default function LoginPage() {
           <div style={s.logoIcon}>
             <span style={{color:'#fff', fontWeight:700, fontSize:18, fontFamily:"'IBM Plex Serif',serif"}}>€</span>
           </div>
-          <span style={s.logoText}>Family-App</span>
+          <span style={s.logoText}>Household</span>
         </div>
 
         <h1 style={s.heading}>Welkom terug</h1>
@@ -103,6 +104,20 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
+          {/* Onthoud mij */}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4 }}>
+            <label style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', fontSize:13, color:'#6B7280' }}>
+              <input
+                type="checkbox"
+                checked={onthoudMe}
+                onChange={e => setOnthoudMe(e.target.checked)}
+                style={{ width:16, height:16, accentColor:'#0179FE', cursor:'pointer' }}
+              />
+              Onthoud mij
+            </label>
+            <a href="#" style={{ fontSize:13, color:'#0179FE', textDecoration:'none' }}>Wachtwoord vergeten?</a>
+          </div>
+
           <button type="submit" disabled={loading} style={{...s.btn, opacity: loading ? 0.65 : 1}}>
             {loading ? 'Bezig...' : 'Inloggen →'}
           </button>
