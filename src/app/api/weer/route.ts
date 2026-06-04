@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 
 type ForecastItem = {
   dt_txt: string;
@@ -7,6 +8,9 @@ type ForecastItem = {
 };
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult.error) return authResult.error;
+
   try {
     const { lat, lng, stad } = await req.json();
     const key = process.env.OPENWEATHER_API_KEY;
