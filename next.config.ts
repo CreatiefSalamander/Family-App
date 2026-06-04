@@ -49,6 +49,26 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          // Voorkomt clickjacking
+          { key: 'X-Frame-Options', value: 'DENY' },
+          // Voorkomt MIME-type sniffing
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // Beperkt referrer info
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // Alleen HTTPS (na eerste bezoek)
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
+          // Beperkt browser features
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self)' },
+        ],
+      },
+    ];
+  },
+
   /* Sluit zware server-only pakketten uit van de Edge runtime */
   serverExternalPackages: [
     '@anthropic-ai/sdk',
