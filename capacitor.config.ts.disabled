@@ -1,0 +1,53 @@
+/**
+ * FASE 2 — Native App via Capacitor
+ *
+ * DIT BESTAND IS DOCUMENTATIE — nog niet in gebruik.
+ * De app draait momenteel als PWA (installeerbaar via browser).
+ * Fase 2 voegt echte iOS/Android native wrappers toe.
+ *
+ * Wanneer klaar voor Fase 2:
+ * 1. npm install @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android
+ * 2. npx cap init
+ * 3. npx cap add ios
+ * 4. npx cap add android
+ * 5. Vervang server.url door de productie Netlify URL
+ */
+
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId:   'nl.household.abdul',
+  appName: 'Household',
+  webDir:  'out',
+
+  /* KRITIEK: gebruik server.url want de app is server-heavy (Next.js SSR).
+   * NOOIT `output: 'export'` gebruiken — dat breekt alle API routes. */
+  server: {
+    url:        'https://abdul-family-app.netlify.app',
+    cleartext:  false,
+    androidScheme: 'https',
+  },
+
+  plugins: {
+    PushNotifications: {
+      presentationOptions: ['badge', 'sound', 'alert'],
+    },
+    SplashScreen: {
+      launchShowDuration:   2000,
+      backgroundColor:      '#0B1827',
+      showSpinner:          false,
+      androidSplashResourceName: 'splash',
+      iosSpinnerStyle:      'small',
+    },
+    StatusBar: {
+      style: 'DARK',
+      backgroundColor: '#111827',
+    },
+    Keyboard: {
+      resize:       'body',
+      resizeOnFullScreen: true,
+    },
+  },
+};
+
+export default config;

@@ -1,49 +1,93 @@
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import Sidebar from '@/components/layout/Sidebar';
-import MobileNav from '@/components/layout/MobileNav';
-import AIChatbot from '@/components/ai/AIChatbot';
+import { redirect }                  from 'next/navigation';
+import { createClient }             from '@/lib/supabase/server';
+import { LangProvider }             from '@/lib/lang-context';
+import { setupNieuweGebruiker }     from '@/lib/setup-user';
+import Sidebar                      from '@/components/layout/Sidebar';
+import MobileNav                    from '@/components/layout/MobileNav';
+import AIChatbot                    from '@/components/ai/AIChatbot';
+import type { Lang }                from '@/lib/translations';
+import { Euro }                     from 'lucide-react';
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) redirect('/login');
 
   const { data: profiel } = await supabase
-    .from('profielen').select('voornaam').eq('id', user.id).single();
-  const naam = profiel?.voornaam || user.email?.split('@')[0] || 'Abdul';
+    .from('profielen')
+    .select('voornaam, achternaam, ai_persoonlijkheid, taal, onboarding_voltooid')
+    .eq('id', user.id)
+    .single();
+
+  const lang     = (profiel?.taal || 'nl') as Lang;
+  const voornaam = profiel?.voornaam || user.email?.split('@')[0] || '';
+  const email    = user.email ?? '';
+  const initialen = voornaam ? voornaam.slice(0, 2).toUpperCase() : email.slice(0, 2).toUpperCase();
+
+  /* ── Eerste login: vul standaard data in ──────────────── */
+  if (!profiel?.onboarding_voltooid) {
+    setupNieuweGebruiker(supabase, user.id).catch(() => {});
+  }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex">
-        <Sidebar email={user.email || ''} naam={naam} />
-      </div>
+    <LangProvider lang={lang}>
+      {/* ══════════════════════════════════════════════════
+          DESKTOP: flex h-screen (Horizon layout)
+          MOBILE:  app-main + content-wrapper (CSS klassen)
+          ══════════════════════════════════════════════════ */}
+      <main
+        className="app-main"
+        style={{
+          display: 'flex',
+          height: '100vh',
+          width: '100%',
+          overflow: 'hidden',
+          backgroundColor: '#F8FAFC',
+        }}
+      >
+        {/* Sidebar — sticky, verborgen op mobiel via CSS */}
+        <Sidebar user={{ email }} profiel={profiel} />
 
-      {/* Main area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile header */}
-        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg gradient-blue flex items-center justify-center">
-              <span className="text-white font-bold text-sm">€</span>
-            </div>
-            <span className="font-display font-bold text-gray-900">Family-App</span>
-          </div>
-          <div className="w-8 h-8 rounded-full gradient-blue flex items-center justify-center text-white text-xs font-bold">
-            {naam.slice(0, 2).toUpperCase()}
-          </div>
-        </header>
-
-        <main className="flex-1 overflow-y-auto">
+        {/* Content area — .content-wrapper handelt mobiel scroll af */}
+        <div className="content-wrapper">
           {children}
-        </main>
+        </div>
+      </main>
 
-        <MobileNav />
-      </div>
+      {/* ── Mobiel: vaste header bovenaan ─────────────────── */}
+      <header className="mobile-header">
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <div style={{
+            width:30, height:30, borderRadius:8,
+            background:'linear-gradient(135deg,#0179FE,#4893FF)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+          }}>
+            <Euro size={16} color="#fff" />
+          </div>
+          <span style={{ fontFamily:"'IBM Plex Serif',serif", fontWeight:700, color:'#fff', fontSize:17 }}>
+            Household
+          </span>
+        </div>
+        {/* Avatar rechts */}
+        <div style={{
+          width:34, height:34, borderRadius:'50%',
+          background:'linear-gradient(135deg,#0179FE,#4893FF)',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          color:'#fff', fontSize:13, fontWeight:700,
+        }}>
+          {initialen || '?'}
+        </div>
+      </header>
 
-      {/* AI chatbot op elke pagina */}
-      <AIChatbot naam={naam} />
-    </div>
+      {/* ── Mobiel: bottom navigation ─────────────────────── */}
+      <MobileNav />
+
+      {/* ── AI chatbot zweeft rechtsonder ─────────────────── */}
+      <AIChatbot naam={voornaam} />
+    </LangProvider>
   );
 }

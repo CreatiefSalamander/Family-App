@@ -1,56 +1,65 @@
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request })
+  let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
+        getAll() {
+          return request.cookies.getAll();
         },
-        set(name: string, value: string, options: Record<string, unknown>) {
-          request.cookies.set({ name, value, ...options } as never)
-          response = NextResponse.next({ request })
-          response.cookies.set({ name, value, ...options } as never)
-        },
-        remove(name: string, options: Record<string, unknown>) {
-          request.cookies.set({ name, value: '', ...options } as never)
-          response = NextResponse.next({ request })
-          response.cookies.set({ name, value: '', ...options } as never)
+        setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options ?? {})
+          );
         },
       },
     }
-  )
+  );
 
-  // Refresh sessie - voorkomt dat de sessie verloopt
-  await supabase.auth.getUser()
+  /* Sessie verversen — NOOIT weglaten */
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const { pathname } = request.nextUrl;
 
-  const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
-    request.nextUrl.pathname.startsWith('/register') ||
-    request.nextUrl.pathname.startsWith('/onboarding')
+  const isAuthPagina = pathname.startsWith('/login') ||
+                       pathname.startsWith('/register') ||
+                       pathname.startsWith('/onboarding');
 
-  // Niet ingelogd + niet op auth pagina → naar login
-  if (!user && !isAuthPage) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  /* Niet ingelogd + geen auth pagina → naar login */
+  if (!user && !isAuthPagina) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    return NextResponse.redirect(url);
   }
 
-  // Ingelogd + op login pagina → naar dashboard
-  if (user && request.nextUrl.pathname === '/login') {
-    return NextResponse.redirect(new URL('/', request.url))
+  /* Ingelogd + op login pagina → naar /home */
+  if (user && pathname === '/login') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/home';
+    return NextResponse.redirect(url);
   }
 
-  return response
+  return supabaseResponse;
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    /*
+     * Match alle paden BEHALVE:
+     * - _next/static (static files)
+     * - _next/image (image optimization)
+     * - favicon.ico
+     * - bestanden met extensie (svg, png, jpg, etc.)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)',
   ],
-}
+};
