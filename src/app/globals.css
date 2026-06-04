@@ -294,7 +294,7 @@ body[data-sidebar="collapsed"] .content-wrapper { margin-left: 0; }
   .home-content {
     padding: 16px !important;
     padding-top: 72px !important;  /* 56px header + 16px ruimte */
-    padding-bottom: 80px !important; /* 64px nav + 16px ruimte */
+    padding-bottom: 100px !important; /* floating nav + margin */
     height: auto !important;
     overflow: visible !important;
   }
