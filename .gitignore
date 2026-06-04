@@ -6,3 +6,7 @@ out/
 *.log
 .DS_Store
 package-lock.json
+
+# Interne Claude instructies — niet publiek
+CLAUDE.md
+RAPPORT_APP.md
