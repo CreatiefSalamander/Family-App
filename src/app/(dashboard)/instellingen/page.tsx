@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useLang } from '@/lib/lang-context';
 import { LANG_LABELS, type Lang } from '@/lib/translations';
-import { User, Globe, Bot, Database, Tag, CheckCircle } from 'lucide-react';
+import { User, Globe, Bot, Database, Tag, CheckCircle, Bell } from 'lucide-react';
+import PushButton from '@/components/ui/PushButton';
 
-type Tab = 'profiel' | 'taal' | 'ai' | 'supabase' | 'regels';
+type Tab = 'profiel' | 'taal' | 'ai' | 'supabase' | 'regels' | 'notificaties';
 
 export default function InstellingenPage() {
   const { t, lang } = useLang();
@@ -54,11 +55,12 @@ export default function InstellingenPage() {
   }
 
   const TABS: { id:Tab; icon:typeof User; label:string }[] = [
-    { id:'profiel',   icon:User,     label:t.settings.profile },
-    { id:'taal',      icon:Globe,    label:t.settings.language },
-    { id:'ai',        icon:Bot,      label:t.settings.ai },
-    { id:'supabase',  icon:Database, label:t.settings.supabase },
-    { id:'regels',    icon:Tag,      label:t.settings.rules },
+    { id:'profiel',       icon:User,     label:t.settings.profile },
+    { id:'taal',          icon:Globe,    label:t.settings.language },
+    { id:'notificaties',  icon:Bell,     label:'Notificaties' },
+    { id:'ai',            icon:Bot,      label:t.settings.ai },
+    { id:'supabase',      icon:Database, label:t.settings.supabase },
+    { id:'regels',        icon:Tag,      label:t.settings.rules },
   ];
 
   return (
@@ -163,6 +165,41 @@ export default function InstellingenPage() {
               <button className="btn-primary" style={{ width:'auto' }} onClick={saveLang} disabled={saving}>
                 {saving ? t.common.loading : t.settings.save}
               </button>
+            </div>
+          )}
+
+          {/* NOTIFICATIES TAB */}
+          {tab==='notificaties' && (
+            <div>
+              <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:8 }}>Notificaties</h3>
+              <p style={{ fontSize:13, color:'#6B7280', marginBottom:24 }}>
+                Ontvang meldingen op je apparaat — ook als de app niet open is.
+              </p>
+
+              {/* PushButton component */}
+              <div className="card" style={{ padding:20, marginBottom:16 }}>
+                <PushButton variant="full"/>
+              </div>
+
+              {/* Info over wat je ontvangt */}
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                <p style={{ fontSize:12, fontWeight:700, color:'#6B7280', textTransform:'uppercase', letterSpacing:'.07em' }}>Wanneer ontvang je een melding?</p>
+                {[
+                  { emoji:'⚠️', label:'Budget bijna vol',         detail:'Als een categorie > 80% van het budget gebruikt' },
+                  { emoji:'💳', label:'Grote transactie',          detail:'Bij een uitgave boven €100' },
+                  { emoji:'📅', label:'Schuld aflossing nadert',   detail:'3 dagen voor een geplande aflossing' },
+                  { emoji:'🎯', label:'Doel bereikt',              detail:'Als een spaardoel 100% is' },
+                  { emoji:'⚡', label:'Laag saldo',               detail:'Als rekening saldo onder €500 komt' },
+                ].map(item => (
+                  <div key={item.label} style={{ display:'flex', alignItems:'flex-start', gap:12, padding:'10px 0', borderBottom:'1px solid #F3F4F6' }}>
+                    <span style={{ fontSize:18, flexShrink:0 }}>{item.emoji}</span>
+                    <div>
+                      <p style={{ fontSize:13, fontWeight:600, color:'#1A1F36' }}>{item.label}</p>
+                      <p style={{ fontSize:11, color:'#9CA3AF' }}>{item.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

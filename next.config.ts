@@ -55,6 +55,7 @@ const nextConfig: NextConfig = {
     '@opentelemetry/api',
     'mammoth',
     'xlsx',
+    'web-push',
   ],
 };
 
