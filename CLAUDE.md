@@ -101,4 +101,4 @@ Status: **Ver gevorderd — alle 18 pagina's aanwezig**
 | Datum | Wat gedaan | Wat volgende keer |
 |-------|-----------|-------------------|
 | 2026-06-04 | CLAUDE.md volledig herschreven: Next.js 15.3 + React 19, alle 18 pagina's afgevinkt, route groups gedocumenteerd, Telegram + Bitvavo toegevoegd | — |
-| 2026-06-05 | Security: api-auth.ts aangemaakt, 12 API routes beveiligd met requireAuth(), gelekte Supabase key geroteerd, security headers toegevoegd, src/index.html opgeschoond, repo public gemaakt | Rate limiting op Anthropic routes + Zod input validatie |
+| 2026-06-05 | Security: api-auth.ts aangemaakt, 12 API routes beveiligd met requireAuth(), gelekte Supabase key geroteerd, security headers toegevoegd aan next.config.ts, src/index.html opgeschoond, repo public gemaakt | Rate limiting op Anthropic routes + Zod input validatie |
