@@ -108,6 +108,15 @@ async function stuurTelegram(chatId: string, tekst: string): Promise<void> {
 }
 
 export async function POST(req: NextRequest) {
+  // Controleer Telegram webhook secret (optioneel maar aanbevolen)
+  const telegramSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+  if (telegramSecret) {
+    const headerSecret = req.headers.get('X-Telegram-Bot-Api-Secret-Token');
+    if (headerSecret !== telegramSecret) {
+      return NextResponse.json({ error: 'Ongeldige webhook signature' }, { status: 401 });
+    }
+  }
+
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   const allowedChatId = process.env.TELEGRAM_CHAT_ID;
 

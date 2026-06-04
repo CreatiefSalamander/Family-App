@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult.error) return authResult.error;
+
   try {
     const { vluchtnummer } = await req.json();
     if (!vluchtnummer) return NextResponse.json({ error: 'vluchtnummer vereist' }, { status: 400 });

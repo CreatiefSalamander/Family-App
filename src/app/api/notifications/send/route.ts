@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult.error) return authResult.error;
+
   const serverKey = process.env.FCM_SERVER_KEY;
   if (!serverKey) {
     return NextResponse.json({ skipped: true, reason: 'FCM_SERVER_KEY niet ingesteld' });
   }
 
   try {
-    const { userId, title, body, url = '/home' } = await req.json();
-    if (!userId || !title) {
-      return NextResponse.json({ error: 'userId en title vereist' }, { status: 400 });
+    const { title, body, url = '/home' } = await req.json();
+    const userId = authResult.user.id; // altijd eigen user, nooit uit body
+    if (!title) {
+      return NextResponse.json({ error: 'title vereist' }, { status: 400 });
     }
 
     /* Haal FCM token op uit Supabase */

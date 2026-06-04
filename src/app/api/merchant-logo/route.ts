@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 
 /* Naam → domein mapping */
 const NAAM_DOMEIN: Record<string, string> = {
@@ -53,6 +54,9 @@ function naamNaarDomein(naam: string): string | null {
 }
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult.error) return authResult.error;
+
   try {
     const { naam } = await req.json();
     const domein   = naamNaarDomein(naam ?? '');

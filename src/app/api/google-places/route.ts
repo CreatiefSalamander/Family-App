@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 
 const TYPES: Record<string, string> = {
   supermarkt:  'supermarket',
@@ -19,6 +20,9 @@ type PlaceResult = {
 };
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult.error) return authResult.error;
+
   try {
     const { lat, lng, type = 'supermarkt', radius = 2000 } = await req.json();
     if (!lat || !lng) return NextResponse.json({ error: 'lat en lng vereist' }, { status: 400 });

@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 
 const POPULAIR = ['USD','GBP','TRY','AMD','AED','JPY','CHF','SEK','PLN','HUF','DKK','NOK'];
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult.error) return authResult.error;
+
   try {
     const { van = 'EUR', naar } = await req.json();
     const resp = await fetch(`https://open.er-api.com/v6/latest/${van}`);

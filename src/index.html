@@ -648,8 +648,8 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
             <div class="settings-section" id="stab-supabase">
               <div class="settings-section-title">Supabase</div>
               <div class="settings-section-sub">Database en authenticatie</div>
-              <div class="form-group"><label class="form-label">Project URL</label><input type="text" class="form-input" id="supa-url-s" value="https://lttxjfrtfrjnlazmbcyq.supabase.co" readonly style="color:var(--text2);cursor:default;"></div>
-              <div class="form-group"><label class="form-label">Anon Key</label><input type="text" class="form-input" id="supa-key-s" value="sb_publishable_SLofdkgzrdibQzeP5v_bew_bIBDTFAD" readonly style="color:var(--text2);cursor:default;font-size:11px;"></div>
+              <div class="form-group"><label class="form-label">Project URL</label><input type="text" class="form-input" id="supa-url-s" value="https://<jouw-project>.supabase.co" readonly style="color:var(--text2);cursor:default;"></div>
+              <div class="form-group"><label class="form-label">Anon Key</label><input type="text" class="form-input" id="supa-key-s" value="<jouw-anon-key>" readonly style="color:var(--text2);cursor:default;font-size:11px;"></div>
               <button class="btn btn-secondary" onclick="testSupabase()"><iconify-icon icon="ph:plug-bold"></iconify-icon>Verbinding testen</button>
               <div id="supa-status" style="margin-top:10px;font-size:12px;display:none;"></div>
             </div>
@@ -810,8 +810,8 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 // ================================================================
 // CONFIG
 // ================================================================
-const SUPABASE_URL='https://lttxjfrtfrjnlazmbcyq.supabase.co';
-const SUPABASE_ANON_KEY='sb_publishable_SLofdkgzrdibQzeP5v_bew_bIBDTFAD';
+const SUPABASE_URL='https://<jouw-project>.supabase.co';
+const SUPABASE_ANON_KEY='<jouw-anon-key>';
 const CLAUDE_MODEL='claude-sonnet-4-5';
 const SYS_PROMPT=`Je bent Family AI, de persoonlijke financiële assistent van Abdul Aziz. Je antwoordt altijd in het Nederlands, bent direct en praktisch. Gebruik het €-teken en Nederlandse datumnotatie. Je hebt toegang tot financiële data via tools.`;
 const TOOLS=[
