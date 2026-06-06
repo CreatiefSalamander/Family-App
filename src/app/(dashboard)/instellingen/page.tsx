@@ -70,24 +70,27 @@ export default function InstellingenPage() {
         <p className="header-box-subtext">{t.settings.subtitle}</p>
       </div>
 
-      <div style={{ display:'flex', gap:20, alignItems:'flex-start' }}>
-        {/* Zijnavigatie */}
-        <div className="card" style={{ padding:8, width:200, flexShrink:0 }}>
-          {TABS.map(tb=>(
-            <button key={tb.id} onClick={()=>setTab(tb.id)} style={{
-              display:'flex', alignItems:'center', gap:10, width:'100%',
-              padding:'10px 14px', borderRadius:8, border:'none', cursor:'pointer',
-              fontSize:13, fontWeight:500, fontFamily:'inherit', transition:'background .15s',
-              background:tab===tb.id?'#EFF6FF':'transparent',
-              color:tab===tb.id?'#0179FE':'#4B5563',
-            }}>
-              <tb.icon size={16}/> {tb.label}
-            </button>
-          ))}
+      {/* settings-layout = flex-row op desktop, flex-col op mobiel via CSS */}
+      <div className="settings-layout" style={{ display:'flex', gap:20, alignItems:'flex-start' }}>
+        {/* Zijnavigatie — settings-sidenav klasse voor mobile override */}
+        <div className="settings-sidenav card" style={{ padding:8, width:200, flexShrink:0 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
+            {TABS.map(tb=>(
+              <button key={tb.id} onClick={()=>setTab(tb.id)} style={{
+                display:'flex', alignItems:'center', gap:10, width:'100%',
+                padding:'10px 14px', borderRadius:8, border:'none', cursor:'pointer',
+                fontSize:13, fontWeight:500, fontFamily:'inherit', transition:'background .15s',
+                background:tab===tb.id?'#EFF6FF':'transparent',
+                color:tab===tb.id?'#0179FE':'#4B5563',
+              }}>
+                <tb.icon size={16}/> {tb.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="card" style={{ flex:1, padding:28 }}>
+        {/* Content — settings-content klasse voor mobile padding override */}
+        <div className="settings-content card" style={{ flex:1, padding:28 }}>
 
           {/* Succes banner */}
           {saved && (

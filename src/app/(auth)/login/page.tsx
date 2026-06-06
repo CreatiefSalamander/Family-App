@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { useDemo } from '@/lib/demo-context';
 
 export default function LoginPage() {
   const [email,     setEmail]     = useState('');
@@ -12,6 +13,13 @@ export default function LoginPage() {
   const [onthoudMe, setOnthoudMe] = useState(true);
   const router = useRouter();
   const sb = createClient();
+  const { activeerDemo } = useDemo();
+
+  // Demo modus — laad nep data en stuur door naar /home
+  function handleDemo() {
+    activeerDemo();
+    router.push('/home');
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -131,8 +139,32 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {/* ── Divider ── */}
+          <div style={{ display:'flex', alignItems:'center', gap:12, marginTop:20 }}>
+            <div style={{ flex:1, height:1, background:'#E5E7EB' }} />
+            <span style={{ fontSize:12, color:'#9CA3AF', whiteSpace:'nowrap' }}>of bekijk een voorbeeld</span>
+            <div style={{ flex:1, height:1, background:'#E5E7EB' }} />
+          </div>
+
+          {/* Demo knop */}
+          <button
+            type="button"
+            onClick={handleDemo}
+            style={{
+              width:'100%', padding:'12px 20px', marginTop:12,
+              background:'#F8FAFC', border:'1.5px solid #E5E7EB',
+              borderRadius:10, cursor:'pointer', fontSize:14, fontWeight:600,
+              color:'#374151', display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+              transition:'background .15s',
+            }}
+            onMouseOver={e => (e.currentTarget.style.background = '#F0F4FF')}
+            onMouseOut={e => (e.currentTarget.style.background = '#F8FAFC')}
+          >
+            <span>✨</span> Probeer demo — geen account nodig
+          </button>
+
           {/* Registreer link */}
-          <p style={{ textAlign:'center', fontSize:13, color:'#475467', marginTop:24 }}>
+          <p style={{ textAlign:'center', fontSize:13, color:'#475467', marginTop:20 }}>
             Nog geen account?{' '}
             <a href="/register" style={{ color:'#0179FE', fontWeight:600, textDecoration:'none' }}>
               Registreer hier

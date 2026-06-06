@@ -286,19 +286,22 @@ body[data-sidebar="collapsed"] .content-wrapper { margin-left: 0; }
     background: #F5F7FA !important;
   }
 
-  /* Content wrapper scrollt */
+  /* Content wrapper scrollt — ALLE pagina's */
   .content-wrapper {
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
     background: #F5F7FA !important;
+    height: 100% !important;
   }
 
-  /* Pagina content padding */
+  /* Pagina content padding — ALLE pagina's via home-content */
   .home-content {
     padding: 0 !important;
-    padding-top: 64px !important;
-    padding-bottom: 80px !important;
+    padding-top: 68px !important;
+    padding-bottom: 90px !important;
     height: auto !important;
+    min-height: calc(100dvh - 60px) !important;
     overflow: visible !important;
     gap: 0 !important;
     background: #F5F7FA !important;
@@ -316,6 +319,64 @@ body[data-sidebar="collapsed"] .content-wrapper { margin-left: 0; }
 
   /* Header box — verborgen op mobiel (vervangen door Dyme begroeting) */
   .header-box { display: none !important; }
+
+  /* ── Instellingen — 2-kolom → 1-kolom op mobiel ──────── */
+  .settings-layout {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+  .settings-sidenav {
+    width: 100% !important;
+    flex-shrink: unset !important;
+    margin-bottom: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    border-bottom: 1px solid #F0F0F0 !important;
+    background: #FFFFFF !important;
+    position: sticky !important;
+    top: 60px !important;
+    z-index: 10 !important;
+    padding: 8px 12px !important;
+  }
+  /* Sidenav buttons horizontaal scrollen */
+  .settings-sidenav > div {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 4px !important;
+    padding-bottom: 2px !important;
+    scrollbar-width: none !important;
+  }
+  .settings-sidenav > div::-webkit-scrollbar { display: none !important; }
+  .settings-sidenav button {
+    flex-shrink: 0 !important;
+    font-size: 13px !important;
+    padding: 8px 14px !important;
+    white-space: nowrap !important;
+    min-height: 36px !important;
+  }
+  .settings-content {
+    flex: 1 !important;
+    padding: 16px !important;
+    overflow: visible !important;
+  }
+
+  /* ── Alle pagina grid-layouts → 1 kolom ─────────────── */
+  .mobile-1col {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+  }
+
+  /* ── Scrollbare tabellen: horizontale scroll wrapper ── */
+  .table-scroll {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* ── Modals en sheets: max-height + scroll ─────────── */
+  .modal-sheet {
+    max-height: 90dvh !important;
+    overflow-y: auto !important;
+  }
 
   /* Cards — Dyme stijl: wit, lichte border */
   .card {

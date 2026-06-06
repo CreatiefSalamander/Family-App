@@ -12,6 +12,7 @@ import {
 import TotalBalanceBox from '@/components/ui/TotalBalanceBox';
 import BankCard from '@/components/ui/BankCard';
 import MerchantLogo from '@/components/finance/MerchantLogo';
+import { useDemoData } from '@/lib/use-demo-data';
 import type { Transactie, Rekening, Budget, Schuld, Doel } from '@/types';
 
 /* ── Helpers ─────────────────────────────────────────────── */
@@ -28,6 +29,7 @@ const CAT_EMOJI: Record<string, string> = {
 
 export default function HomePage() {
   const { t, lang }   = useLang();
+  const demoData      = useDemoData();
   const [tx,    setTx]   = useState<Transactie[]>([]);
   const [rek,   setRek]  = useState<Rekening[]>([]);
   const [bud,   setBud]  = useState<Budget[]>([]);
@@ -40,6 +42,20 @@ export default function HomePage() {
   const sb = createClient();
 
   useEffect(() => {
+    // Demo modus — laad nep data zonder Supabase aanroep
+    if (demoData.isDemoMode) {
+      setTx(  demoData.transacties as unknown as Transactie[]);
+      setRek( demoData.rekeningen  as unknown as Rekening[]);
+      setBud( demoData.budgets     as unknown as Budget[]);
+      setSch( demoData.schulden    as unknown as Schuld[]);
+      setDoel(demoData.doelen      as unknown as Doel[]);
+      setNaam(demoData.user!.voornaam);
+      setVollnaam(`${demoData.user!.voornaam} ${demoData.user!.achternaam}`);
+      setEmail(demoData.user!.email);
+      setLoad(false);
+      return;
+    }
+
     (async () => {
       const { data: { user } } = await sb.auth.getUser();
       if (!user) return;
@@ -63,7 +79,8 @@ export default function HomePage() {
       }
       setLoad(false);
     })();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoData.isDemoMode]);
 
   /* ── Berekeningen ─────────────────────────────────────── */
   const now   = new Date();

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { DemoProvider } from '@/lib/demo-context';
 
 export const metadata: Metadata = {
   title: 'Household',
@@ -29,7 +30,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body>{children}</body>
+      <body>
+        {/* DemoProvider wraps alles zodat elke pagina demo-modus kan detecteren */}
+        <DemoProvider>{children}</DemoProvider>
+      </body>
     </html>
   );
 }
