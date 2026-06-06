@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   if (authResult.error) return authResult.error;
 
   // Max 30 berichten per minuut per gebruiker
-  const rl = checkRateLimit(authResult.user.id, 'ai-chat', 30);
+  const rl = await checkRateLimit(authResult.user.id, 'ai-chat', 30);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: `Te veel verzoeken. Probeer over ${Math.ceil(rl.resetIn / 1000)} seconden opnieuw.` },
@@ -44,15 +44,4 @@ export async function POST(req: NextRequest) {
     const response = await anthropic.messages.create({
       model:      'claude-sonnet-4-5',
       max_tokens: 1024,
-      system:     body.system || '',
-      messages:   body.messages,
-      tools:      body.tools || [],
-    });
-
-    return NextResponse.json(response);
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Onbekende fout';
-    console.error('[ai-chat]', msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
-  }
-}
+      sys

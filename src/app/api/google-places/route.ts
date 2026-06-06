@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   if (authResult.error) return authResult.error;
 
   // Max 20 zoekopdrachten per minuut per gebruiker (Google Places kost geld per call)
-  const rl = checkRateLimit(authResult.user.id, 'google-places', 20);
+  const rl = await checkRateLimit(authResult.user.id, 'google-places', 20);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: `Te veel verzoeken. Probeer over ${Math.ceil(rl.resetIn / 1000)} seconden opnieuw.` },
@@ -71,18 +71,4 @@ export async function POST(req: NextRequest) {
     }
 
     const resultaten = ((data.results ?? []) as PlaceResult[]).slice(0, 10).map(p => ({
-      naam:    p.name,
-      adres:   p.vicinity,
-      rating:  p.rating ?? null,
-      open:    p.opening_hours?.open_now ?? null,
-      lat:     p.geometry.location.lat,
-      lng:     p.geometry.location.lng,
-      placeId: p.place_id,
-      type:    placeType,
-    }));
-
-    return NextResponse.json({ resultaten });
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
-  }
-}
+      naam:    p.name

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   if (authResult.error) return authResult.error;
 
   // Max 5 document-analyses per minuut per gebruiker (zwaarste Anthropic call)
-  const rl = checkRateLimit(authResult.user.id, 'analyze-document', 5);
+  const rl = await checkRateLimit(authResult.user.id, 'analyze-document', 5);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: `Te veel verzoeken. Probeer over ${Math.ceil(rl.resetIn / 1000)} seconden opnieuw.` },
@@ -90,14 +90,4 @@ export async function POST(req: NextRequest) {
     /* Extraheer JSON uit het antwoord */
     const match = text.match(/\[[\s\S]*\]/);
     if (!match) {
-      return NextResponse.json({ error: 'Geen transacties gevonden in document', raw: text }, { status: 422 });
-    }
-
-    const transacties = JSON.parse(match[0]);
-    return NextResponse.json({ transacties, totaal: transacties.length });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Onbekende fout';
-    console.error('[analyze-document]', msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
-  }
-}
+      return NextResponse.json({ error: 'Geen transacties gevo

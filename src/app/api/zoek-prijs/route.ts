@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   if (authResult.error) return authResult.error;
 
   // Max 15 zoekopdrachten per minuut per gebruiker (SerpAPI kost geld per call)
-  const rl = checkRateLimit(authResult.user.id, 'zoek-prijs', 15);
+  const rl = await checkRateLimit(authResult.user.id, 'zoek-prijs', 15);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: `Te veel verzoeken. Probeer over ${Math.ceil(rl.resetIn / 1000)} seconden opnieuw.` },
@@ -58,15 +58,4 @@ export async function POST(req: NextRequest) {
         prijsRaw:   item.extracted_price ?? null,
         winkel:     item.source     ?? '',
         link:       item.link       ?? '#',
-        afbeelding: item.thumbnail  ?? null,
-        rating:     item.rating     ?? null,
-        reviews:    item.reviews    ?? null,
-      }));
-
-    return NextResponse.json({ resultaten, totaal: resultaten.length });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Onbekende fout';
-    console.error('[zoek-prijs]', msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
-  }
-}
+        afbeelding: item.thumbnail  ?? n

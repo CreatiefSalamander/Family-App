@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   if (authResult.error) return authResult.error;
 
   // Max 3 rapporten per minuut per gebruiker (1x per maand nodig)
-  const rl = checkRateLimit(authResult.user.id, 'maandrapport', 3);
+  const rl = await checkRateLimit(authResult.user.id, 'maandrapport', 3);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: `Te veel verzoeken. Probeer over ${Math.ceil(rl.resetIn / 1000)} seconden opnieuw.` },
@@ -68,13 +68,4 @@ Schrijf een beknopt rapport met:
 
 Formatteer als nette HTML met inline CSS. Gebruik een professionele opmaak met secties en kleuren.
 Gebruik: font-family: Inter, sans-serif; max-width: 700px; color: #1A1F36.
-Secties in het blauw (#0179FE), positief in groen (#22C55E), aandacht in oranje (#F59E0B).`,
-      }],
-    });
-
-    const html = response.content[0].type === 'text' ? response.content[0].text : '<p>Rapport kon niet worden gegenereerd.</p>';
-    return NextResponse.json({ html });
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
-  }
-}
+Se

@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   if (authResult.error) return authResult.error;
 
   // Max 30 vluchtzoekopdrachten per minuut per gebruiker
-  const rl = checkRateLimit(authResult.user.id, 'vlucht-tracker', 30);
+  const rl = await checkRateLimit(authResult.user.id, 'vlucht-tracker', 30);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: `Te veel verzoeken. Probeer over ${Math.ceil(rl.resetIn / 1000)} seconden opnieuw.` },
@@ -61,15 +61,4 @@ export async function POST(req: NextRequest) {
       },
       aankomst: {
         luchthaven: vlucht.arrival?.airport ?? '',
-        iata:       vlucht.arrival?.iata ?? '',
-        gepland:    vlucht.arrival?.scheduled ?? '',
-        verwacht:   vlucht.arrival?.estimated ?? '',
-        gate:       vlucht.arrival?.gate ?? '',
-        terminal:   vlucht.arrival?.terminal ?? '',
-      },
-      vertraging: vlucht.departure?.delay ?? 0,
-    });
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
-  }
-}
+        iata:       vlucht.arrival?.iata ?? ''
