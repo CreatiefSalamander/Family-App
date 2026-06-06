@@ -215,7 +215,8 @@ export default function AIChatbot({ naam = '' }: { naam?: string }) {
   return (
     <>
       {/* Zwevende knop */}
-      <div style={{ position:'fixed', bottom:24, right:24, zIndex:50 }}>
+      {/* Op mobiel: boven de bottom nav (72px + 16px marge = 88px) */}
+      <div style={{ position:'fixed', bottom:'calc(72px + env(safe-area-inset-bottom, 0px) + 16px)', right:20, zIndex:51 }} className="ai-fab-wrapper">
         {/* Pulse ring */}
         <div style={{ position:'absolute', inset:-8, borderRadius:'50%', background:'rgba(1,121,254,.3)', animation:'pulse-ring 2s ease infinite' }}/>
         <button onClick={()=>setOpen(o=>!o)} style={{
@@ -238,7 +239,7 @@ export default function AIChatbot({ naam = '' }: { naam?: string }) {
       {/* Chat venster */}
       {open && (
         <div style={{
-          position:'fixed', bottom:92, right:24, zIndex:50,
+          position:'fixed', bottom:'calc(72px + env(safe-area-inset-bottom, 0px) + 80px)', right:20, zIndex:51,
           width:380, height:520, background:'white',
           borderRadius:20, overflow:'hidden',
           boxShadow:'0 20px 60px rgba(0,0,0,.2)',

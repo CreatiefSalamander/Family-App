@@ -4,9 +4,9 @@ import { LangProvider }             from '@/lib/lang-context';
 import { setupNieuweGebruiker }     from '@/lib/setup-user';
 import Sidebar                      from '@/components/layout/Sidebar';
 import MobileNav                    from '@/components/layout/MobileNav';
+import MobileHeaderClient           from '@/components/layout/MobileHeaderClient';
 import AIChatbot                    from '@/components/ai/AIChatbot';
 import type { Lang }                from '@/lib/translations';
-import { RefreshCw }                from 'lucide-react';
 
 export default async function DashboardLayout({
   children,
@@ -58,73 +58,12 @@ export default async function DashboardLayout({
         </div>
       </main>
 
-      {/* ── Mobiel: vaste header bovenaan — Dyme-stijl ──── */}
-      <header className="mobile-header" style={{
-        background: '#FFFFFF',
-        borderBottom: '1px solid #F0F0F0',
-        height: 60,
-        padding: '0 16px',
-      }}>
-        {/* Links: hamburger menu (static — interactie via MobileNav client component) */}
-        <div
-          style={{
-            padding: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 5,
-            cursor: 'pointer',
-          }}
-          aria-label="Menu"
-        >
-          <div style={{ width: 22, height: 2, background: '#1A1F36', borderRadius: 2 }} />
-          <div style={{ width: 22, height: 2, background: '#1A1F36', borderRadius: 2 }} />
-          <div style={{ width: 16, height: 2, background: '#1A1F36', borderRadius: 2 }} />
-        </div>
-
-        {/* Midden: app naam */}
-        <span style={{
-          fontFamily: "'IBM Plex Serif', serif",
-          fontSize: 18,
-          fontWeight: 700,
-          color: '#1A1F36',
-        }}>
-          Household
-        </span>
-
-        {/* Rechts: refresh + blauwe avatar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 6,
-            WebkitTapHighlightColor: 'transparent',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: 'unset',
-          }}
-          aria-label="Vernieuwen"
-          >
-            <RefreshCw size={20} color="#9CA3AF" />
-          </button>
-          <div style={{
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            background: '#0179FE',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff',
-            fontSize: 13,
-            fontWeight: 700,
-            flexShrink: 0,
-          }}>
-            {initialen || '?'}
-          </div>
-        </div>
-      </header>
+      {/* ── Mobiel: header + slide-in drawer (client component) ─ */}
+      <MobileHeaderClient
+        initialen={initialen}
+        voornaam={voornaam}
+        email={email}
+      />
 
       {/* ── Mobiel: bottom navigation ─────────────────────── */}
       <MobileNav />

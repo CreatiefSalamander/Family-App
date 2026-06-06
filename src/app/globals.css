@@ -641,6 +641,126 @@ select.input-field { appearance: none; cursor: pointer; }
   flex-shrink: 0;
 }
 
+/* ══════════════════════════════════════════════════════════
+   FLOATING WIDGETS — zwevende kaarten met diepe schaduwen
+   ══════════════════════════════════════════════════════════ */
+
+/* Float card — wit, verhoogd, hoekig */
+.float-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.05);
+  box-shadow:
+    0 1px 3px rgba(0,0,0,.06),
+    0 4px 16px rgba(0,0,0,.08),
+    0 8px 32px rgba(0,0,0,.04);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.float-card:active {
+  transform: scale(.995);
+}
+
+/* Float section — sectie wrapper met horizontale padding op mobiel */
+.float-section {
+  padding: 0 0 20px;
+}
+
+/* Float KPI — individueel KPI kaartje */
+.float-kpi {
+  background: #FFFFFF;
+  border-radius: 14px;
+  padding: 16px;
+  border-top: 3px solid transparent;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,.06),
+    0 6px 20px rgba(0,0,0,.05);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.float-kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0,0,0,.1);
+}
+
+/* Sectie title */
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1A1F36;
+  margin: 0;
+}
+
+/* ── Horizontale scroll container (vue-horizontal-list stijl) ─ */
+.h-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  /* fade-out aan de zijkanten */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+}
+.h-scroll::-webkit-scrollbar { display: none; }
+
+/* Individueel scroll item — niet krimpen */
+.h-scroll-item {
+  flex-shrink: 0;
+}
+
+/* ── AI FAB wrapper — desktop verbergen fix ─────────────── */
+@media (min-width: 768px) {
+  .ai-fab-wrapper {
+    bottom: 24px !important;
+    right: 24px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE — float-section en h-scroll padding aanpassen
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* Padding voor de float sections op mobiel */
+  .float-section {
+    padding: 0 14px 16px !important;
+  }
+
+  /* Float card op mobiel iets meer afgerond */
+  .float-card {
+    border-radius: 14px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08) !important;
+  }
+
+  /* KPI grid op mobiel */
+  .float-kpi {
+    padding: 14px !important;
+    border-radius: 12px !important;
+  }
+
+  /* Scroll container op mobiel: uitlopen tot schermrand */
+  .float-section .h-scroll {
+    margin: 0 -14px;
+    padding: 0 14px 4px;
+  }
+
+  /* Section title kleiner op mobiel */
+  .section-title {
+    font-size: 15px !important;
+  }
+
+  /* Mobiele header — verborgen op desktop, getoond op mobiel */
+  .mobile-header {
+    display: flex !important;
+  }
+
+  /* Home content: genoeg ruimte voor sticky header (60px) + bottom nav (72px) */
+  .home-content {
+    padding-top: 72px !important;
+    padding-bottom: 88px !important;
+  }
+}
+
 /* PROFILE BANNER — gradient mesh achtergrond */
 .profile-banner {
   height: 120px;
