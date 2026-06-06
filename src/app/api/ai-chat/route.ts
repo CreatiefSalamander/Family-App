@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { requireAuth } from '@/lib/api-auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 import { z } from 'zod';
 
 const Schema = z.object({
@@ -19,6 +20,14 @@ const anthropic = new Anthropic({
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult.error) return authResult.error;
+
+  // Max 30 berichten per minuut per gebruiker
+  if (!checkRateLimit(authResult.user.id, 'ai-chat', 30)) {
+    return NextResponse.json(
+      { error: 'Te veel verzoeken — wacht even en probeer opnieuw' },
+      { status: 429 },
+    );
+  }
 
   let body: z.infer<typeof Schema>;
   try {
