@@ -58,4 +58,15 @@ export async function POST(req: NextRequest) {
         prijsRaw:   item.extracted_price ?? null,
         winkel:     item.source     ?? '',
         link:       item.link       ?? '#',
-        afbeelding: item.thumbnail  ?? n
+        afbeelding: item.thumbnail  ?? null,
+        rating:     item.rating     ?? null,
+        reviews:    item.reviews    ?? null,
+      }));
+
+    return NextResponse.json({ resultaten, totaal: resultaten.length });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Onbekende fout';
+    console.error('[zoek-prijs]', msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}

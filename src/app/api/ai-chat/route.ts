@@ -44,4 +44,15 @@ export async function POST(req: NextRequest) {
     const response = await anthropic.messages.create({
       model:      'claude-sonnet-4-5',
       max_tokens: 1024,
-      sys
+      system:     body.system || '',
+      messages:   body.messages,
+      tools:      body.tools || [],
+    });
+
+    return NextResponse.json(response);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Onbekende fout';
+    console.error('[ai-chat]', msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}

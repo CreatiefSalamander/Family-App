@@ -71,4 +71,18 @@ export async function POST(req: NextRequest) {
     }
 
     const resultaten = ((data.results ?? []) as PlaceResult[]).slice(0, 10).map(p => ({
-      naam:    p.name
+      naam:    p.name,
+      adres:   p.vicinity,
+      rating:  p.rating ?? null,
+      open:    p.opening_hours?.open_now ?? null,
+      lat:     p.geometry.location.lat,
+      lng:     p.geometry.location.lng,
+      placeId: p.place_id,
+      type:    placeType,
+    }));
+
+    return NextResponse.json({ resultaten });
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
+}

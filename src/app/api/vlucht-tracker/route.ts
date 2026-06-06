@@ -61,4 +61,15 @@ export async function POST(req: NextRequest) {
       },
       aankomst: {
         luchthaven: vlucht.arrival?.airport ?? '',
-        iata:       vlucht.arrival?.iata ?? ''
+        iata:       vlucht.arrival?.iata ?? '',
+        gepland:    vlucht.arrival?.scheduled ?? '',
+        verwacht:   vlucht.arrival?.estimated ?? '',
+        gate:       vlucht.arrival?.gate ?? '',
+        terminal:   vlucht.arrival?.terminal ?? '',
+      },
+      vertraging: vlucht.departure?.delay ?? 0,
+    });
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
+}

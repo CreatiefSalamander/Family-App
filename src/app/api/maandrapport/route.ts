@@ -68,4 +68,13 @@ Schrijf een beknopt rapport met:
 
 Formatteer als nette HTML met inline CSS. Gebruik een professionele opmaak met secties en kleuren.
 Gebruik: font-family: Inter, sans-serif; max-width: 700px; color: #1A1F36.
-Se
+Secties in het blauw (#0179FE), positief in groen (#22C55E), aandacht in oranje (#F59E0B).`,
+      }],
+    });
+
+    const html = response.content[0].type === 'text' ? response.content[0].text : '<p>Rapport kon niet worden gegenereerd.</p>';
+    return NextResponse.json({ html });
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
+}

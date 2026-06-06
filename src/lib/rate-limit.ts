@@ -1,15 +1,15 @@
 /**
- * Rate limiter — Upstash Redis als env vars aanwezig zijn, anders in-memory fallback.
+ * Rate limiter — gebruikt Supabase als SUPABASE_SERVICE_ROLE_KEY aanwezig is,
+ * anders in-memory fallback (per serverless instantie).
  *
- * Upstash gratis tier: 10.000 commands/dag, persistent over serverless instanties.
- * Voeg toe aan Netlify env vars:
- *   UPSTASH_REDIS_REST_URL   → https://xxxxx.upstash.io
- *   UPSTASH_REDIS_REST_TOKEN → AXxx...
+ * Vereist eenmalig in Supabase SQL Editor:
+ *   → zie CLAUDE.md of vraag aan Claude om de migratie SQL
  *
- * Bestaande aanroepen hoeven NIET gewijzigd te worden — dezelfde interface.
+ * Env var nodig in Netlify:
+ *   SUPABASE_SERVICE_ROLE_KEY  (Supabase dashboard → Settings → API → service_role)
  */
 
-// ── In-memory fallback (per instantie) ───────────────────────────────────────
+// ── In-memory fallback ────────────────────────────────────────────────────────
 const vensters = new Map<string, number[]>();
 
 function inMemoryCheck(
@@ -17,7 +17,7 @@ function inMemoryCheck(
   max: number,
   vensterMs: number,
 ): { allowed: boolean; resetIn: number } {
-  const nu    = Date.now();
+  const nu     = Date.now();
   const tijden = (vensters.get(key) ?? []).filter(t => nu - t < vensterMs);
 
   if (tijden.length >= max) {
@@ -28,68 +28,48 @@ function inMemoryCheck(
   return { allowed: true, resetIn: 0 };
 }
 
-// ── Upstash sliding window via REST API (geen import nodig) ──────────────────
-async function upstashCheck(
+// ── Supabase RPC check (atomisch via stored function) ─────────────────────────
+async function supabaseCheck(
   key: string,
   max: number,
   vensterSec: number,
 ): Promise<{ allowed: boolean; resetIn: number }> {
-  const url   = process.env.UPSTASH_REDIS_REST_URL!;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN!;
-  const nu    = Date.now();
-  const windowStart = nu - vensterSec * 1000;
+  const url        = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-  // MULTI: verwijder oude entries, tel, voeg toe, stel TTL in
-  const cmds = [
-    ['ZREMRANGEBYSCORE', key, '0', String(windowStart)],
-    ['ZCARD', key],
-    ['ZADD', key, String(nu), String(nu)],
-    ['EXPIRE', key, String(vensterSec)],
-  ];
+  try {
+    const res = await fetch(`${url}/rest/v1/rpc/check_rate_limit`, {
+      method: 'POST',
+      headers: {
+        apikey:          serviceKey,
+        Authorization:   `Bearer ${serviceKey}`,
+        'Content-Type':  'application/json',
+      },
+      body: JSON.stringify({
+        p_key:            key,
+        p_max:            max,
+        p_window_seconds: vensterSec,
+      }),
+    });
 
-  const res = await fetch(`${url}/pipeline`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(cmds),
-  });
+    if (!res.ok) {
+      // Supabase niet bereikbaar — veilig terugvallen op in-memory
+      console.warn('[rate-limit] Supabase RPC mislukt, gebruik in-memory fallback');
+      return inMemoryCheck(key, max, vensterSec * 1000);
+    }
 
-  if (!res.ok) {
-    // Upstash niet bereikbaar — veilig terugvallen op in-memory
+    const data = await res.json() as { allowed: boolean; reset_in: number };
+    return { allowed: data.allowed, resetIn: data.reset_in ?? 0 };
+
+  } catch {
     return inMemoryCheck(key, max, vensterSec * 1000);
   }
-
-  const data = await res.json() as Array<{ result: unknown }>;
-  // data[1].result = ZCARD vóór onze nieuwe entry = aantal verzoeken in venster
-  const huidigeCount = Number(data[1].result ?? 0);
-
-  if (huidigeCount >= max) {
-    // Bereken wanneer het oudste entry verloopt
-    const oldestRes = await fetch(`${url}/ZRANGE/${encodeURIComponent(key)}/0/0/WITHSCORES`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    let resetIn = vensterSec * 1000;
-    if (oldestRes.ok) {
-      const od = await oldestRes.json() as { result: string[] };
-      const oldest = Number(od.result?.[1] ?? nu - vensterSec * 1000);
-      resetIn = Math.max(0, oldest + vensterSec * 1000 - nu);
-    }
-    // Verwijder de net toegevoegde entry (we weigeren het verzoek)
-    await fetch(`${url}/ZREM/${encodeURIComponent(key)}/${nu}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return { allowed: false, resetIn };
-  }
-
-  return { allowed: true, resetIn: 0 };
 }
 
-// ── Publieke interface — drop-in vervanging ──────────────────────────────────
+// ── Publieke interface ────────────────────────────────────────────────────────
 /**
  * Controleer of een gebruiker binnen de limiet zit.
- * @param userId    Supabase user ID (of IP als fallback)
+ * @param userId    Supabase user ID
  * @param sleutel   Unieke naam voor de route (bijv. 'ai-chat')
  * @param max       Max verzoeken per venster
  * @param vensterMs Venstergrootte in milliseconden (standaard 60 seconden)
@@ -103,12 +83,10 @@ export async function checkRateLimit(
   const key        = `rl:${sleutel}:${userId}`;
   const vensterSec = Math.ceil(vensterMs / 1000);
 
-  const heeftUpstash =
-    process.env.UPSTASH_REDIS_REST_URL &&
-    process.env.UPSTASH_REDIS_REST_TOKEN;
-
-  if (heeftUpstash) {
-    return upstashCheck(key, max, vensterSec);
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return supabaseCheck(key, max, vensterSec);
   }
+
+  // Geen service key → in-memory fallback
   return inMemoryCheck(key, max, vensterMs);
 }
