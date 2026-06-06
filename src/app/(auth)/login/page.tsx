@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email,     setEmail]     = useState('');
+  const [password,  setPassword]  = useState('');
   const [showPw,    setShowPw]    = useState(false);
   const [error,     setError]     = useState('');
   const [loading,   setLoading]   = useState(false);
@@ -28,34 +28,6 @@ export default function LoginPage() {
     }
   }
 
-  const s = {
-    wrap: { display:'flex', height:'100vh', overflow:'hidden', fontFamily:"'Inter', system-ui, sans-serif" },
-    left: { width:'40%', display:'flex', flexDirection:'column' as const, justifyContent:'center', padding:'0 56px', background:'#fff', overflowY:'auto' as const },
-    right: { flex:1, background:'#111827', display:'flex', flexDirection:'column' as const, alignItems:'center', justifyContent:'center', padding:'48px', position:'relative' as const, overflow:'hidden' },
-    logo: { display:'flex', alignItems:'center', gap:10, marginBottom:40 },
-    logoIcon: { width:36, height:36, borderRadius:10, background:'linear-gradient(135deg,#0179FE,#4893FF)', display:'flex', alignItems:'center', justifyContent:'center' },
-    logoText: { fontFamily:"'IBM Plex Serif', serif", fontSize:21, fontWeight:700, color:'#1A1F36' },
-    heading: { fontFamily:"'IBM Plex Serif', serif", fontSize:30, fontWeight:700, color:'#1A1F36', marginBottom:6, letterSpacing:-0.5 },
-    sub: { fontSize:14, color:'#6B7280', marginBottom:28 },
-    errBox: { background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:8, padding:'10px 14px', color:'#DC2626', fontSize:13, marginBottom:16 },
-    label: { display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 },
-    input: { width:'100%', border:'1.5px solid #E5E7EB', borderRadius:8, padding:'11px 14px', fontSize:14, fontFamily:'inherit', color:'#1A1F36', outline:'none', background:'white', boxSizing:'border-box' as const },
-    inputWrap: { position:'relative' as const },
-    eyeBtn: { position:'absolute' as const, right:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#9CA3AF', fontSize:16 },
-    btn: { width:'100%', background:'linear-gradient(135deg,#0179FE,#4893FF)', color:'#fff', border:'none', borderRadius:8, padding:'13px 20px', fontSize:15, fontWeight:600, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 2px 8px rgba(1,121,254,.3)', marginTop:4 },
-    switchText: { textAlign:'center' as const, fontSize:13, color:'#6B7280', marginTop:20 },
-    link: { color:'#0179FE', fontWeight:600, cursor:'pointer', textDecoration:'none' },
-    // Right side
-    blob1: { position:'absolute' as const, top:-60, right:-60, width:280, height:280, borderRadius:'50%', background:'rgba(1,121,254,.12)' },
-    blob2: { position:'absolute' as const, bottom:-80, left:-40, width:320, height:320, borderRadius:'50%', background:'rgba(1,121,254,.07)' },
-    rightContent: { position:'relative' as const, zIndex:1, maxWidth:340 },
-    rightHeading: { fontFamily:"'IBM Plex Serif', serif", fontSize:26, fontWeight:700, color:'#fff', marginBottom:8, lineHeight:1.3 },
-    rightSub: { fontSize:14, color:'rgba(255,255,255,.55)', marginBottom:40 },
-    bullet: { display:'flex', alignItems:'flex-start', gap:12, marginBottom:18 },
-    bulletIcon: { width:22, height:22, borderRadius:'50%', background:'rgba(34,197,94,.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 },
-    bulletText: { fontSize:14, color:'rgba(255,255,255,.8)', lineHeight:1.5 },
-  };
-
   const bullets = [
     'Automatische CSV import van Rabobank en ING',
     'Schulden en doelen altijd bij de hand',
@@ -63,89 +35,208 @@ export default function LoginPage() {
   ];
 
   return (
-    <div style={s.wrap}>
-      {/* LEFT: formulier */}
-      <div style={s.left}>
-        <div style={s.logo}>
-          <div style={s.logoIcon}>
-            <span style={{color:'#fff', fontWeight:700, fontSize:18, fontFamily:"'IBM Plex Serif',serif"}}>€</span>
+    <div className="min-h-screen flex flex-col lg:flex-row" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+
+      {/* ── MOBIEL: donkere hero bovenin (verborgen op desktop) ── */}
+      <div className="lg:hidden relative bg-[#111827] px-6 pt-10 pb-20 overflow-hidden">
+        {/* Decoratieve blobs */}
+        <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-[rgba(1,121,254,0.12)]" />
+        <div className="absolute -bottom-14 -left-8 w-52 h-52 rounded-full bg-[rgba(1,121,254,0.07)]" />
+
+        {/* Logo */}
+        <div className="relative z-10 flex items-center gap-2.5 mb-6">
+          <div
+            className="w-9 h-9 rounded-[10px] flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg,#0179FE,#4893FF)' }}
+          >
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: 18, fontFamily: "'IBM Plex Serif',serif" }}>€</span>
           </div>
-          <span style={s.logoText}>Household</span>
+          <span style={{ fontFamily: "'IBM Plex Serif', serif", fontSize: 20, fontWeight: 700, color: '#fff' }}>
+            Household
+          </span>
         </div>
 
-        <h1 style={s.heading}>Welkom terug</h1>
-        <p style={s.sub}>Log in om je financieel dashboard te bekijken</p>
+        {/* Tagline */}
+        <div className="relative z-10">
+          <h2
+            className="text-2xl font-bold text-white mb-1 leading-snug"
+            style={{ fontFamily: "'IBM Plex Serif', serif" }}
+          >
+            Jouw financiën,<br />altijd inzichtelijk
+          </h2>
+          <p className="text-sm text-white/55">Alles op één plek, veilig en persoonlijk</p>
+        </div>
+      </div>
 
-        {error && <div style={s.errBox}>{error}</div>}
+      {/* ── FORMULIER PANEL ── */}
+      {/* Op mobiel: witte card die over de hero schuift via -mt-6 + rounded-t-3xl */}
+      <div className="
+        flex-1 flex flex-col
+        px-6 py-8
+        bg-white
+        -mt-6 rounded-t-3xl
+        lg:mt-0 lg:rounded-none
+        lg:w-[40%] lg:flex-none
+        lg:justify-center lg:px-14
+        overflow-y-auto relative z-10
+      ">
 
-        <form onSubmit={handleLogin} style={{width:'100%'}}>
-          <div style={{marginBottom:18}}>
-            <label style={s.label}>E-mailadres</label>
+        {/* Logo — alleen zichtbaar op desktop */}
+        <div className="hidden lg:flex items-center gap-2.5 mb-10">
+          <div
+            className="w-9 h-9 rounded-[10px] flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg,#0179FE,#4893FF)' }}
+          >
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: 18, fontFamily: "'IBM Plex Serif',serif" }}>€</span>
+          </div>
+          <span style={{ fontFamily: "'IBM Plex Serif', serif", fontSize: 21, fontWeight: 700, color: '#1A1F36' }}>
+            Household
+          </span>
+        </div>
+
+        <h1
+          className="text-[26px] lg:text-[30px] font-bold text-[#1A1F36] mb-1.5 tracking-tight"
+          style={{ fontFamily: "'IBM Plex Serif', serif" }}
+        >
+          Welkom terug
+        </h1>
+        <p className="text-sm text-[#6B7280] mb-6">Log in om je financieel dashboard te bekijken</p>
+
+        {error && (
+          <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-lg px-3.5 py-2.5 text-[#DC2626] text-[13px] mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleLogin} className="w-full">
+          {/* E-mail */}
+          <div className="mb-4">
+            <label className="block text-[13px] font-semibold text-[#374151] mb-1.5">E-mailadres</label>
             <input
-              type="email" value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="jouw@email.com" required style={s.input}
-              onFocus={e => (e.target.style.borderColor='#0179FE')}
-              onBlur={e => (e.target.style.borderColor='#E5E7EB')}
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="jouw@email.com"
+              required
+              className="w-full border-[1.5px] border-[#E5E7EB] rounded-lg px-3.5 py-[11px] text-[14px] text-[#1A1F36] bg-white outline-none box-border transition-colors"
+              style={{ fontFamily: 'inherit' }}
+              onFocus={e => (e.target.style.borderColor = '#0179FE')}
+              onBlur={e  => (e.target.style.borderColor = '#E5E7EB')}
             />
           </div>
-          <div style={{marginBottom:20}}>
-            <label style={s.label}>Wachtwoord</label>
-            <div style={s.inputWrap}>
+
+          {/* Wachtwoord */}
+          <div className="mb-5">
+            <label className="block text-[13px] font-semibold text-[#374151] mb-1.5">Wachtwoord</label>
+            <div className="relative">
               <input
-                type={showPw ? 'text' : 'password'} value={password}
+                type={showPw ? 'text' : 'password'}
+                value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••" required
-                style={{...s.input, paddingRight:44}}
-                onFocus={e => (e.target.style.borderColor='#0179FE')}
-                onBlur={e => (e.target.style.borderColor='#E5E7EB')}
+                placeholder="••••••••"
+                required
+                className="w-full border-[1.5px] border-[#E5E7EB] rounded-lg px-3.5 py-[11px] pr-11 text-[14px] text-[#1A1F36] bg-white outline-none box-border transition-colors"
+                style={{ fontFamily: 'inherit' }}
+                onFocus={e => (e.target.style.borderColor = '#0179FE')}
+                onBlur={e  => (e.target.style.borderColor = '#E5E7EB')}
               />
-              <button type="button" onClick={() => setShowPw(s => !s)} style={s.eyeBtn}>
+              <button
+                type="button"
+                onClick={() => setShowPw(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-[#9CA3AF] text-base"
+              >
                 {showPw ? '🙈' : '👁'}
               </button>
             </div>
           </div>
-          {/* Onthoud mij */}
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4 }}>
-            <label style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', fontSize:13, color:'#6B7280' }}>
+
+          {/* Onthoud mij + Wachtwoord vergeten */}
+          <div className="flex items-center justify-between mb-5">
+            <label className="flex items-center gap-2 cursor-pointer text-[13px] text-[#6B7280]">
               <input
                 type="checkbox"
                 checked={onthoudMe}
                 onChange={e => setOnthoudMe(e.target.checked)}
-                style={{ width:16, height:16, accentColor:'#0179FE', cursor:'pointer' }}
+                className="w-4 h-4 cursor-pointer accent-[#0179FE]"
               />
               Onthoud mij
             </label>
-            <a href="#" style={{ fontSize:13, color:'#0179FE', textDecoration:'none' }}>Wachtwoord vergeten?</a>
+            <a href="#" className="text-[13px] text-[#0179FE] no-underline">
+              Wachtwoord vergeten?
+            </a>
           </div>
 
-          <button type="submit" disabled={loading} style={{...s.btn, opacity: loading ? 0.65 : 1}}>
+          {/* Inloggen knop */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full text-white border-none rounded-lg py-[13px] px-5 text-[15px] font-semibold cursor-pointer transition-opacity"
+            style={{
+              background: 'linear-gradient(135deg,#0179FE,#4893FF)',
+              boxShadow: '0 2px 8px rgba(1,121,254,.3)',
+              fontFamily: 'inherit',
+              opacity: loading ? 0.65 : 1,
+            }}
+          >
             {loading ? 'Bezig...' : 'Inloggen →'}
           </button>
         </form>
 
-        <p style={s.switchText}>
+        <p className="text-center text-[13px] text-[#6B7280] mt-5">
           Nog geen account?{' '}
-          <a href="/register" style={s.link}>Registreer hier</a>
+          <a href="/register" className="text-[#0179FE] font-semibold no-underline">
+            Registreer hier
+          </a>
         </p>
-      </div>
 
-      {/* RIGHT: visueel */}
-      <div style={s.right}>
-        <div style={s.blob1} />
-        <div style={s.blob2} />
-        <div style={s.rightContent}>
-          <h2 style={s.rightHeading}>Jouw financiën,<br />altijd inzichtelijk</h2>
-          <p style={s.rightSub}>Alles op één plek, veilig en persoonlijk</p>
+        {/* Compacte bullets — alleen op mobiel onder het formulier */}
+        <div className="lg:hidden mt-8 pt-6 border-t border-[#F3F4F6]">
           {bullets.map((text, i) => (
-            <div key={i} style={s.bullet}>
-              <div style={s.bulletIcon}>
-                <span style={{color:'#22C55E', fontSize:12, fontWeight:700}}>✓</span>
+            <div key={i} className="flex items-start gap-3 mb-3">
+              <div
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                style={{ background: 'rgba(1,121,254,0.1)' }}
+              >
+                <span style={{ color: '#0179FE', fontSize: 11, fontWeight: 700 }}>✓</span>
               </div>
-              <p style={s.bulletText}>{text}</p>
+              <p className="text-[13px] text-[#6B7280] leading-snug">{text}</p>
             </div>
           ))}
         </div>
       </div>
+
+      {/* ── RECHTER PANEL — alleen zichtbaar op desktop ── */}
+      <div className="hidden lg:flex flex-1 bg-[#111827] flex-col items-center justify-center p-12 relative overflow-hidden">
+        <div
+          className="absolute -top-[60px] -right-[60px] w-[280px] h-[280px] rounded-full"
+          style={{ background: 'rgba(1,121,254,.12)' }}
+        />
+        <div
+          className="absolute -bottom-[80px] -left-[40px] w-[320px] h-[320px] rounded-full"
+          style={{ background: 'rgba(1,121,254,.07)' }}
+        />
+        <div className="relative z-10 max-w-[340px]">
+          <h2
+            className="text-[26px] font-bold text-white mb-2 leading-snug"
+            style={{ fontFamily: "'IBM Plex Serif', serif" }}
+          >
+            Jouw financiën,<br />altijd inzichtelijk
+          </h2>
+          <p className="text-[14px] text-white/55 mb-10">Alles op één plek, veilig en persoonlijk</p>
+          {bullets.map((text, i) => (
+            <div key={i} className="flex items-start gap-3 mb-[18px]">
+              <div
+                className="w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                style={{ background: 'rgba(34,197,94,.2)' }}
+              >
+                <span style={{ color: '#22C55E', fontSize: 12, fontWeight: 700 }}>✓</span>
+              </div>
+              <p className="text-[14px] text-white/80 leading-relaxed">{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 }
