@@ -1,16 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
+import { z } from 'zod';
+
+const Schema = z.object({
+  product: z.string().min(1).max(200),
+});
 
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult.error) return authResult.error;
 
+  let body: z.infer<typeof Schema>;
   try {
-    const { product } = await req.json();
+    body = Schema.parse(await req.json());
+  } catch {
+    return NextResponse.json(
+      { error: 'Ongeldige invoer — controleer de verstuurde velden' },
+      { status: 400 }
+    );
+  }
 
-    if (!product?.trim()) {
-      return NextResponse.json({ error: 'product vereist' }, { status: 400 });
-    }
+  try {
+    const { product } = body;
 
     const params = new URLSearchParams({
       q:       product + ' prijs nederland',

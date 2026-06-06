@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
+import { z } from 'zod';
+
+const Schema = z.object({
+  lat:  z.number().min(-90).max(90).optional(),
+  lng:  z.number().min(-180).max(180).optional(),
+  stad: z.string().min(1).max(100).optional(),
+});
 
 type ForecastItem = {
   dt_txt: string;
@@ -11,8 +18,18 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult.error) return authResult.error;
 
+  let body: z.infer<typeof Schema>;
   try {
-    const { lat, lng, stad } = await req.json();
+    body = Schema.parse(await req.json());
+  } catch {
+    return NextResponse.json(
+      { error: 'Ongeldige invoer — controleer de verstuurde velden' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { lat, lng, stad } = body;
     const key = process.env.OPENWEATHER_API_KEY;
     if (!key) return NextResponse.json({ error: 'OPENWEATHER_API_KEY niet ingesteld' }, { status: 500 });
 

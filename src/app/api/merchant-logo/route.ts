@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
+import { z } from 'zod';
+
+const Schema = z.object({
+  naam: z.string().min(1).max(200),
+});
 
 /* Naam → domein mapping */
 const NAAM_DOMEIN: Record<string, string> = {
@@ -57,8 +62,18 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult.error) return authResult.error;
 
+  let body: z.infer<typeof Schema>;
   try {
-    const { naam } = await req.json();
+    body = Schema.parse(await req.json());
+  } catch {
+    return NextResponse.json(
+      { error: 'Ongeldige invoer — controleer de verstuurde velden' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { naam } = body;
     const domein   = naamNaarDomein(naam ?? '');
 
     if (!domein) {

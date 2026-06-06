@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { requireAuth } from '@/lib/api-auth';
+import { z } from 'zod';
+
+const Schema = z.object({
+  base64:    z.string().optional(),
+  mediaType: z.string().optional(),
+  tekst:     z.string().max(100000).optional(),
+}).refine(d => d.tekst || d.base64, {
+  message: 'base64 (PDF) of tekst (Word) vereist',
+});
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -20,8 +29,18 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult.error) return authResult.error;
 
+  let body: z.infer<typeof Schema>;
   try {
-    const { base64, mediaType, tekst } = await req.json();
+    body = Schema.parse(await req.json());
+  } catch {
+    return NextResponse.json(
+      { error: 'Ongeldige invoer — controleer de verstuurde velden' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { base64, mediaType, tekst } = body;
 
     let response;
 

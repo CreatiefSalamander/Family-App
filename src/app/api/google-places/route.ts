@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
+import { z } from 'zod';
+
+const Schema = z.object({
+  lat:    z.number().min(-90).max(90),
+  lng:    z.number().min(-180).max(180),
+  type:   z.string().max(50).optional(),
+  radius: z.number().min(100).max(50000).optional(),
+});
 
 const TYPES: Record<string, string> = {
   supermarkt:  'supermarket',
@@ -23,9 +31,18 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult.error) return authResult.error;
 
+  let body: z.infer<typeof Schema>;
   try {
-    const { lat, lng, type = 'supermarkt', radius = 2000 } = await req.json();
-    if (!lat || !lng) return NextResponse.json({ error: 'lat en lng vereist' }, { status: 400 });
+    body = Schema.parse(await req.json());
+  } catch {
+    return NextResponse.json(
+      { error: 'Ongeldige invoer — controleer de verstuurde velden' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { lat, lng, type = 'supermarkt', radius = 2000 } = body;
 
     const key = process.env.GOOGLE_PLACES_API_KEY;
     if (!key) return NextResponse.json({ error: 'GOOGLE_PLACES_API_KEY niet ingesteld' }, { status: 500 });

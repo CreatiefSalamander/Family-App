@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { requireAuth } from '@/lib/api-auth';
+import { z } from 'zod';
+
+const Schema = z.object({
+  base64:    z.string().min(1),
+  mediaType: z.string().optional(),
+});
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -8,9 +14,18 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult.error) return authResult.error;
 
+  let body: z.infer<typeof Schema>;
   try {
-    const { base64, mediaType = 'image/jpeg' } = await req.json();
-    if (!base64) return NextResponse.json({ error: 'base64 afbeelding vereist' }, { status: 400 });
+    body = Schema.parse(await req.json());
+  } catch {
+    return NextResponse.json(
+      { error: 'Ongeldige invoer — controleer de verstuurde velden' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { base64, mediaType = 'image/jpeg' } = body;
 
     const response = await anthropic.messages.create({
       model:      'claude-sonnet-4-5',

@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
+import { z } from 'zod';
+
+const Schema = z.object({
+  van:   z.string().length(3).optional(),
+  naar:  z.string().length(3).optional(),
+  bedrag: z.number().min(0).optional(),
+});
 
 const POPULAIR = ['USD','GBP','TRY','AMD','AED','JPY','CHF','SEK','PLN','HUF','DKK','NOK'];
 
@@ -7,8 +14,18 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult.error) return authResult.error;
 
+  let body: z.infer<typeof Schema>;
   try {
-    const { van = 'EUR', naar } = await req.json();
+    body = Schema.parse(await req.json());
+  } catch {
+    return NextResponse.json(
+      { error: 'Ongeldige invoer — controleer de verstuurde velden' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { van = 'EUR', naar } = body;
     const resp = await fetch(`https://open.er-api.com/v6/latest/${van}`);
     const data = await resp.json();
 
