@@ -1,6 +1,7 @@
 'use client';
 
 import DoughnutChart from './DoughnutChart';
+import AnimatedCounter from './AnimatedCounter';
 import type { Rekening } from '@/types';
 
 const fmtEuro = (n: number) =>
@@ -43,7 +44,7 @@ export default function TotalBalanceBox({ rekeningen, totaalSaldo, loading }: Pr
             fontSize: 30, fontWeight: 700,
             color: '#ffffff', lineHeight: 1,
           }}>
-            {loading ? '—' : fmtEuro(totaalSaldo)}
+            {loading ? '—' : <AnimatedCounter amount={totaalSaldo} />}
           </p>
         </div>
 

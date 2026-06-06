@@ -245,20 +245,17 @@ export default function RegisterPage() {
       </div>
 
       {/* ── Rechter kant: sky-blue Horizon panel — verborgen op mobiel via .auth-asset ── */}
-      <div className="auth-asset" style={{ position:'relative' }}>
-        <div style={s.blob1} />
-        <div style={s.blob2} />
-        <div style={s.rightContent}>
+      <div className="auth-asset">
+        {/* auth-image.svg zoals het originele Horizon ontwerp */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', padding:'0 24px', textAlign:'center' }}>
           <h2 style={s.rightH}>Jouw financiën,<br />veilig en privé</h2>
-          <p style={s.rightSub}>Household slaat alleen op wat nodig is</p>
-          {bullets.map((text, i) => (
-            <div key={i} style={s.bullet}>
-              <div style={s.bulletIcon}>
-                <span style={{ color:'#0179FE', fontSize:12, fontWeight:700 }}>✓</span>
-              </div>
-              <p style={s.bulletText}>{text}</p>
-            </div>
-          ))}
+          <p style={{ ...s.rightSub, marginBottom:24 }}>Household slaat alleen op wat nodig is</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/icons/auth-image.svg"
+            alt="Finance illustratie"
+            style={{ width:'100%', maxWidth:400, objectFit:'contain', borderRadius:12 }}
+          />
         </div>
       </div>
 

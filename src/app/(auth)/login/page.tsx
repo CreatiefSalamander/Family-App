@@ -28,13 +28,6 @@ export default function LoginPage() {
     }
   }
 
-  const bullets = [
-    'Automatische CSV import van Rabobank en ING',
-    'Schulden en doelen altijd bij de hand',
-    'AI-assistent voor persoonlijk financieel advies',
-    'Crypto, reizen en kasboek in één app',
-  ];
-
   return (
     /* Horizon auth layout: wit formulier links + sky-blue panel rechts */
     <main style={{ display:'flex', minHeight:'100vh', width:'100%', fontFamily:"'Inter',system-ui,sans-serif" }}>
@@ -149,28 +142,21 @@ export default function LoginPage() {
       </section>
 
       {/* ── Rechter kant: sky-blue panel — verborgen op mobiel via .auth-asset ── */}
-      <div className="auth-asset" style={{ position:'relative' }}>
-        {/* Decoratieve blobs */}
-        <div style={{ position:'absolute', top:-60, right:-60, width:280, height:280, borderRadius:'50%', background:'rgba(1,121,254,.08)', pointerEvents:'none' }} />
-        <div style={{ position:'absolute', bottom:-80, left:-40, width:240, height:240, borderRadius:'50%', background:'rgba(1,121,254,.05)', pointerEvents:'none' }} />
-
-        {/* Content */}
-        <div style={{ position:'relative', zIndex:1, padding:'0 52px', maxWidth:480 }}>
-          <h2 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:30, fontWeight:700, color:'#00214F', marginBottom:10, lineHeight:1.25 }}>
+      <div className="auth-asset">
+        {/* auth-image.svg zoals het originele Horizon ontwerp */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', padding:'0 24px', textAlign:'center' }}>
+          <h2 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:26, fontWeight:700, color:'#00214F', marginBottom:8, lineHeight:1.3 }}>
             Jouw financiën,<br/>altijd inzichtelijk
           </h2>
-          <p style={{ fontSize:15, color:'#475467', marginBottom:36, lineHeight:1.6 }}>
+          <p style={{ fontSize:14, color:'#475467', marginBottom:24, lineHeight:1.6 }}>
             Alles op één plek — veilig, persoonlijk en overzichtelijk
           </p>
-
-          {bullets.map((text, i) => (
-            <div key={i} style={{ display:'flex', gap:12, marginBottom:18, alignItems:'flex-start' }}>
-              <div style={{ width:24, height:24, borderRadius:'50%', background:'rgba(1,121,254,.12)', border:'1px solid rgba(1,121,254,.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
-                <span style={{ color:'#0179FE', fontSize:12, fontWeight:700 }}>✓</span>
-              </div>
-              <p style={{ fontSize:14, color:'#344054', lineHeight:1.6 }}>{text}</p>
-            </div>
-          ))}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/icons/auth-image.svg"
+            alt="Finance illustratie"
+            style={{ width:'100%', maxWidth:400, objectFit:'contain', borderRadius:12 }}
+          />
         </div>
       </div>
 

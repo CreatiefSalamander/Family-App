@@ -75,8 +75,8 @@ export default function BankCard({ rekening, naam, showBalance = true }: Props) 
           width={316}
           height={190}
           style={{
-            position: 'absolute', top: 0, right: 0,
-            opacity: 0.25, pointerEvents: 'none',
+            position: 'absolute', top: 0, left: 0,
+            opacity: 0.6, pointerEvents: 'none',
           }}
         />
 

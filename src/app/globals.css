@@ -569,14 +569,15 @@ select.input-field { appearance: none; cursor: pointer; }
   border-radius: 20px;
   padding: 20px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  /* creditCard shadow — exact Horizon token */
+  box-shadow: 8px 10px 16px 0px rgba(0, 0, 0, 0.05), 0 4px 24px rgba(0, 0, 0, 0.18);
   cursor: pointer;
   transition: transform .2s ease, box-shadow .2s ease;
   text-decoration: none;
 }
 .bank-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 8px 10px 24px 0px rgba(0, 0, 0, 0.12), 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 
 .bank-card_content {
@@ -734,3 +735,55 @@ select.input-field { appearance: none; cursor: pointer; }
 /* PROGRESS BAR */
 .progress-track { height: 6px; background: #F3F4F6; border-radius: 3px; overflow: hidden; }
 .progress-fill  { height: 100%; border-radius: 3px; transition: width .8s ease; }
+
+/* ══════════════════════════════════════════════════════════
+   CATEGORY BADGE — gekleurde stip + border per categorie
+   Exact overgenomen uit Horizon transactionCategoryStyles
+   ══════════════════════════════════════════════════════════ */
+.cat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  border-width: 1.5px;
+  border-style: solid;
+  padding: 2px 8px 2px 6px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.cat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+/* Per categorie kleuren */
+.cat-boodschappen { border-color: #6172F3; color: #3538CD; }
+.cat-boodschappen .cat-dot { background: #6172F3; }
+.cat-eten         { border-color: #EE46BC; color: #C11574; }
+.cat-eten         .cat-dot { background: #EE46BC; }
+.cat-transport    { border-color: #175CD3; color: #194185; }
+.cat-transport    .cat-dot { background: #2E90FA; }
+.cat-wonen        { border-color: #F79009; color: #B54708; }
+.cat-wonen        .cat-dot { background: #F79009; }
+.cat-gezondheid   { border-color: #039855; color: #027A48; }
+.cat-gezondheid   .cat-dot { background: #039855; }
+.cat-salaris,
+.cat-inkomen      { border-color: #12B76A; color: #027A48; }
+.cat-salaris .cat-dot,
+.cat-inkomen .cat-dot { background: #12B76A; }
+.cat-zakelijk     { border-color: #7A5AF8; color: #5925DC; }
+.cat-zakelijk     .cat-dot { background: #7A5AF8; }
+.cat-abonnement   { border-color: #06AED4; color: #0E7090; }
+.cat-abonnement   .cat-dot { background: #06AED4; }
+.cat-kleding      { border-color: #DD2590; color: #9E165F; }
+.cat-kleding      .cat-dot { background: #DD2590; }
+.cat-sport        { border-color: #EF6820; color: #B93815; }
+.cat-sport        .cat-dot { background: #EF6820; }
+.cat-belasting    { border-color: #F04438; color: #B42318; }
+.cat-belasting    .cat-dot { background: #F04438; }
+.cat-verzekering  { border-color: #0086C9; color: #065986; }
+.cat-verzekering  .cat-dot { background: #0086C9; }
+.cat-default      { border-color: #D0D5DD; color: #344054; }
+.cat-default      .cat-dot { background: #98A2B3; }

@@ -17,6 +17,21 @@ const CAT_ICON: Record<string, string> = {
 const CATS = ['Boodschappen','Eten','Transport','Wonen','Gezondheid','Salaris','Inkomen','Zakelijk','Abonnement','Kleding','Sport','Belasting','Verzekering','Overig'];
 const PER_PAGE = 20;
 
+// Geldige cat-badge klassen (Horizon stijl)
+const CAT_CLASSES = new Set(['boodschappen','eten','transport','wonen','gezondheid','salaris','inkomen','zakelijk','abonnement','kleding','sport','belasting','verzekering']);
+
+// CategoryBadge — gekleurde stip + gekleurde border per categorie
+function CategoryBadge({ category }: { category: string }) {
+  const key = category.toLowerCase().replace(/\s+/g, '-');
+  const cls = CAT_CLASSES.has(key) ? `cat-${key}` : 'cat-default';
+  return (
+    <span className={`cat-badge ${cls}`}>
+      <span className="cat-dot" />
+      {category}
+    </span>
+  );
+}
+
 export default function TransactiesPage() {
   const { t } = useLang();
   const [tx, setTx]         = useState<Transactie[]>([]);
@@ -138,35 +153,40 @@ export default function TransactiesPage() {
                 <p key={h} style={{ fontSize:11, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</p>
               ))}
             </div>
-            {/* Transactie rijen — flex kaart-layout werkt goed op zowel mobiel als desktop */}
-            {slice.map(item=>(
+            {/* Transactie rijen — flex kaart-layout, Horizon rij-kleuren */}
+            {slice.map(item=>{
+              const isIncome = item.type === 'income';
+              // Rij achtergrond: groen-tinted voor inkomst, rood-tinted voor uitgave (Horizon stijl)
+              const rowBg = isIncome ? '#F6FEF9' : '#FFFBFA';
+              const rowHover = isIncome ? '#ECFDF3' : '#FEF2F2';
+              return (
               <div key={item.id}
-                style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid #F9FAFB', transition:'background .15s' }}
-                onMouseEnter={e=>(e.currentTarget.style.background='#F9FAFB')}
-                onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
+                style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid #F9FAFB', background:rowBg, transition:'background .15s' }}
+                onMouseEnter={e=>(e.currentTarget.style.background=rowHover)}
+                onMouseLeave={e=>(e.currentTarget.style.background=rowBg)}>
                 {/* Categorie icoon */}
-                <div style={{ width:40, height:40, borderRadius:12, background:'#F3F4F6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>
+                <div style={{ width:40, height:40, borderRadius:12, background:'rgba(255,255,255,.7)', border:'1px solid #F3F4F6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>
                   {CAT_ICON[item.category]||'📄'}
                 </div>
-                {/* Omschrijving + badge + datum */}
+                {/* Omschrijving + gekleurde badge */}
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ fontSize:13, fontWeight:600, color:'#1A1F36', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  <p style={{ fontSize:13, fontWeight:600, color:'#344054', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                     {item.description}
                   </p>
-                  <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:3 }}>
-                    <span className={`badge ${item.type==='income'?'badge-green':'badge-gray'}`}>{item.category}</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:4 }}>
+                    <CategoryBadge category={item.category} />
                     <span className="tx-col-datum" style={{ fontSize:11, color:'#9CA3AF' }}>{fmtDate(item.date)}</span>
                   </div>
                 </div>
                 {/* Bedrag rechts */}
                 <div style={{ flexShrink:0, textAlign:'right' }}>
-                  <p className="amount" style={{ fontSize:14, color:item.type==='income'?'#22C55E':'#EF4444' }}>
-                    {item.type==='income'?'+':'-'}{fmtEuro(item.amount)}
+                  <p className="amount" style={{ fontSize:14, color:isIncome?'#039855':'#F04438' }}>
+                    {isIncome?'+':'-'}{fmtEuro(item.amount)}
                   </p>
                   <p className="tx-col-datum" style={{ fontSize:11, color:'#9CA3AF', marginTop:2 }}>{fmtDate(item.date)}</p>
                 </div>
               </div>
-            ))}
+            );})}
           </>
         )}
       </div>
