@@ -139,14 +139,15 @@ export default function MobileNav() {
           paddingBottom:'env(safe-area-inset-bottom, 0px)',
         }}
       >
-        {/* Glassmorphism pill */}
+        {/* Glassmorphism pill — hoogte 80px voor comfortabele touch targets */}
         <div style={{
           margin:'0 12px 10px',
-          height:62,
-          background:'rgba(17,24,39,.88)',
-          backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)',
-          borderRadius:22,
-          border:'1px solid rgba(255,255,255,.1)',
+          height:80,
+          background:'rgba(17,24,39,.92)',
+          backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)',
+          borderRadius:24,
+          border:'1px solid rgba(255,255,255,.12)',
+          borderTop:'1px solid rgba(255,255,255,.18)',
           boxShadow:'0 8px 32px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.06) inset',
           display:'flex', alignItems:'center',
         }}>
@@ -160,18 +161,20 @@ export default function MobileNav() {
                 gap:3, padding:'8px 4px', textDecoration:'none', position:'relative',
                 color: active ? '#60A5FA' : 'rgba(255,255,255,.4)',
                 transition:'color .18s',
+                minHeight:56, /* Apple HIG minimale touch target */
+                WebkitTapHighlightColor:'transparent',
               }}>
                 {/* Actieve indicatordot bovenaan — zoals reference */}
                 {active && (
                   <div style={{
-                    position:'absolute', top:6, left:'50%', transform:'translateX(-50%)',
+                    position:'absolute', top:8, left:'50%', transform:'translateX(-50%)',
                     width:4, height:4, borderRadius:'50%',
                     background:'linear-gradient(135deg,#0179FE,#60A5FA)',
                     boxShadow:'0 0 6px rgba(1,121,254,.8)',
                   }} />
                 )}
-                <Icon size={20} strokeWidth={active ? 2.5 : 1.8} style={{ marginTop: active ? 4 : 0 }}/>
-                <span style={{ fontSize:9.5, fontWeight: active ? 700 : 500, fontFamily:"'Inter',sans-serif", letterSpacing:'.01em' }}>
+                <Icon size={21} strokeWidth={active ? 2.5 : 1.8} style={{ marginTop: active ? 4 : 0 }}/>
+                <span style={{ fontSize:11, fontWeight: active ? 700 : 500, fontFamily:"'Inter',sans-serif", letterSpacing:'.01em' }}>
                   {label}
                 </span>
               </Link>
@@ -184,10 +187,11 @@ export default function MobileNav() {
             style={{
               flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
               gap:3, padding:'4px', border:'none', cursor:'pointer', background:'transparent',
+              minHeight:56, WebkitTapHighlightColor:'transparent',
             }}
           >
             <div style={{
-              width:44, height:44, borderRadius:15,
+              width:46, height:46, borderRadius:16,
               background: snelOpen ? 'rgba(239,68,68,.9)' : 'linear-gradient(135deg,#0179FE,#4893FF)',
               display:'flex', alignItems:'center', justifyContent:'center',
               boxShadow: snelOpen ? '0 4px 14px rgba(239,68,68,.4)' : '0 4px 16px rgba(1,121,254,.45)',
@@ -206,21 +210,22 @@ export default function MobileNav() {
               gap:3, padding:'8px 4px', border:'none', cursor:'pointer', background:'transparent',
               color: meerOpen ? '#60A5FA' : 'rgba(255,255,255,.4)',
               position:'relative', transition:'color .18s',
+              minHeight:56, WebkitTapHighlightColor:'transparent',
             }}
           >
             {meerOpen && (
               <div style={{
-                position:'absolute', top:6, left:'50%', transform:'translateX(-50%)',
+                position:'absolute', top:8, left:'50%', transform:'translateX(-50%)',
                 width:4, height:4, borderRadius:'50%',
                 background:'linear-gradient(135deg,#0179FE,#60A5FA)',
                 boxShadow:'0 0 6px rgba(1,121,254,.8)',
               }} />
             )}
             {meerOpen
-              ? <X size={20} strokeWidth={2.5} style={{ marginTop: 4 }}/>
-              : <MoreHorizontal size={20} strokeWidth={1.8}/>
+              ? <X size={21} strokeWidth={2.5} style={{ marginTop: 4 }}/>
+              : <MoreHorizontal size={21} strokeWidth={1.8}/>
             }
-            <span style={{ fontSize:9.5, fontWeight: meerOpen ? 700 : 500, fontFamily:"'Inter',sans-serif" }}>Meer</span>
+            <span style={{ fontSize:11, fontWeight: meerOpen ? 700 : 500, fontFamily:"'Inter',sans-serif" }}>Meer</span>
           </button>
 
         </div>

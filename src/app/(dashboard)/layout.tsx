@@ -6,7 +6,7 @@ import Sidebar                      from '@/components/layout/Sidebar';
 import MobileNav                    from '@/components/layout/MobileNav';
 import AIChatbot                    from '@/components/ai/AIChatbot';
 import type { Lang }                from '@/lib/translations';
-import { Euro }                     from 'lucide-react';
+import { Euro, Bell }               from 'lucide-react';
 
 export default async function DashboardLayout({
   children,
@@ -72,14 +72,25 @@ export default async function DashboardLayout({
             Household
           </span>
         </div>
-        {/* Avatar rechts */}
-        <div style={{
-          width:34, height:34, borderRadius:'50%',
-          background:'linear-gradient(135deg,#0179FE,#4893FF)',
-          display:'flex', alignItems:'center', justifyContent:'center',
-          color:'#fff', fontSize:13, fontWeight:700,
-        }}>
-          {initialen || '?'}
+        {/* Notificatie bell + avatar rechts */}
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <button style={{
+            width:34, height:34, borderRadius:'50%',
+            background:'rgba(255,255,255,.08)',
+            border:'1px solid rgba(255,255,255,.12)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            cursor:'pointer', color:'rgba(255,255,255,.7)',
+          }}>
+            <Bell size={16} />
+          </button>
+          <div style={{
+            width:34, height:34, borderRadius:'50%',
+            background:'linear-gradient(135deg,#0179FE,#4893FF)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            color:'#fff', fontSize:13, fontWeight:700,
+          }}>
+            {initialen || '?'}
+          </div>
         </div>
       </header>
 

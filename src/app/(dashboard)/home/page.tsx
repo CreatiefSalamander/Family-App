@@ -138,7 +138,7 @@ export default function HomePage() {
           const [kleur, label] = score >= 71 ? ['#22C55E','Goed'] : score >= 41 ? ['#F59E0B','Matig'] : ['#EF4444','Kritiek'];
           const dashArray = 2 * Math.PI * 28;
           return (
-            <div className="card" style={{ padding:20, marginBottom:24, display:'flex', alignItems:'center', gap:20 }}>
+            <div className="card" style={{ padding:'clamp(12px,3vw,20px)', marginBottom:'clamp(14px,4vw,24px)', display:'flex', alignItems:'center', gap:'clamp(12px,3vw,20px)' }}>
               <svg width="72" height="72" viewBox="0 0 72 72" style={{ flexShrink:0 }}>
                 <circle cx="36" cy="36" r="28" fill="none" stroke="#F3F4F6" strokeWidth="8"/>
                 <circle cx="36" cy="36" r="28" fill="none" stroke={kleur} strokeWidth="8"
@@ -160,7 +160,7 @@ export default function HomePage() {
         })()}
 
         {/* 4 KPI Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 16, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(clamp(130px,38vw,160px),1fr))', gap: 'clamp(10px,2.5vw,16px)', marginBottom: 'clamp(14px,4vw,24px)' }}>
           {kpis.map(({ label, value, icon: Icon, color, border, bg }) => (
             <div key={label} className="kpi-card card-hover" style={{ borderLeftColor: border }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
@@ -171,7 +171,7 @@ export default function HomePage() {
                   <Icon size={15} color={color} />
                 </div>
               </div>
-              <p className="amount" style={{ fontSize: 20, color: loading ? '#D1D5DB' : color }}>
+              <p className="amount" style={{ fontSize: 'clamp(15px,4vw,20px)', color: loading ? '#D1D5DB' : color }}>
                 {loading ? '—' : fmtEuro(value)}
               </p>
             </div>
@@ -179,7 +179,7 @@ export default function HomePage() {
         </div>
 
         {/* Recente transacties */}
-        <div className="card" style={{ padding: 24 }}>
+        <div className="card" style={{ padding: 'clamp(14px,4vw,24px)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <h3 style={{ fontSize: 15, fontWeight: 700, color: '#1A1F36' }}>
               {t.dashboard.recent_transactions}
