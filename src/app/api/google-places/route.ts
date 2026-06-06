@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 import { z } from 'zod';
 
 const Schema = z.object({
@@ -30,6 +31,15 @@ type PlaceResult = {
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult.error) return authResult.error;
+
+  // Max 20 zoekopdrachten per minuut per gebruiker (Google Places kost geld per call)
+  const rl = checkRateLimit(authResult.user.id, 'google-places', 20);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: `Te veel verzoeken. Probeer over ${Math.ceil(rl.resetIn / 1000)} seconden opnieuw.` },
+      { status: 429 },
+    );
+  }
 
   let body: z.infer<typeof Schema>;
   try {

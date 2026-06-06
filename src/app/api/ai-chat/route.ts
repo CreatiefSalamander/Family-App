@@ -22,9 +22,10 @@ export async function POST(req: NextRequest) {
   if (authResult.error) return authResult.error;
 
   // Max 30 berichten per minuut per gebruiker
-  if (!checkRateLimit(authResult.user.id, 'ai-chat', 30)) {
+  const rl = checkRateLimit(authResult.user.id, 'ai-chat', 30);
+  if (!rl.allowed) {
     return NextResponse.json(
-      { error: 'Te veel verzoeken — wacht even en probeer opnieuw' },
+      { error: `Te veel verzoeken. Probeer over ${Math.ceil(rl.resetIn / 1000)} seconden opnieuw.` },
       { status: 429 },
     );
   }

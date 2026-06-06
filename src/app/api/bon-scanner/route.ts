@@ -16,9 +16,10 @@ export async function POST(req: NextRequest) {
   if (authResult.error) return authResult.error;
 
   // Max 5 bon-scans per minuut per gebruiker (vision API is duur)
-  if (!checkRateLimit(authResult.user.id, 'bon-scanner', 5)) {
+  const rl = checkRateLimit(authResult.user.id, 'bon-scanner', 5);
+  if (!rl.allowed) {
     return NextResponse.json(
-      { error: 'Te veel verzoeken — wacht even en probeer opnieuw' },
+      { error: `Te veel verzoeken. Probeer over ${Math.ceil(rl.resetIn / 1000)} seconden opnieuw.` },
       { status: 429 },
     );
   }

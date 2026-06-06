@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { requireAuth } from '@/lib/api-auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 import { z } from 'zod';
 
 const Schema = z.object({
@@ -28,6 +29,15 @@ Regels:
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult.error) return authResult.error;
+
+  // Max 5 document-analyses per minuut per gebruiker (zwaarste Anthropic call)
+  const rl = checkRateLimit(authResult.user.id, 'analyze-document', 5);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: `Te veel verzoeken. Probeer over ${Math.ceil(rl.resetIn / 1000)} seconden opnieuw.` },
+      { status: 429 },
+    );
+  }
 
   let body: z.infer<typeof Schema>;
   try {
