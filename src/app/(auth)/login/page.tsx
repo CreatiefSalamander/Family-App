@@ -32,211 +32,148 @@ export default function LoginPage() {
     'Automatische CSV import van Rabobank en ING',
     'Schulden en doelen altijd bij de hand',
     'AI-assistent voor persoonlijk financieel advies',
+    'Crypto, reizen en kasboek in één app',
   ];
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    /* Horizon auth layout: wit formulier links + sky-blue panel rechts */
+    <main style={{ display:'flex', minHeight:'100vh', width:'100%', fontFamily:"'Inter',system-ui,sans-serif" }}>
 
-      {/* ── MOBIEL: donkere hero bovenin (verborgen op desktop) ── */}
-      <div className="lg:hidden relative bg-[#111827] px-6 pt-10 pb-20 overflow-hidden">
-        {/* Decoratieve blobs */}
-        <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-[rgba(1,121,254,0.12)]" />
-        <div className="absolute -bottom-14 -left-8 w-52 h-52 rounded-full bg-[rgba(1,121,254,0.07)]" />
+      {/* ── Linker kant: formulier ────────────────────────────── */}
+      <section style={{
+        flex:1, display:'flex', alignItems:'center', justifyContent:'center',
+        padding:'48px 24px', backgroundColor:'#fff', overflowY:'auto',
+      }}>
+        <div style={{ width:'100%', maxWidth:420 }}>
 
-        {/* Logo */}
-        <div className="relative z-10 flex items-center gap-2.5 mb-6">
-          <div
-            className="w-9 h-9 rounded-[10px] flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg,#0179FE,#4893FF)' }}
-          >
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 18, fontFamily: "'IBM Plex Serif',serif" }}>€</span>
-          </div>
-          <span style={{ fontFamily: "'IBM Plex Serif', serif", fontSize: 20, fontWeight: 700, color: '#fff' }}>
-            Household
-          </span>
-        </div>
-
-        {/* Tagline */}
-        <div className="relative z-10">
-          <h2
-            className="text-2xl font-bold text-white mb-1 leading-snug"
-            style={{ fontFamily: "'IBM Plex Serif', serif" }}
-          >
-            Jouw financiën,<br />altijd inzichtelijk
-          </h2>
-          <p className="text-sm text-white/55">Alles op één plek, veilig en persoonlijk</p>
-        </div>
-      </div>
-
-      {/* ── FORMULIER PANEL ── */}
-      {/* Op mobiel: witte card die over de hero schuift via -mt-6 + rounded-t-3xl */}
-      <div className="
-        flex-1 flex flex-col
-        px-6 py-8
-        bg-white
-        -mt-6 rounded-t-3xl
-        lg:mt-0 lg:rounded-none
-        lg:w-[40%] lg:flex-none
-        lg:justify-center lg:px-14
-        overflow-y-auto relative z-10
-      ">
-
-        {/* Logo — alleen zichtbaar op desktop */}
-        <div className="hidden lg:flex items-center gap-2.5 mb-10">
-          <div
-            className="w-9 h-9 rounded-[10px] flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg,#0179FE,#4893FF)' }}
-          >
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 18, fontFamily: "'IBM Plex Serif',serif" }}>€</span>
-          </div>
-          <span style={{ fontFamily: "'IBM Plex Serif', serif", fontSize: 21, fontWeight: 700, color: '#1A1F36' }}>
-            Household
-          </span>
-        </div>
-
-        <h1
-          className="text-[26px] lg:text-[30px] font-bold text-[#1A1F36] mb-1.5 tracking-tight"
-          style={{ fontFamily: "'IBM Plex Serif', serif" }}
-        >
-          Welkom terug
-        </h1>
-        <p className="text-sm text-[#6B7280] mb-6">Log in om je financieel dashboard te bekijken</p>
-
-        {error && (
-          <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-lg px-3.5 py-2.5 text-[#DC2626] text-[13px] mb-4">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin} className="w-full">
-          {/* E-mail */}
-          <div className="mb-4">
-            <label className="block text-[13px] font-semibold text-[#374151] mb-1.5">E-mailadres</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="jouw@email.com"
-              required
-              className="w-full border-[1.5px] border-[#E5E7EB] rounded-lg px-3.5 py-[11px] text-[14px] text-[#1A1F36] bg-white outline-none box-border transition-colors"
-              style={{ fontFamily: 'inherit' }}
-              onFocus={e => (e.target.style.borderColor = '#0179FE')}
-              onBlur={e  => (e.target.style.borderColor = '#E5E7EB')}
-            />
+          {/* Logo */}
+          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:32 }}>
+            <div style={{ width:34, height:34, background:'linear-gradient(90deg,#0179FE,#4893FF)', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <span style={{ color:'#fff', fontFamily:"'IBM Plex Serif',serif", fontWeight:700, fontSize:18 }}>€</span>
+            </div>
+            <span style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:22, fontWeight:700, color:'#00214F' }}>
+              Household
+            </span>
           </div>
 
-          {/* Wachtwoord */}
-          <div className="mb-5">
-            <label className="block text-[13px] font-semibold text-[#374151] mb-1.5">Wachtwoord</label>
-            <div className="relative">
+          {/* Heading */}
+          <h1 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:28, fontWeight:600, color:'#101828', marginBottom:6, lineHeight:1.25 }}>
+            Welkom terug
+          </h1>
+          <p style={{ fontSize:15, color:'#475467', marginBottom:28 }}>
+            Voer je gegevens in om in te loggen
+          </p>
+
+          {/* Foutmelding */}
+          {error && (
+            <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:8, padding:'10px 14px', color:'#DC2626', fontSize:13, marginBottom:20 }}>
+              {error}
+            </div>
+          )}
+
+          {/* Formulier */}
+          <form onSubmit={handleLogin} style={{ display:'flex', flexDirection:'column', gap:18 }}>
+
+            {/* E-mail */}
+            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+              <label style={{ fontSize:13, fontWeight:600, color:'#344054' }}>E-mailadres</label>
               <input
-                type={showPw ? 'text' : 'password'}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
+                className="input-field"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="jouw@email.com"
                 required
-                className="w-full border-[1.5px] border-[#E5E7EB] rounded-lg px-3.5 py-[11px] pr-11 text-[14px] text-[#1A1F36] bg-white outline-none box-border transition-colors"
-                style={{ fontFamily: 'inherit' }}
-                onFocus={e => (e.target.style.borderColor = '#0179FE')}
-                onBlur={e  => (e.target.style.borderColor = '#E5E7EB')}
+                style={{ fontSize:16 /* voorkomt iOS zoom */ }}
               />
-              <button
-                type="button"
-                onClick={() => setShowPw(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-[#9CA3AF] text-base"
-              >
-                {showPw ? '🙈' : '👁'}
-              </button>
             </div>
-          </div>
 
-          {/* Onthoud mij + Wachtwoord vergeten */}
-          <div className="flex items-center justify-between mb-5">
-            <label className="flex items-center gap-2 cursor-pointer text-[13px] text-[#6B7280]">
-              <input
-                type="checkbox"
-                checked={onthoudMe}
-                onChange={e => setOnthoudMe(e.target.checked)}
-                className="w-4 h-4 cursor-pointer accent-[#0179FE]"
-              />
-              Onthoud mij
-            </label>
-            <a href="#" className="text-[13px] text-[#0179FE] no-underline">
-              Wachtwoord vergeten?
+            {/* Wachtwoord */}
+            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+              <label style={{ fontSize:13, fontWeight:600, color:'#344054' }}>Wachtwoord</label>
+              <div style={{ position:'relative' }}>
+                <input
+                  className="input-field"
+                  type={showPw ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  style={{ paddingRight:44, fontSize:16 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(v => !v)}
+                  style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#9CA3AF', fontSize:15, lineHeight:1 }}
+                >
+                  {showPw ? '🙈' : '👁'}
+                </button>
+              </div>
+            </div>
+
+            {/* Onthoud mij + wachtwoord vergeten */}
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+              <label style={{ display:'flex', gap:8, alignItems:'center', fontSize:13, color:'#475467', cursor:'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={onthoudMe}
+                  onChange={e => setOnthoudMe(e.target.checked)}
+                  style={{ accentColor:'#0179FE', width:16, height:16 }}
+                />
+                Onthoud mij
+              </label>
+              <a href="#" style={{ fontSize:13, color:'#0179FE', textDecoration:'none', fontWeight:500 }}>
+                Wachtwoord vergeten?
+              </a>
+            </div>
+
+            {/* Inlogknop — form-btn klasse uit globals.css */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="form-btn"
+              style={{ padding:'13px 20px', fontSize:15, fontWeight:600, marginTop:4 }}
+            >
+              {loading ? 'Bezig met inloggen...' : 'Inloggen'}
+            </button>
+          </form>
+
+          {/* Registreer link */}
+          <p style={{ textAlign:'center', fontSize:13, color:'#475467', marginTop:24 }}>
+            Nog geen account?{' '}
+            <a href="/register" style={{ color:'#0179FE', fontWeight:600, textDecoration:'none' }}>
+              Registreer hier
             </a>
-          </div>
-
-          {/* Inloggen knop */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full text-white border-none rounded-lg py-[13px] px-5 text-[15px] font-semibold cursor-pointer transition-opacity"
-            style={{
-              background: 'linear-gradient(135deg,#0179FE,#4893FF)',
-              boxShadow: '0 2px 8px rgba(1,121,254,.3)',
-              fontFamily: 'inherit',
-              opacity: loading ? 0.65 : 1,
-            }}
-          >
-            {loading ? 'Bezig...' : 'Inloggen →'}
-          </button>
-        </form>
-
-        <p className="text-center text-[13px] text-[#6B7280] mt-5">
-          Nog geen account?{' '}
-          <a href="/register" className="text-[#0179FE] font-semibold no-underline">
-            Registreer hier
-          </a>
-        </p>
-
-        {/* Compacte bullets — alleen op mobiel onder het formulier */}
-        <div className="lg:hidden mt-8 pt-6 border-t border-[#F3F4F6]">
-          {bullets.map((text, i) => (
-            <div key={i} className="flex items-start gap-3 mb-3">
-              <div
-                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                style={{ background: 'rgba(1,121,254,0.1)' }}
-              >
-                <span style={{ color: '#0179FE', fontSize: 11, fontWeight: 700 }}>✓</span>
-              </div>
-              <p className="text-[13px] text-[#6B7280] leading-snug">{text}</p>
-            </div>
-          ))}
+          </p>
         </div>
-      </div>
+      </section>
 
-      {/* ── RECHTER PANEL — alleen zichtbaar op desktop ── */}
-      <div className="hidden lg:flex flex-1 bg-[#111827] flex-col items-center justify-center p-12 relative overflow-hidden">
-        <div
-          className="absolute -top-[60px] -right-[60px] w-[280px] h-[280px] rounded-full"
-          style={{ background: 'rgba(1,121,254,.12)' }}
-        />
-        <div
-          className="absolute -bottom-[80px] -left-[40px] w-[320px] h-[320px] rounded-full"
-          style={{ background: 'rgba(1,121,254,.07)' }}
-        />
-        <div className="relative z-10 max-w-[340px]">
-          <h2
-            className="text-[26px] font-bold text-white mb-2 leading-snug"
-            style={{ fontFamily: "'IBM Plex Serif', serif" }}
-          >
-            Jouw financiën,<br />altijd inzichtelijk
+      {/* ── Rechter kant: sky-blue panel — verborgen op mobiel via .auth-asset ── */}
+      <div className="auth-asset" style={{ position:'relative' }}>
+        {/* Decoratieve blobs */}
+        <div style={{ position:'absolute', top:-60, right:-60, width:280, height:280, borderRadius:'50%', background:'rgba(1,121,254,.08)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', bottom:-80, left:-40, width:240, height:240, borderRadius:'50%', background:'rgba(1,121,254,.05)', pointerEvents:'none' }} />
+
+        {/* Content */}
+        <div style={{ position:'relative', zIndex:1, padding:'0 52px', maxWidth:480 }}>
+          <h2 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:30, fontWeight:700, color:'#00214F', marginBottom:10, lineHeight:1.25 }}>
+            Jouw financiën,<br/>altijd inzichtelijk
           </h2>
-          <p className="text-[14px] text-white/55 mb-10">Alles op één plek, veilig en persoonlijk</p>
+          <p style={{ fontSize:15, color:'#475467', marginBottom:36, lineHeight:1.6 }}>
+            Alles op één plek — veilig, persoonlijk en overzichtelijk
+          </p>
+
           {bullets.map((text, i) => (
-            <div key={i} className="flex items-start gap-3 mb-[18px]">
-              <div
-                className="w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                style={{ background: 'rgba(34,197,94,.2)' }}
-              >
-                <span style={{ color: '#22C55E', fontSize: 12, fontWeight: 700 }}>✓</span>
+            <div key={i} style={{ display:'flex', gap:12, marginBottom:18, alignItems:'flex-start' }}>
+              <div style={{ width:24, height:24, borderRadius:'50%', background:'rgba(1,121,254,.12)', border:'1px solid rgba(1,121,254,.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
+                <span style={{ color:'#0179FE', fontSize:12, fontWeight:700 }}>✓</span>
               </div>
-              <p className="text-[14px] text-white/80 leading-relaxed">{text}</p>
+              <p style={{ fontSize:14, color:'#344054', lineHeight:1.6 }}>{text}</p>
             </div>
           ))}
         </div>
       </div>
 
-    </div>
+    </main>
   );
 }

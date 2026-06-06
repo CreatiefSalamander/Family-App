@@ -107,9 +107,9 @@ export default function Sidebar({ user, profiel }: SidebarProps) {
           <button
             onClick={toggleCollapse}
             data-tip={collapsed ? 'Uitklappen' : 'Inklappen'}
-            style={{ background:'rgba(255,255,255,.08)', border:'none', borderRadius:6, width:26, height:26, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#6B7280', flexShrink:0, transition:'background .15s' }}
-            onMouseEnter={e=>(e.currentTarget.style.background='rgba(255,255,255,.16)')}
-            onMouseLeave={e=>(e.currentTarget.style.background='rgba(255,255,255,.08)')}
+            style={{ background:'rgba(0,0,0,.05)', border:'none', borderRadius:6, width:26, height:26, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#667085', flexShrink:0, transition:'background .15s' }}
+            onMouseEnter={e=>(e.currentTarget.style.background='rgba(1,121,254,.08)')}
+            onMouseLeave={e=>(e.currentTarget.style.background='rgba(0,0,0,.05)')}
           >
             {collapsed ? <ChevronRight size={14}/> : <ChevronLeft size={14}/>}
           </button>
@@ -144,15 +144,15 @@ export default function Sidebar({ user, profiel }: SidebarProps) {
       </div>
 
       {/* ── Footer ───────────────────────────────────────── */}
-      <div style={{ borderTop:'1px solid rgba(255,255,255,.08)', paddingTop:12 }}>
+      <div style={{ borderTop:'1px solid #E5E7EB', paddingTop:12 }}>
         <div className="sidebar-footer-user" style={{ display:'flex', alignItems:'center', gap:10, padding:'6px 12px', marginBottom:4 }}>
           <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#0179FE,#4893FF)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:13, fontWeight:700, flexShrink:0 }}>
             {initialen}
           </div>
           {!collapsed && (
             <div className="sidebar-user-info" style={{ flex:1, minWidth:0 }}>
-              <p style={{ color:'#fff', fontSize:13, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{vollnaam}</p>
-              <p style={{ color:'#6B7280', fontSize:11, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{user.email}</p>
+              <p style={{ color:'#101828', fontSize:13, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{vollnaam}</p>
+              <p style={{ color:'#667085', fontSize:11, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{user.email}</p>
             </div>
           )}
         </div>

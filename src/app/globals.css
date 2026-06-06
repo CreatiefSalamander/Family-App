@@ -18,7 +18,7 @@ body {
 /* ── RTL ─────────────────────────────────────────────────── */
 [dir="rtl"] body,
 [dir="rtl"] { font-family: 'Noto Sans Arabic', 'Inter', system-ui, sans-serif; }
-[dir="rtl"] .sidebar { right: 0; left: auto; border-right: none; border-left: 1px solid rgba(255,255,255,.08); }
+[dir="rtl"] .sidebar { right: 0; left: auto; border-right: none; border-left: 1px solid #E5E7EB; }
 [dir="rtl"] .right-sidebar { border-left: none; border-right: 1px solid #E5E7EB; }
 
 /* ── Font helpers ───────────────────────────────────────── */
@@ -41,8 +41,8 @@ body {
   height: 100vh;
   flex-direction: column;
   justify-content: space-between;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  background-color: #111827;
+  border-right: 1px solid #E5E7EB;
+  background-color: #ffffff;
   padding: 20px 12px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -83,7 +83,7 @@ body[data-sidebar="collapsed"] .content-wrapper { margin-left: 0; }
   gap: 12px;
   padding: 10px 12px;
   border-radius: 8px;
-  color: #9CA3AF;
+  color: #344054;   /* Horizon: black-2 / gray-700 */
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -94,7 +94,7 @@ body[data-sidebar="collapsed"] .content-wrapper { margin-left: 0; }
   width: 100%;
   font-family: inherit;
 }
-.sidebar-link:hover { background: rgba(255,255,255,.08); color: #E5E7EB; }
+.sidebar-link:hover { background: rgba(1,121,254,.06); color: #0179FE; }
 .sidebar-link.active,
 .sidebar-link-active {
   background: linear-gradient(90deg, #0179FE 0%, #4893FF 100%);
@@ -108,7 +108,7 @@ body[data-sidebar="collapsed"] .content-wrapper { margin-left: 0; }
   font-family: 'IBM Plex Serif', serif;
   font-size: 19px;
   font-weight: 700;
-  color: #ffffff;
+  color: #00214F;   /* Horizon: black-1 */
   letter-spacing: -0.3px;
 }
 
@@ -694,6 +694,42 @@ select.input-field { appearance: none; cursor: pointer; }
   50%      { opacity: .5; }
 }
 .skeleton { animation: skeleton 1.5s ease-in-out infinite; background: #F3F4F6; border-radius: 6px; }
+
+/* ══════════════════════════════════════════════════════════
+   AUTH LAYOUT — Horizon stijl (wit formulier + sky-blue rechts)
+   ══════════════════════════════════════════════════════════ */
+
+/* Rechter paneel: sticky sky-blue, verborgen op mobiel en tablet */
+.auth-asset {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  max-width: 50%;
+  position: sticky;
+  top: 0;
+  align-items: center;
+  justify-content: center;
+  background-color: #F3F9FF;
+  overflow: hidden;
+}
+@media (max-width: 1023px) {
+  .auth-asset { display: none; }
+}
+
+/* Gradient knop (bank-gradient) voor formulieren */
+.form-btn {
+  width: 100%;
+  background: linear-gradient(90deg, #0179FE 0%, #4893FF 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.form-btn:hover { opacity: .92; }
+.form-btn:disabled { opacity: .65; cursor: not-allowed; }
 
 /* PROGRESS BAR */
 .progress-track { height: 6px; background: #F3F4F6; border-radius: 3px; overflow: hidden; }

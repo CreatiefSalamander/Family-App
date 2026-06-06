@@ -96,8 +96,8 @@ export default function RegisterPage() {
 
   const s = {
     wrap:      { display:'flex', height:'100vh', overflow:'hidden', fontFamily:"'Inter',system-ui,sans-serif" } as const,
-    left:      { width:'45%', display:'flex', flexDirection:'column' as const, justifyContent:'center', padding:'0 52px', background:'#fff', overflowY:'auto' as const },
-    right:     { flex:1, background:'#111827', display:'flex', flexDirection:'column' as const, alignItems:'center', justifyContent:'center', padding:'48px', position:'relative' as const, overflow:'hidden' } as const,
+    left:      { flex:1, display:'flex', flexDirection:'column' as const, justifyContent:'center', padding:'0 clamp(24px,6vw,52px)', background:'#fff', overflowY:'auto' as const },
+    // right wordt afgehandeld via .auth-asset class (sky-blue, verborgen op mobiel)
     logo:      { display:'flex', alignItems:'center', gap:10, marginBottom:36 },
     logoIcon:  { width:36, height:36, borderRadius:10, background:'linear-gradient(135deg,#0179FE,#4893FF)', display:'flex', alignItems:'center', justifyContent:'center' },
     logoText:  { fontFamily:"'IBM Plex Serif',serif", fontSize:20, fontWeight:700, color:'#1A1F36' },
@@ -107,15 +107,15 @@ export default function RegisterPage() {
     okBox:     { background:'#F0FDF4', border:'1px solid #86EFAC', borderRadius:8, padding:'12px 14px', color:'#16A34A', fontSize:13, marginBottom:16 },
     label:     { display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 } as const,
     grid2:     { display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 },
-    // Right side
-    blob1:     { position:'absolute' as const, top:-80, right:-80, width:300, height:300, borderRadius:'50%', background:'rgba(1,121,254,.1)' },
-    blob2:     { position:'absolute' as const, bottom:-80, left:-60, width:280, height:280, borderRadius:'50%', background:'rgba(1,121,254,.06)' },
+    // Right side — sky-blue Horizon kleuren (donker tekst ipv wit)
+    blob1:     { position:'absolute' as const, top:-80, right:-80, width:300, height:300, borderRadius:'50%', background:'rgba(1,121,254,.08)' },
+    blob2:     { position:'absolute' as const, bottom:-80, left:-60, width:280, height:280, borderRadius:'50%', background:'rgba(1,121,254,.05)' },
     rightContent: { position:'relative' as const, zIndex:1, maxWidth:360, textAlign:'center' as const },
-    rightH:    { fontFamily:"'IBM Plex Serif',serif", fontSize:26, fontWeight:700, color:'#fff', marginBottom:10, lineHeight:1.3 },
-    rightSub:  { fontSize:14, color:'rgba(255,255,255,.6)', marginBottom:36 },
+    rightH:    { fontFamily:"'IBM Plex Serif',serif", fontSize:26, fontWeight:700, color:'#00214F', marginBottom:10, lineHeight:1.3 },
+    rightSub:  { fontSize:14, color:'#475467', marginBottom:36 },
     bullet:    { display:'flex', alignItems:'flex-start', gap:12, marginBottom:16, textAlign:'left' as const },
-    bulletIcon: { width:22, height:22, borderRadius:'50%', background:'rgba(34,197,94,.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:2 },
-    bulletText: { fontSize:14, color:'rgba(255,255,255,.8)', lineHeight:1.5 },
+    bulletIcon: { width:22, height:22, borderRadius:'50%', background:'rgba(1,121,254,.12)', border:'1px solid rgba(1,121,254,.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:2 },
+    bulletText: { fontSize:14, color:'#344054', lineHeight:1.5 },
   };
 
   const bullets = [
@@ -244,8 +244,8 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      {/* ── Rechter kant: visueel ───────────────────────── */}
-      <div style={s.right}>
+      {/* ── Rechter kant: sky-blue Horizon panel — verborgen op mobiel via .auth-asset ── */}
+      <div className="auth-asset" style={{ position:'relative' }}>
         <div style={s.blob1} />
         <div style={s.blob2} />
         <div style={s.rightContent}>
@@ -254,7 +254,7 @@ export default function RegisterPage() {
           {bullets.map((text, i) => (
             <div key={i} style={s.bullet}>
               <div style={s.bulletIcon}>
-                <span style={{ color:'#22C55E', fontSize:12, fontWeight:700 }}>✓</span>
+                <span style={{ color:'#0179FE', fontSize:12, fontWeight:700 }}>✓</span>
               </div>
               <p style={s.bulletText}>{text}</p>
             </div>
