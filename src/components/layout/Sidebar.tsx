@@ -105,6 +105,7 @@ export default function Sidebar({ user, profiel }: SidebarProps) {
             {!collapsed && <span className="sidebar-logo">Household</span>}
           </Link>
           <button
+            className="sidebar-collapse-btn"
             onClick={toggleCollapse}
             data-tip={collapsed ? 'Uitklappen' : 'Inklappen'}
             style={{ background:'rgba(0,0,0,.05)', border:'none', borderRadius:6, width:26, height:26, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#667085', flexShrink:0, transition:'background .15s' }}

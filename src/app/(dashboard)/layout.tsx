@@ -6,7 +6,7 @@ import Sidebar                      from '@/components/layout/Sidebar';
 import MobileNav                    from '@/components/layout/MobileNav';
 import AIChatbot                    from '@/components/ai/AIChatbot';
 import type { Lang }                from '@/lib/translations';
-import { Euro, Bell }               from 'lucide-react';
+import { Euro, Bell, RefreshCw }    from 'lucide-react';
 
 export default async function DashboardLayout({
   children,
@@ -58,36 +58,73 @@ export default async function DashboardLayout({
         </div>
       </main>
 
-      {/* ── Mobiel: vaste header bovenaan ─────────────────── */}
-      <header className="mobile-header">
-        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <div style={{
-            width:30, height:30, borderRadius:8,
-            background:'linear-gradient(135deg,#0179FE,#4893FF)',
-            display:'flex', alignItems:'center', justifyContent:'center',
-          }}>
-            <Euro size={16} color="#fff" />
-          </div>
-          <span style={{ fontFamily:"'IBM Plex Serif',serif", fontWeight:700, color:'#fff', fontSize:17 }}>
-            Household
-          </span>
-        </div>
-        {/* Notificatie bell + avatar rechts */}
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+      {/* ── Mobiel: vaste header bovenaan — Dyme-stijl ──── */}
+      <header className="mobile-header" style={{
+        background: '#FFFFFF',
+        borderBottom: '1px solid #F0F0F0',
+        height: 60,
+        padding: '0 16px',
+      }}>
+        {/* Links: hamburger menu */}
+        <button
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 5,
+            WebkitTapHighlightColor: 'transparent',
+            minHeight: 'unset',
+          }}
+          onClick={() => {}}
+          aria-label="Menu"
+        >
+          <div style={{ width: 22, height: 2, background: '#1A1F36', borderRadius: 2 }} />
+          <div style={{ width: 22, height: 2, background: '#1A1F36', borderRadius: 2 }} />
+          <div style={{ width: 16, height: 2, background: '#1A1F36', borderRadius: 2 }} />
+        </button>
+
+        {/* Midden: app naam */}
+        <span style={{
+          fontFamily: "'IBM Plex Serif', serif",
+          fontSize: 18,
+          fontWeight: 700,
+          color: '#1A1F36',
+        }}>
+          Household
+        </span>
+
+        {/* Rechts: refresh + blauwe avatar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button style={{
-            width:34, height:34, borderRadius:'50%',
-            background:'rgba(255,255,255,.08)',
-            border:'1px solid rgba(255,255,255,.12)',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            cursor:'pointer', color:'rgba(255,255,255,.7)',
-          }}>
-            <Bell size={16} />
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 6,
+            WebkitTapHighlightColor: 'transparent',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 'unset',
+          }}
+          aria-label="Vernieuwen"
+          >
+            <RefreshCw size={20} color="#9CA3AF" />
           </button>
           <div style={{
-            width:34, height:34, borderRadius:'50%',
-            background:'linear-gradient(135deg,#0179FE,#4893FF)',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            color:'#fff', fontSize:13, fontWeight:700,
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            background: '#0179FE',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            fontSize: 13,
+            fontWeight: 700,
+            flexShrink: 0,
           }}>
             {initialen || '?'}
           </div>

@@ -113,7 +113,17 @@ export default function HomePage() {
       {/* ══ Hoofd content ═══════════════════════════════════ */}
       <div className="home-content no-scrollbar">
 
-        {/* Header box */}
+        {/* Dyme-stijl begroeting — alleen zichtbaar op mobiel */}
+        <div className="dyme-greeting" style={{ padding: '20px 16px 12px' }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1A1F36', lineHeight: 1.2 }}>
+            Hoi {naam || 'daar'}! 👋
+          </h1>
+          <p style={{ fontSize: 14, color: '#9CA3AF', marginTop: 4 }}>
+            Welkom terug
+          </p>
+        </div>
+
+        {/* Header box — alleen desktop (verborgen op mobiel via CSS) */}
         <div className="header-box">
           <h1 className="header-box-title">
             {greeting}, {naam}! 👋
@@ -178,14 +188,14 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Recente transacties */}
+        {/* Recente transacties — Dyme-stijl header + kaart */}
         <div className="card" style={{ padding: 'clamp(14px,4vw,24px)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 700, color: '#1A1F36' }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color: '#1A1F36' }}>
               {t.dashboard.recent_transactions}
-            </h3>
-            <Link href="/transacties" style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#0179FE', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
-              {t.dashboard.view_all} <ArrowUpRight size={14} />
+            </span>
+            <Link href="/transacties" style={{ fontSize: 13, color: '#0179FE', fontWeight: 600, textDecoration: 'none' }}>
+              {t.dashboard.view_all} →
             </Link>
           </div>
 

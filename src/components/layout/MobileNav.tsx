@@ -5,125 +5,195 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Home, ArrowLeftRight, PieChart, Plus, X,
-  Camera, FileText, Wallet, Target, MoreHorizontal,
-  TrendingDown, Briefcase, BarChart2, Search,
-  MapPin, Settings, Upload, Bitcoin, Plane, Users,
+  MoreHorizontal, Bitcoin, Plane, MapPin,
+  Search, Users, Settings, FileText,
+  BookOpen, Target, TrendingDown, Briefcase,
+  BarChart2, Wallet,
 } from 'lucide-react';
 
-const MAIN_ITEMS = [
-  { href:'/home',        icon:Home,           label:'Home'        },
-  { href:'/transacties', icon:ArrowLeftRight, label:'Transacties' },
-  { href:'/begroting',   icon:PieChart,       label:'Begroting'   },
+/* ── Hoofd navigatie items (altijd zichtbaar) ───────────── */
+const MAIN_NAV = [
+  { href: '/home',        icon: Home,           label: 'Home'       },
+  { href: '/transacties', icon: ArrowLeftRight, label: 'Transacties'},
+  { href: '/begroting',   icon: PieChart,       label: 'Begroting'  },
 ];
 
+/* ── Alle extra pagina's in het Meer-menu ──────────────── */
 const MEER_ITEMS = [
-  { href:'/schulden',      icon:TrendingDown, label:'Schulden'    },
-  { href:'/doelen',        icon:Target,       label:'Doelen'      },
-  { href:'/zakelijk',      icon:Briefcase,    label:'Zakelijk'    },
-  { href:'/jaaroverzicht', icon:BarChart2,    label:'Jaaroverzicht'},
-  { href:'/crypto',        icon:Bitcoin,      label:'Crypto'      },
-  { href:'/reizen',        icon:Plane,        label:'Reizen'      },
-  { href:'/prijsradar',    icon:Search,       label:'Prijsradar'  },
-  { href:'/locatie',       icon:MapPin,       label:'Locatie'     },
-  { href:'/gezin',         icon:Users,        label:'Gezin'       },
-  { href:'/import',        icon:Upload,       label:'Import'      },
-  { href:'/kasboek',       icon:Wallet,       label:'Kasboek'     },
-  { href:'/rekeningen',    icon:Wallet,       label:'Rekeningen'  },
-  { href:'/instellingen',  icon:Settings,     label:'Instellingen'},
+  { href: '/rekeningen',    icon: Wallet,      label: 'Rekeningen'   },
+  { href: '/schulden',      icon: TrendingDown, label: 'Schulden'    },
+  { href: '/doelen',        icon: Target,      label: 'Doelen'       },
+  { href: '/zakelijk',      icon: Briefcase,   label: 'Zakelijk'     },
+  { href: '/jaaroverzicht', icon: BarChart2,   label: 'Jaaroverzicht'},
+  { href: '/kasboek',       icon: BookOpen,    label: 'Kasboek'      },
+  { href: '/import',        icon: FileText,    label: 'Import'       },
+  { href: '/crypto',        icon: Bitcoin,     label: 'Crypto'       },
+  { href: '/reizen',        icon: Plane,       label: 'Reizen'       },
+  { href: '/prijsradar',    icon: Search,      label: 'Prijsradar'   },
+  { href: '/locatie',       icon: MapPin,      label: 'Locatie'      },
+  { href: '/gezin',         icon: Users,       label: 'Gezin'        },
+  { href: '/instellingen',  icon: Settings,    label: 'Instellingen' },
 ];
 
+/* ── Snelle acties in de FAB sheet ─────────────────────── */
 const SNEL_ACTIES = [
-  { icon:Camera,   label:'Bon scannen',   href:'/transacties?bon=1',  color:'#0179FE' },
-  { icon:FileText, label:'Transactie',    href:'/transacties?nieuw=1', color:'#8B5CF6' },
-  { icon:Wallet,   label:'Kasboek',       href:'/kasboek',             color:'#22C55E' },
-  { icon:Target,   label:'Doel storting', href:'/doelen',              color:'#F59E0B' },
+  { label: 'Transactie', href: '/transacties?nieuw=1', kleur: '#0179FE', bg: '#EFF6FF' },
+  { label: 'Kasboek',    href: '/kasboek',             kleur: '#7C3AED', bg: '#F5F3FF' },
+  { label: 'Doel',       href: '/doelen',              kleur: '#16A34A', bg: '#F0FDF4' },
+  { label: 'Import',     href: '/import',              kleur: '#D97706', bg: '#FFFBEB' },
 ];
+
+/* ── Kleurconstanten ────────────────────────────────────── */
+const BLAUW = '#0179FE';
+const GRIJS = '#9CA3AF';
 
 export default function MobileNav() {
   const path = usePathname();
-  const [snelOpen, setSnelOpen] = useState(false);
+  const [fabOpen,  setFabOpen]  = useState(false);
   const [meerOpen, setMeerOpen] = useState(false);
 
-  const sluitAlles = () => { setSnelOpen(false); setMeerOpen(false); };
+  const sluitAlles = () => { setFabOpen(false); setMeerOpen(false); };
 
   return (
     <>
-      {/* ── Dimoverlay ─────────────────────────────────────── */}
-      {(snelOpen || meerOpen) && (
+      {/* ── Dimoverlay ───────────────────────────────────── */}
+      {(fabOpen || meerOpen) && (
         <div
+          style={{
+            position: 'fixed', inset: 0,
+            background: 'rgba(0,0,0,.5)',
+            zIndex: 48,
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+          }}
           onClick={sluitAlles}
-          style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.55)', zIndex:48, backdropFilter:'blur(6px)', WebkitBackdropFilter:'blur(6px)' }}
         />
       )}
 
-      {/* ── Snelle acties sheet ─────────────────────────────── */}
-      {snelOpen && (
+      {/* ── FAB snelle acties sheet — wit ────────────────── */}
+      {fabOpen && (
         <div style={{
-          position:'fixed', bottom:88, left:12, right:12, zIndex:49,
-          background:'rgba(17,24,39,.96)',
-          backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)',
-          border:'1px solid rgba(255,255,255,.1)',
-          borderRadius:20, padding:'16px 16px 18px',
-          boxShadow:'0 -4px 40px rgba(0,0,0,.5)',
-          animation:'sheetUp .28s cubic-bezier(.16,1,.3,1)',
+          position: 'fixed',
+          bottom: 80,
+          left: 16, right: 16,
+          background: '#FFFFFF',
+          borderRadius: 20,
+          padding: 20,
+          zIndex: 49,
+          boxShadow: '0 -4px 32px rgba(0,0,0,.15)',
+          animation: 'sheetUp .25s cubic-bezier(.16,1,.3,1)',
         }}>
-          {/* Handle */}
-          <div style={{ width:32, height:4, borderRadius:2, background:'rgba(255,255,255,.15)', margin:'0 auto 14px' }} />
-          <p style={{ fontSize:11, color:'rgba(255,255,255,.35)', fontWeight:700, letterSpacing:'.12em', textTransform:'uppercase', marginBottom:14, textAlign:'center' }}>
+          {/* Handle balk */}
+          <div style={{
+            width: 36, height: 4,
+            background: '#E5E7EB',
+            borderRadius: 2,
+            margin: '0 auto 16px',
+          }} />
+          <p style={{
+            fontSize: 11, fontWeight: 700,
+            color: '#9CA3AF', letterSpacing: '.1em',
+            textTransform: 'uppercase',
+            textAlign: 'center', marginBottom: 16,
+          }}>
             SNELLE ACTIE
           </p>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10 }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 12,
+          }}>
             {SNEL_ACTIES.map(a => (
-              <Link key={a.label} href={a.href} onClick={sluitAlles} style={{ textDecoration:'none', display:'flex', flexDirection:'column', alignItems:'center', gap:7 }}>
+              <Link
+                key={a.label}
+                href={a.href}
+                onClick={sluitAlles}
+                style={{ textDecoration: 'none' }}
+              >
                 <div style={{
-                  width:54, height:54, borderRadius:18,
-                  background:`rgba(${hexToRgb(a.color)},.12)`,
-                  border:`1px solid rgba(${hexToRgb(a.color)},.25)`,
-                  display:'flex', alignItems:'center', justifyContent:'center',
+                  display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', gap: 6,
                 }}>
-                  <a.icon size={22} color={a.color} strokeWidth={2}/>
+                  <div style={{
+                    width: 52, height: 52,
+                    borderRadius: 16,
+                    background: a.bg,
+                    display: 'flex', alignItems: 'center',
+                    justifyContent: 'center',
+                    border: `1px solid ${a.kleur}22`,
+                  }}>
+                    <Plus size={22} color={a.kleur} />
+                  </div>
+                  <span style={{
+                    fontSize: 11, fontWeight: 600,
+                    color: '#6B7280', textAlign: 'center',
+                  }}>
+                    {a.label}
+                  </span>
                 </div>
-                <span style={{ fontSize:10, color:'rgba(255,255,255,.6)', fontWeight:600, textAlign:'center', lineHeight:1.3 }}>{a.label}</span>
               </Link>
             ))}
           </div>
         </div>
       )}
 
-      {/* ── Meer pagina's sheet ──────────────────────────────── */}
+      {/* ── Meer-menu sheet — wit, onderaan scherm ───────── */}
       {meerOpen && (
         <div style={{
-          position:'fixed', bottom:88, left:12, right:12, zIndex:49,
-          background:'rgba(17,24,39,.96)',
-          backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)',
-          border:'1px solid rgba(255,255,255,.1)',
-          borderRadius:20, padding:'16px 16px 18px',
-          boxShadow:'0 -4px 40px rgba(0,0,0,.5)',
-          animation:'sheetUp .28s cubic-bezier(.16,1,.3,1)',
-          maxHeight:'72vh', overflowY:'auto',
+          position: 'fixed',
+          bottom: 80,
+          left: 0, right: 0,
+          background: '#FFFFFF',
+          borderRadius: '20px 20px 0 0',
+          padding: '16px 16px 24px',
+          zIndex: 49,
+          boxShadow: '0 -4px 32px rgba(0,0,0,.15)',
+          maxHeight: '70vh',
+          overflowY: 'auto',
+          animation: 'sheetUp .25s cubic-bezier(.16,1,.3,1)',
         }}>
-          <div style={{ width:32, height:4, borderRadius:2, background:'rgba(255,255,255,.15)', margin:'0 auto 14px' }} />
-          <p style={{ fontSize:11, color:'rgba(255,255,255,.35)', fontWeight:700, letterSpacing:'.12em', textTransform:'uppercase', marginBottom:14, textAlign:'center' }}>
-            ALLE PAGINA&apos;S
-          </p>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10 }}>
+          <div style={{
+            width: 36, height: 4,
+            background: '#E5E7EB',
+            borderRadius: 2,
+            margin: '0 auto 20px',
+          }} />
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 8,
+          }}>
             {MEER_ITEMS.map(item => {
-              const active = path === item.href;
+              const actief = path === item.href;
               return (
-                <Link key={item.href} href={item.href} onClick={sluitAlles}
-                  style={{ textDecoration:'none', display:'flex', flexDirection:'column', alignItems:'center', gap:7 }}>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={sluitAlles}
+                  style={{ textDecoration: 'none' }}
+                >
                   <div style={{
-                    width:54, height:54, borderRadius:18, display:'flex', alignItems:'center', justifyContent:'center',
-                    background: active ? 'linear-gradient(135deg,#0179FE,#4893FF)' : 'rgba(255,255,255,.07)',
-                    border: active ? 'none' : '1px solid rgba(255,255,255,.08)',
-                    boxShadow: active ? '0 4px 14px rgba(1,121,254,.35)' : 'none',
-                    transition:'all .2s',
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', gap: 6,
+                    padding: '12px 4px',
+                    borderRadius: 12,
+                    background: actief
+                      ? 'linear-gradient(135deg,#0179FE,#4893FF)'
+                      : '#F5F7FA',
                   }}>
-                    <item.icon size={20} color={active ? '#fff' : 'rgba(255,255,255,.5)'} strokeWidth={active ? 2.5 : 1.8}/>
+                    <item.icon
+                      size={20}
+                      color={actief ? '#fff' : '#6B7280'}
+                      strokeWidth={actief ? 2.5 : 1.8}
+                    />
+                    <span style={{
+                      fontSize: 10, fontWeight: actief ? 700 : 600,
+                      color: actief ? '#fff' : '#6B7280',
+                      textAlign: 'center', lineHeight: 1.2,
+                    }}>
+                      {item.label}
+                    </span>
                   </div>
-                  <span style={{ fontSize:9.5, color: active ? '#60A5FA' : 'rgba(255,255,255,.45)', fontWeight: active ? 700 : 500, textAlign:'center', lineHeight:1.3 }}>
-                    {item.label}
-                  </span>
                 </Link>
               );
             })}
@@ -131,120 +201,135 @@ export default function MobileNav() {
         </div>
       )}
 
-      {/* ── Bottom navigation bar ───────────────────────────── */}
+      {/* ── Bottom nav bar — Dyme stijl (wit, geen pill) ─── */}
       <nav
         className="mobile-bottom-nav"
         style={{
-          position:'fixed', bottom:0, left:0, right:0, zIndex:50,
-          paddingBottom:'env(safe-area-inset-bottom, 0px)',
+          position: 'fixed',
+          bottom: 0, left: 0, right: 0,
+          background: '#FFFFFF',
+          borderTop: '1px solid #F0F0F0',
+          zIndex: 50,
+          display: 'flex',
+          alignItems: 'center',
+          paddingBottom: 'env(safe-area-inset-bottom, 8px)',
+          paddingTop: 8,
+          boxShadow: '0 -2px 12px rgba(0,0,0,.06)',
         }}
       >
-        {/* Glassmorphism pill — hoogte 80px voor comfortabele touch targets */}
-        <div style={{
-          margin:'0 12px 10px',
-          height:80,
-          background:'rgba(17,24,39,.92)',
-          backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)',
-          borderRadius:24,
-          border:'1px solid rgba(255,255,255,.12)',
-          borderTop:'1px solid rgba(255,255,255,.18)',
-          boxShadow:'0 8px 32px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.06) inset',
-          display:'flex', alignItems:'center',
-        }}>
-
-          {/* Hoofd-items links */}
-          {MAIN_ITEMS.map(({ href, icon: Icon, label }) => {
-            const active = path === href || path.startsWith(href + '/');
-            return (
-              <Link key={href} href={href} style={{
-                flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-                gap:3, padding:'8px 4px', textDecoration:'none', position:'relative',
-                color: active ? '#60A5FA' : 'rgba(255,255,255,.4)',
-                transition:'color .18s',
-                minHeight:56, /* Apple HIG minimale touch target */
-                WebkitTapHighlightColor:'transparent',
+        {/* Hoofd navigatie items */}
+        {MAIN_NAV.map(({ href, icon: Icon, label }) => {
+          const actief = path === href || path.startsWith(href + '/');
+          return (
+            <Link
+              key={href}
+              href={href}
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 3,
+                padding: '4px 2px',
+                textDecoration: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                minHeight: 52,
+              }}
+            >
+              <Icon
+                size={22}
+                color={actief ? BLAUW : GRIJS}
+                strokeWidth={actief ? 2.5 : 1.8}
+              />
+              <span style={{
+                fontSize: 10,
+                fontWeight: actief ? 700 : 500,
+                color: actief ? BLAUW : GRIJS,
+                fontFamily: "'Inter', sans-serif",
               }}>
-                {/* Actieve indicatordot bovenaan — zoals reference */}
-                {active && (
-                  <div style={{
-                    position:'absolute', top:8, left:'50%', transform:'translateX(-50%)',
-                    width:4, height:4, borderRadius:'50%',
-                    background:'linear-gradient(135deg,#0179FE,#60A5FA)',
-                    boxShadow:'0 0 6px rgba(1,121,254,.8)',
-                  }} />
-                )}
-                <Icon size={21} strokeWidth={active ? 2.5 : 1.8} style={{ marginTop: active ? 4 : 0 }}/>
-                <span style={{ fontSize:11, fontWeight: active ? 700 : 500, fontFamily:"'Inter',sans-serif", letterSpacing:'.01em' }}>
-                  {label}
-                </span>
-              </Link>
-            );
-          })}
+                {label}
+              </span>
+            </Link>
+          );
+        })}
 
-          {/* FAB — snelle acties */}
-          <button
-            onClick={() => { setSnelOpen(v => !v); setMeerOpen(false); }}
-            style={{
-              flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-              gap:3, padding:'4px', border:'none', cursor:'pointer', background:'transparent',
-              minHeight:56, WebkitTapHighlightColor:'transparent',
-            }}
-          >
-            <div style={{
-              width:46, height:46, borderRadius:16,
-              background: snelOpen ? 'rgba(239,68,68,.9)' : 'linear-gradient(135deg,#0179FE,#4893FF)',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              boxShadow: snelOpen ? '0 4px 14px rgba(239,68,68,.4)' : '0 4px 16px rgba(1,121,254,.45)',
-              transition:'all .22s cubic-bezier(.34,1.56,.64,1)',
-              transform: snelOpen ? 'rotate(45deg) scale(1.05)' : 'rotate(0deg) scale(1)',
-            }}>
-              {snelOpen ? <X size={20} color="#fff" strokeWidth={2.5}/> : <Plus size={22} color="#fff" strokeWidth={2.5}/>}
-            </div>
-          </button>
-
-          {/* Meer menu */}
-          <button
-            onClick={() => { setMeerOpen(v => !v); setSnelOpen(false); }}
-            style={{
-              flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-              gap:3, padding:'8px 4px', border:'none', cursor:'pointer', background:'transparent',
-              color: meerOpen ? '#60A5FA' : 'rgba(255,255,255,.4)',
-              position:'relative', transition:'color .18s',
-              minHeight:56, WebkitTapHighlightColor:'transparent',
-            }}
-          >
-            {meerOpen && (
-              <div style={{
-                position:'absolute', top:8, left:'50%', transform:'translateX(-50%)',
-                width:4, height:4, borderRadius:'50%',
-                background:'linear-gradient(135deg,#0179FE,#60A5FA)',
-                boxShadow:'0 0 6px rgba(1,121,254,.8)',
-              }} />
-            )}
-            {meerOpen
-              ? <X size={21} strokeWidth={2.5} style={{ marginTop: 4 }}/>
-              : <MoreHorizontal size={21} strokeWidth={1.8}/>
+        {/* FAB knop — blauw vierkant */}
+        <button
+          onClick={() => { setFabOpen(!fabOpen); setMeerOpen(false); }}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 3,
+            minHeight: 52,
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          <div style={{
+            width: 44, height: 44,
+            borderRadius: 14,
+            background: fabOpen
+              ? '#EF4444'
+              : 'linear-gradient(135deg,#0179FE,#4893FF)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(1,121,254,.35)',
+            transition: 'background .2s',
+          }}>
+            {fabOpen
+              ? <X size={20} color="#fff" strokeWidth={2.5}/>
+              : <Plus size={22} color="#fff" strokeWidth={2.5}/>
             }
-            <span style={{ fontSize:11, fontWeight: meerOpen ? 700 : 500, fontFamily:"'Inter',sans-serif" }}>Meer</span>
-          </button>
+          </div>
+        </button>
 
-        </div>
+        {/* Meer knop */}
+        <button
+          onClick={() => { setMeerOpen(!meerOpen); setFabOpen(false); }}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 3,
+            minHeight: 52,
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          <MoreHorizontal
+            size={22}
+            color={meerOpen ? BLAUW : GRIJS}
+            strokeWidth={meerOpen ? 2.5 : 1.8}
+          />
+          <span style={{
+            fontSize: 10,
+            fontWeight: meerOpen ? 700 : 500,
+            color: meerOpen ? BLAUW : GRIJS,
+            fontFamily: "'Inter', sans-serif",
+          }}>
+            Meer
+          </span>
+        </button>
       </nav>
 
+      {/* Sheet animatie */}
       <style>{`
         @keyframes sheetUp {
-          from { opacity:0; transform:translateY(24px); }
-          to   { opacity:1; transform:translateY(0); }
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </>
   );
-}
-
-/* Helper: hex kleur naar r,g,b getallen (voor rgba()) */
-function hexToRgb(hex: string): string {
-  const r = parseInt(hex.slice(1,3), 16);
-  const g = parseInt(hex.slice(3,5), 16);
-  const b = parseInt(hex.slice(5,7), 16);
-  return `${r},${g},${b}`;
 }

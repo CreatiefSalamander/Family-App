@@ -269,75 +269,133 @@ body[data-sidebar="collapsed"] .content-wrapper { margin-left: 0; }
 }
 
 /* ══════════════════════════════════════════════════════════
-   MOBILE (≤ 767px)
+   MOBILE (≤ 767px) — Dyme-stijl
    ══════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  /* Voorkom horizontaal scrollen op de hele pagina */
-  body { overflow-x: hidden !important; }
+  /* Verberg desktop elementen */
+  .sidebar { display: none !important; }
+  .sidebar-collapse-btn { display: none !important; }
 
-  /* Sidebar verborgen, mobile header zichtbaar */
-  .sidebar       { display: none !important; }
+  /* Toon mobile header */
   .mobile-header { display: flex !important; }
 
-  /* App main: volledig scherm, geen overflow */
+  /* App container */
   .app-main {
     height: 100dvh !important;
     overflow: hidden !important;
+    background: #F5F7FA !important;
   }
 
-  /* Content wrapper: verticaal scrollen, touch-geoptimaliseerd */
+  /* Content wrapper scrollt */
   .content-wrapper {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
+    background: #F5F7FA !important;
   }
 
-  /* Home content: compacte padding voor header (56px) + nav (80px) */
+  /* Pagina content padding */
   .home-content {
-    padding: 12px !important;
-    padding-top: 68px !important;   /* 56px header + 12px */
-    padding-bottom: 96px !important; /* nav + veiligheidszone */
+    padding: 0 !important;
+    padding-top: 64px !important;
+    padding-bottom: 80px !important;
     height: auto !important;
     overflow: visible !important;
+    gap: 0 !important;
+    background: #F5F7FA !important;
   }
 
-  /* Home: kolom layout op mobiel */
+  /* Home flex richting */
   .home {
     flex-direction: column !important;
     height: auto !important;
     overflow: visible !important;
   }
 
-  /* Right sidebar verborgen op mobiel */
+  /* Right sidebar verborgen */
   .right-sidebar { display: none !important; }
 
-  /* Header box: kleiner op mobiel */
-  .header-box-title { font-size: 20px !important; }
+  /* Header box — verborgen op mobiel (vervangen door Dyme begroeting) */
+  .header-box { display: none !important; }
 
-  /* Cards: compacter op mobiel */
+  /* Cards — Dyme stijl: wit, lichte border */
   .card {
-    padding: 14px !important;
-    border-radius: 14px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #F0F0F0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06) !important;
+    margin: 0 16px 12px !important;
+    padding: 16px !important;
   }
 
-  /* KPI cards: compacter padding */
+  /* KPI cards: 2 kolommen */
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    padding: 0 16px !important;
+    margin-bottom: 12px !important;
+  }
   .kpi-card {
-    padding: 14px !important;
-    border-radius: 14px !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+    margin: 0 !important;
   }
 
-  /* KPI grid: kleinere gap */
-  .kpi-grid { gap: 10px !important; }
+  /* Transactie tabel kolommen verbergen */
+  .tx-col-datum { display: none !important; }
+  .tx-col-bron  { display: none !important; }
 
-  /* iOS: voorkom automatisch inzoomen bij focus op input */
+  /* Transacties: verberg import-knop en tabel-header */
+  .tx-import-btn   { display: none !important; }
+  .tx-table-header { display: none !important; }
+
+  /* Instellingen nav: horizontaal */
+  .settings-nav {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding: 0 16px !important;
+  }
+  .settings-nav::-webkit-scrollbar { display: none !important; }
+  .settings-nav button {
+    flex-shrink: 0 !important;
+    font-size: 13px !important;
+    padding: 8px 14px !important;
+  }
+
+  /* Bank cards */
+  .bank-card {
+    max-width: 100% !important;
+    margin: 0 16px !important;
+  }
+
+  /* Total balance — Dyme groot saldo */
+  .total-balance {
+    margin: 0 16px 12px !important;
+    padding: 20px !important;
+    border-radius: 16px !important;
+    gap: 12px !important;
+  }
+  .total-balance-chart { width: 72px !important; height: 72px !important; }
+
+  /* Formulieren — voorkomt iOS zoom */
   input, select, textarea {
     font-size: 16px !important;
-    min-height: 44px !important; /* Apple HIG minimale touch target */
-  }
-
-  /* Knoppen: minimale touch target (Apple HIG) */
-  button, .btn-primary, .btn-secondary {
     min-height: 44px !important;
   }
+
+  /* Knoppen — touch targets */
+  button { min-height: 44px !important; }
+
+  /* Geen horizontaal overflow */
+  body { overflow-x: hidden !important; }
+
+  /* Sectie labels Dyme-stijl — zichtbaar op mobiel */
+  .mobile-section-label { display: flex !important; }
+
+  /* Dyme begroeting — zichtbaar op mobiel */
+  .dyme-greeting { display: block !important; }
 
   /* Helper class: verberg native scrollbar op mobiel */
   .mobile-scroll {
@@ -346,48 +404,6 @@ body[data-sidebar="collapsed"] .content-wrapper { margin-left: 0; }
     scrollbar-width: none !important;
   }
   .mobile-scroll::-webkit-scrollbar { display: none !important; }
-
-  /* Sectie titels: compacter op mobiel */
-  h2 { font-size: 16px !important; }
-  h3 { font-size: 15px !important; }
-
-  /* Transactie tabel: verberg minder belangrijke kolommen */
-  .tx-col-datum      { display: none !important; }
-  .tx-col-bron       { display: none !important; }
-
-  /* Transacties: verberg import-knop en tabel-header op mobiel */
-  .tx-import-btn     { display: none !important; }
-  .tx-table-header   { display: none !important; }
-
-  /* Instellingen navigatie: horizontaal scrollen, geen scrollbar */
-  .settings-nav {
-    flex-direction: row !important;
-    overflow-x: auto !important;
-    width: 100% !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important;
-  }
-  .settings-nav::-webkit-scrollbar { display: none !important; }
-  .settings-nav button {
-    flex-shrink: 0 !important;
-    font-size: 12px !important;
-    padding: 8px 10px !important;
-    gap: 6px !important;
-  }
-
-  /* Bank cards: full width */
-  .bank-card { max-width: 100% !important; }
-
-  /* Total balance box: compacter op mobiel */
-  .total-balance {
-    padding: 14px !important;
-    gap: 10px !important;
-    margin-bottom: 14px !important;
-  }
-  .total-balance-chart { width: 72px !important; height: 72px !important; }
-
-  /* Knoppen: full width helper */
-  .btn-mobile-full { width: 100% !important; }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -793,3 +809,73 @@ select.input-field { appearance: none; cursor: pointer; }
 .cat-verzekering  .cat-dot { background: #0086C9; }
 .cat-default      { border-color: #D0D5DD; color: #344054; }
 .cat-default      .cat-dot { background: #98A2B3; }
+
+/* ══════════════════════════════════════════════════════════
+   DYME-STIJL COMPONENTEN
+   ══════════════════════════════════════════════════════════ */
+
+/* Dyme begroeting — verborgen op desktop, zichtbaar op mobiel */
+.dyme-greeting { display: none; }
+
+/* Sectie label pill — verborgen op desktop, zichtbaar op mobiel via media query */
+.mobile-section-label {
+  display: none;
+  background: #EFEFEF;
+  border-radius: 20px;
+  padding: 4px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  width: fit-content;
+}
+
+/* Dyme-stijl transactierij */
+.dyme-tx-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #F5F5F5;
+}
+
+/* Merchant avatar cirkel */
+.dyme-tx-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Transactie info kolom */
+.dyme-tx-info { flex: 1; min-width: 0; }
+
+.dyme-tx-naam {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1A1F36;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dyme-tx-cat {
+  font-size: 12px;
+  color: #9CA3AF;
+  margin-top: 1px;
+}
+
+/* Bedrag — JetBrains Mono */
+.dyme-tx-bedrag {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+}
+.dyme-tx-bedrag.positief { color: #16A34A; }
+.dyme-tx-bedrag.negatief { color: #1A1F36; }
