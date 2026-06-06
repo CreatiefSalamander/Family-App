@@ -352,8 +352,12 @@ body[data-sidebar="collapsed"] .content-wrapper { margin-left: 0; }
   h3 { font-size: 15px !important; }
 
   /* Transactie tabel: verberg minder belangrijke kolommen */
-  .tx-col-datum { display: none !important; }
-  .tx-col-bron  { display: none !important; }
+  .tx-col-datum      { display: none !important; }
+  .tx-col-bron       { display: none !important; }
+
+  /* Transacties: verberg import-knop en tabel-header op mobiel */
+  .tx-import-btn     { display: none !important; }
+  .tx-table-header   { display: none !important; }
 
   /* Instellingen navigatie: horizontaal scrollen, geen scrollbar */
   .settings-nav {

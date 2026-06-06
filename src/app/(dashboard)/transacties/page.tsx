@@ -79,7 +79,7 @@ export default function TransactiesPage() {
             <p className="header-box-subtext">{t.transactions.subtitle}</p>
           </div>
           <div style={{ display:'flex', gap:10 }}>
-            <button className="btn-ghost" style={{ fontSize:13 }}><Upload size={15}/> {t.transactions.import}</button>
+            <button className="btn-ghost tx-import-btn" style={{ fontSize:13 }}><Upload size={15}/> {t.transactions.import}</button>
             <button className="btn-ghost" style={{ fontSize:13 }} onClick={()=>setBonOpen(true)}><Camera size={15}/> 📸 Bon</button>
             <button className="btn-primary" style={{ fontSize:13 }} onClick={() => setShow(true)}><Plus size={15}/> {t.transactions.add}</button>
           </div>
@@ -95,27 +95,30 @@ export default function TransactiesPage() {
         ].map(s=>(
           <div key={s.label} className="card" style={{ padding:16, background:s.bg, border:'none' }}>
             <p style={{ fontSize:11, color:'#6B7280', fontWeight:700, textTransform:'uppercase', letterSpacing:'.07em' }}>{s.label}</p>
-            <p className="amount" style={{ fontSize:18, color:s.color, marginTop:4 }}>{fmtEuro(s.value)}</p>
+            <p className="amount" style={{ fontSize:'clamp(13px,3.5vw,18px)', color:s.color, marginTop:4 }}>{fmtEuro(s.value)}</p>
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="card" style={{ padding:16, marginBottom:16, display:'flex', gap:12, flexWrap:'wrap', alignItems:'center' }}>
-        <div style={{ position:'relative', flex:1, minWidth:200 }}>
+      {/* Filterbalk: zoekbalk altijd bovenaan, selects eronder op mobiel */}
+      <div className="card" style={{ padding:'clamp(12px,3vw,16px)', marginBottom:16 }}>
+        <div style={{ position:'relative', marginBottom:10 }}>
           <Search size={14} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'#9CA3AF' }}/>
           <input className="input-field" value={query} onChange={e=>{ setQuery(e.target.value); setPg(1); }}
-            placeholder={t.transactions.search} style={{ paddingLeft:34 }}/>
+            placeholder={t.transactions.search} style={{ paddingLeft:34, width:'100%' }}/>
         </div>
-        <select className="input-field" value={typ} onChange={e=>{ setTyp(e.target.value); setPg(1); }} style={{ width:130 }}>
-          <option value="all">{t.transactions.all}</option>
-          <option value="income">{t.transactions.income}</option>
-          <option value="expense">{t.transactions.expense}</option>
-        </select>
-        <select className="input-field" value={cat} onChange={e=>{ setCat(e.target.value); setPg(1); }} style={{ width:150 }}>
-          <option value="">{t.transactions.filter_cat}</option>
-          {CATS.map(c=><option key={c}>{c}</option>)}
-        </select>
+        <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+          <select className="input-field" value={typ} onChange={e=>{ setTyp(e.target.value); setPg(1); }} style={{ flex:1, minWidth:'clamp(100px,28vw,130px)' }}>
+            <option value="all">{t.transactions.all}</option>
+            <option value="income">{t.transactions.income}</option>
+            <option value="expense">{t.transactions.expense}</option>
+          </select>
+          <select className="input-field" value={cat} onChange={e=>{ setCat(e.target.value); setPg(1); }} style={{ flex:2, minWidth:'clamp(120px,36vw,150px)' }}>
+            <option value="">{t.transactions.filter_cat}</option>
+            {CATS.map(c=><option key={c}>{c}</option>)}
+          </select>
+        </div>
       </div>
 
       {/* Tabel */}
@@ -129,27 +132,39 @@ export default function TransactiesPage() {
           </div>
         ) : (
           <>
-            <div style={{ display:'grid', gridTemplateColumns:'40px 1fr 110px 90px 110px', gap:12, padding:'10px 20px', borderBottom:'1px solid #F3F4F6' }}>
+            {/* Tabel header — verborgen op mobiel via .tx-table-header class */}
+            <div className="tx-table-header" style={{ display:'grid', gridTemplateColumns:'40px 1fr 110px 90px 110px', gap:12, padding:'10px 20px', borderBottom:'1px solid #F3F4F6' }}>
               {['','Omschrijving','Categorie','Datum','Bedrag'].map(h=>(
                 <p key={h} style={{ fontSize:11, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</p>
               ))}
             </div>
+            {/* Transactie rijen — flex kaart-layout werkt goed op zowel mobiel als desktop */}
             {slice.map(item=>(
-              <div key={item.id} style={{ display:'grid', gridTemplateColumns:'40px 1fr 110px 90px 110px', gap:12, padding:'11px 20px', borderBottom:'1px solid #F9FAFB', alignItems:'center' }}
+              <div key={item.id}
+                style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid #F9FAFB', transition:'background .15s' }}
                 onMouseEnter={e=>(e.currentTarget.style.background='#F9FAFB')}
                 onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
-                <div style={{ width:36, height:36, borderRadius:'50%', background:'#F3F4F6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:17 }}>
+                {/* Categorie icoon */}
+                <div style={{ width:40, height:40, borderRadius:12, background:'#F3F4F6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>
                   {CAT_ICON[item.category]||'📄'}
                 </div>
-                <div style={{ minWidth:0 }}>
-                  <p style={{ fontSize:13, fontWeight:600, color:'#1A1F36', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.description}</p>
-                  <p style={{ fontSize:11, color:'#9CA3AF' }}>{item.source}</p>
+                {/* Omschrijving + badge + datum */}
+                <div style={{ flex:1, minWidth:0 }}>
+                  <p style={{ fontSize:13, fontWeight:600, color:'#1A1F36', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                    {item.description}
+                  </p>
+                  <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:3 }}>
+                    <span className={`badge ${item.type==='income'?'badge-green':'badge-gray'}`}>{item.category}</span>
+                    <span className="tx-col-datum" style={{ fontSize:11, color:'#9CA3AF' }}>{fmtDate(item.date)}</span>
+                  </div>
                 </div>
-                <span className={`badge ${item.type==='income'?'badge-green':'badge-gray'}`}>{item.category}</span>
-                <p style={{ fontSize:12, color:'#6B7280' }}>{fmtDate(item.date)}</p>
-                <p className="amount" style={{ fontSize:13, color:item.type==='income'?'#22C55E':'#EF4444' }}>
-                  {item.type==='income'?'+':'-'}{fmtEuro(item.amount)}
-                </p>
+                {/* Bedrag rechts */}
+                <div style={{ flexShrink:0, textAlign:'right' }}>
+                  <p className="amount" style={{ fontSize:14, color:item.type==='income'?'#22C55E':'#EF4444' }}>
+                    {item.type==='income'?'+':'-'}{fmtEuro(item.amount)}
+                  </p>
+                  <p className="tx-col-datum" style={{ fontSize:11, color:'#9CA3AF', marginTop:2 }}>{fmtDate(item.date)}</p>
+                </div>
               </div>
             ))}
           </>
@@ -167,38 +182,64 @@ export default function TransactiesPage() {
         </div>
       )}
 
-      {/* Modal */}
-      {show&&(
-        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.4)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100 }}
-          onClick={e=>e.target===e.currentTarget&&setShow(false)}>
-          <div className="card" style={{ width:440, padding:28 }}>
-            <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:20 }}>{t.transactions.add}</h3>
-            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+      {/* Modal — bottom sheet op mobiel, centered card op desktop */}
+      {show && (
+        <>
+          <div
+            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.5)', zIndex:100, backdropFilter:'blur(4px)' }}
+            onClick={() => !saving && setShow(false)}
+          />
+          <div className="tx-modal" style={{
+            position:'fixed', zIndex:101,
+            bottom:0, left:0, right:0,
+            background:'#fff',
+            borderRadius:'20px 20px 0 0',
+            padding:'20px 20px calc(24px + env(safe-area-inset-bottom, 0px))',
+            boxShadow:'0 -8px 40px rgba(0,0,0,.2)',
+            animation:'txSheetUp .3s cubic-bezier(.16,1,.3,1)',
+          }}>
+            {/* Drag handle */}
+            <div style={{ width:36, height:4, borderRadius:2, background:'#E5E7EB', margin:'0 auto 18px' }} />
+
+            <h3 style={{ fontFamily:"'IBM Plex Serif',serif", fontSize:18, fontWeight:700, color:'#1A1F36', marginBottom:18 }}>
+              {t.transactions.add}
+            </h3>
+            <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
               <input className="input-field" placeholder="Omschrijving" value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))}/>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
                 <input className="input-field" type="number" placeholder="Bedrag (€)" value={form.amount} onChange={e=>setForm(f=>({...f,amount:e.target.value}))}/>
                 <select className="input-field" value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))}>
                   <option value="expense">{t.transactions.expense}</option>
                   <option value="income">{t.transactions.income}</option>
                 </select>
               </div>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
                 <select className="input-field" value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))}>
                   {CATS.map(c=><option key={c}>{c}</option>)}
                 </select>
                 <input className="input-field" type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/>
               </div>
-              <div style={{ display:'flex', gap:10, marginTop:6 }}>
-                <button className="btn-ghost" style={{ flex:1 }} onClick={()=>setShow(false)}>{t.common.cancel}</button>
-                <button className="btn-primary" style={{ flex:1 }} onClick={addTx} disabled={saving}>{saving?t.common.loading:t.common.add}</button>
+              <div style={{ display:'flex', gap:10, marginTop:4 }}>
+                <button className="btn-ghost" style={{ flex:1, minHeight:44 }} onClick={()=>setShow(false)}>{t.common.cancel}</button>
+                <button className="btn-primary" style={{ flex:2, minHeight:44 }} onClick={addTx} disabled={saving}>{saving?t.common.loading:t.common.add}</button>
               </div>
             </div>
           </div>
-        </div>
+          <style>{`
+            @keyframes txSheetUp { from { transform:translateY(60px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+            @media (min-width:768px) {
+              .tx-modal {
+                bottom:auto!important; left:50%!important; right:auto!important;
+                top:50%!important; transform:translate(-50%,-50%)!important;
+                width:440px!important; border-radius:20px!important; animation:none!important;
+              }
+            }
+          `}</style>
+        </>
       )}
 
       {/* FAB */}
-      <button className="btn-primary" onClick={()=>setShow(true)} style={{ position:'fixed', bottom:88, right:24, width:52, height:52, borderRadius:'50%', padding:0, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 16px rgba(1,121,254,.4)', zIndex:40 }}>
+      <button className="btn-primary" onClick={()=>setShow(true)} style={{ position:'fixed', bottom:102, right:20, width:52, height:52, borderRadius:'50%', padding:0, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 16px rgba(1,121,254,.4)', zIndex:40 }}>
         <Plus size={22}/>
       </button>
 
