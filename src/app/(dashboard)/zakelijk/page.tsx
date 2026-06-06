@@ -147,7 +147,8 @@ export default function ZakelijkPage() {
         ))}
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:20 }}>
+      {/* mobile-stack: 2-kolom op desktop, 1-kolom op mobiel */}
+      <div className="mobile-stack" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:20 }}>
         {/* Opdrachtgevers */}
         <div className="card" style={{ padding:24 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>

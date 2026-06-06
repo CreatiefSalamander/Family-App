@@ -61,8 +61,8 @@ export default function SchuldenPage() {
         </div>
       </div>
 
-      {/* KPI cards */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16, marginBottom:24 }}>
+      {/* KPI cards — kpi-grid-3: 3-kolom op desktop, 2-kolom op mobiel */}
+      <div className="kpi-grid-3" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16, marginBottom:24 }}>
         {[
           { label:t.debts.total,   value:fmtEuro(totaalRest),  color:'#EF4444', border:'#EF4444', bg:'#FEF2F2' },
           { label:t.debts.monthly, value:fmtEuro(totaalMaand), color:'#F59E0B', border:'#F59E0B', bg:'#FFFBEB' },

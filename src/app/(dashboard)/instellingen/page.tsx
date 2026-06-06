@@ -72,8 +72,8 @@ export default function InstellingenPage() {
 
       {/* settings-layout = flex-row op desktop, flex-col op mobiel via CSS */}
       <div className="settings-layout" style={{ display:'flex', gap:20, alignItems:'flex-start' }}>
-        {/* Zijnavigatie — settings-sidenav klasse voor mobile override */}
-        <div className="settings-sidenav card" style={{ padding:8, width:200, flexShrink:0 }}>
+        {/* Zijnavigatie — settings-nav klasse voor mobile override */}
+        <div className="settings-nav card" style={{ padding:8, width:200, flexShrink:0 }}>
           <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
             {TABS.map(tb=>(
               <button key={tb.id} onClick={()=>setTab(tb.id)} style={{

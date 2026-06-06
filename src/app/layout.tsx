@@ -29,6 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <meta name="mobile-web-app-capable" content="yes" />
+        {/* Preconnect voor Google Fonts — voorkomt render-blocking font load */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* DNS prefetch voor Supabase en externe API's */}
+        <link rel="dns-prefetch" href="https://lttxjfrtfrjnlazmbcyq.supabase.co" />
       </head>
       <body>
         {/* DemoProvider wraps alles zodat elke pagina demo-modus kan detecteren */}

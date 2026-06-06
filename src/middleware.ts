@@ -30,9 +30,17 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  /* Demo modus — cookie bypass (geen Supabase account nodig) */
+  const isDemoMode = request.cookies.get('demo_mode')?.value === '1';
+
   const isAuthPagina = pathname.startsWith('/login') ||
                        pathname.startsWith('/register') ||
                        pathname.startsWith('/onboarding');
+
+  /* Demo modus mag altijd door naar dashboard */
+  if (isDemoMode && !isAuthPagina) {
+    return supabaseResponse;
+  }
 
   /* Niet ingelogd + geen auth pagina → naar login */
   if (!user && !isAuthPagina) {
@@ -41,11 +49,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  /* Ingelogd + op login pagina → naar /home */
+  /* Ingelogd + op login pagina → naar /home (alleen als remember-me actief) */
   if (user && pathname === '/login') {
-    const url = request.nextUrl.clone();
-    url.pathname = '/home';
-    return NextResponse.redirect(url);
+    const heeftPersistCookie = request.cookies.get('household_persist')?.value === '1';
+    if (heeftPersistCookie) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/home';
+      return NextResponse.redirect(url);
+    }
+    /* Geen remember-me: wis auth cookies en toon login */
+    const response = NextResponse.next({ request });
+    const authCookies = request.cookies.getAll().filter(c => c.name.startsWith('sb-'));
+    authCookies.forEach(c => response.cookies.delete(c.name));
+    return response;
   }
 
   return supabaseResponse;

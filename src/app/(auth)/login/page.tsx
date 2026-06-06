@@ -15,8 +15,10 @@ export default function LoginPage() {
   const sb = createClient();
   const { activeerDemo } = useDemo();
 
-  // Demo modus — laad nep data en stuur door naar /home
+  // Demo modus — zet cookie + stuur door naar /home
   function handleDemo() {
+    // Zorg dat evt. eerder household_persist cookie weg is
+    document.cookie = 'household_persist=; path=/; max-age=0';
     activeerDemo();
     router.push('/home');
   }
@@ -27,6 +29,14 @@ export default function LoginPage() {
     try {
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) throw error;
+
+      // Remember-me: sla persistentie-cookie op (30 dagen) of verwijder hem
+      if (onthoudMe) {
+        document.cookie = 'household_persist=1; path=/; max-age=2592000; SameSite=Lax';
+      } else {
+        document.cookie = 'household_persist=; path=/; max-age=0';
+      }
+
       const { data: profiel } = await sb.from('profielen').select('onboarding_voltooid').eq('id', data.user.id).single();
       router.push(profiel?.onboarding_voltooid === false ? '/onboarding' : '/home');
     } catch (err: unknown) {
