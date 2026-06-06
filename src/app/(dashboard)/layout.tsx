@@ -6,7 +6,7 @@ import Sidebar                      from '@/components/layout/Sidebar';
 import MobileNav                    from '@/components/layout/MobileNav';
 import AIChatbot                    from '@/components/ai/AIChatbot';
 import type { Lang }                from '@/lib/translations';
-import { Euro, Bell, RefreshCw }    from 'lucide-react';
+import { RefreshCw }                from 'lucide-react';
 
 export default async function DashboardLayout({
   children,
@@ -65,26 +65,21 @@ export default async function DashboardLayout({
         height: 60,
         padding: '0 16px',
       }}>
-        {/* Links: hamburger menu */}
-        <button
+        {/* Links: hamburger menu (static — interactie via MobileNav client component) */}
+        <div
           style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
             padding: 8,
             display: 'flex',
             flexDirection: 'column',
             gap: 5,
-            WebkitTapHighlightColor: 'transparent',
-            minHeight: 'unset',
+            cursor: 'pointer',
           }}
-          onClick={() => {}}
           aria-label="Menu"
         >
           <div style={{ width: 22, height: 2, background: '#1A1F36', borderRadius: 2 }} />
           <div style={{ width: 22, height: 2, background: '#1A1F36', borderRadius: 2 }} />
           <div style={{ width: 16, height: 2, background: '#1A1F36', borderRadius: 2 }} />
-        </button>
+        </div>
 
         {/* Midden: app naam */}
         <span style={{
